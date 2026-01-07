@@ -9,6 +9,8 @@
     "test": "tsx --test test/unit/**/*.test.ts"
   },
   "dependencies": {
+    "@bull-board/api": "^6.16.2",
+    "@bull-board/fastify": "^6.16.2",
     "@fastify/cors": "^10.0.0",
     "axios": "^1.7.0",
     "bullmq": "^5.0.0",
