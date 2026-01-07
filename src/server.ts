@@ -9,32 +9,34 @@ import { logger } from './lib/logger';
 let context: AppContext | null = null;
 let isShuttingDown = false;
 
+const log = logger.child({ scope: 'Server' });
+
 async function gracefulShutdown(signal: string): Promise<void> {
   if (isShuttingDown) return;
   isShuttingDown = true;
 
-  logger.info(`[Server] Received ${signal}, starting graceful shutdown...`);
+  log.info('shutdown.start', { signal });
 
   if (context) {
     try {
-      logger.info('[Server] Closing HTTP server...');
+      log.info('shutdown.http.close');
       await context.app.close();
 
-      logger.info('[Server] Closing workers...');
+      log.info('shutdown.workers.close');
       await closeWorkers(context.workers);
 
-      logger.info('[Server] Closing browser...');
+      log.info('shutdown.browser.close');
       await closeBrowser();
 
-      logger.info('[Server] Closing Redis...');
+      log.info('shutdown.redis.close');
       await redis.quit();
 
-      logger.info('[Server] Closing MongoDB...');
+      log.info('shutdown.mongo.close');
       await mongoose.disconnect();
 
-      logger.info('[Server] Graceful shutdown completed');
+      log.info('shutdown.complete');
     } catch (error) {
-      logger.error('[Server] Error during shutdown:', error);
+      log.error('shutdown.error', { error });
     }
   }
 
@@ -48,10 +50,10 @@ async function main() {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
   await context.app.listen({ port: env.PORT, host: '0.0.0.0' });
-  logger.info(`[Server] Listening on port ${env.PORT}`);
+  log.info('listen', { port: env.PORT });
 }
 
 main().catch((error) => {
-  logger.error('[Server] Startup error:', error);
+  log.error('startup.error', { error });
   process.exit(1);
 });

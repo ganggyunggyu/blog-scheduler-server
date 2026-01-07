@@ -1,5 +1,5 @@
 import { Job } from 'bullmq';
-import { generateManuscript, prepareImages } from '../services/manuscript.service';
+import { prepareJob } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { publishQueue } from './queues';
 import { logger } from '../lib/logger';
@@ -9,13 +9,15 @@ interface GenerateJobData {
   scheduleJobId: string;
   keyword: string;
   account: { id: string; password: string };
-  scheduledAt: string;
   service: string;
   ref: string;
   generateImages: boolean;
   imageCount: number;
   delayBetweenPostsSeconds: number;
+  scheduledAt: string; // 네이버 예약발행 시간 (ISO format)
 }
+
+const log = logger.child({ scope: 'Generate' });
 
 export async function processGenerate(job: Job<GenerateJobData>) {
   const {
@@ -23,15 +25,20 @@ export async function processGenerate(job: Job<GenerateJobData>) {
     scheduleJobId,
     keyword,
     account,
-    scheduledAt,
     service,
     ref,
     generateImages,
     imageCount,
     delayBetweenPostsSeconds,
+    scheduledAt,
   } = job.data;
 
-  logger.info(`[Generate] Starting job ${job.id} for keyword: ${keyword}`);
+  log.info('start', {
+    jobId: job.id,
+    keyword,
+    scheduleId,
+    scheduleJobId,
+  });
 
   await ScheduleModel.findOneAndUpdate(
     { _id: scheduleId, status: 'pending' },
@@ -41,18 +48,17 @@ export async function processGenerate(job: Job<GenerateJobData>) {
   await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'generating' });
 
   try {
-    logger.info(`[Generate] Generating manuscript for: ${keyword}`);
-    const manuscript = await generateManuscript(keyword, service, ref);
-    logger.info(`[Generate] Manuscript generated: ${manuscript.title.slice(0, 30)}...`);
-
-    const images = generateImages ? await prepareImages(keyword, imageCount) : [];
-    if (images.length > 0) {
-      logger.info(`[Generate] Downloaded ${images.length} images`);
-    }
+    // 원고 + 이미지를 한 폴더에 준비
+    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount);
+    log.info('job.prepared', {
+      jobDir: prepared.jobDir,
+      title: prepared.title.slice(0, 30),
+      images: prepared.images.length,
+    });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       status: 'generated',
-      manuscriptId: manuscript.id,
+      manuscriptId: prepared.manuscriptId,
     });
 
     const publishJob = await publishQueue.add(
@@ -61,13 +67,14 @@ export async function processGenerate(job: Job<GenerateJobData>) {
         scheduleId,
         scheduleJobId,
         account,
+        jobDir: prepared.jobDir,
         manuscript: {
-          title: manuscript.title,
-          content: manuscript.content,
-          images,
+          title: prepared.title,
+          content: prepared.content,
+          images: prepared.images,
         },
-        scheduledAt,
         throttleSeconds: delayBetweenPostsSeconds,
+        scheduledAt, // 네이버 예약발행 시간 전달
       }
     );
 
@@ -75,7 +82,7 @@ export async function processGenerate(job: Job<GenerateJobData>) {
       publishJobId: String(publishJob.id),
     });
 
-    logger.info(`[Generate] Job ${job.id} completed, publish job ${publishJob.id} queued`);
+    log.info('publish.queued', { jobId: job.id, publishJobId: publishJob.id });
 
     return { scheduleJobId, publishJobId: publishJob.id };
   } catch (error) {
@@ -83,10 +90,15 @@ export async function processGenerate(job: Job<GenerateJobData>) {
     const attempts = job.opts.attempts ?? 1;
     const isFinalAttempt = job.attemptsMade + 1 >= attempts;
 
-    logger.error(`[Generate] Job ${job.id} failed (attempt ${job.attemptsMade + 1}/${attempts}): ${message}`);
+    log.error('failed', {
+      jobId: job.id,
+      attempt: job.attemptsMade + 1,
+      attempts,
+      message,
+    });
 
     if (isFinalAttempt) {
-      logger.error(`[Generate] Job ${job.id} permanently failed after ${attempts} attempts`);
+      log.error('failed.permanent', { jobId: job.id, attempts });
 
       await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
         status: 'failed',

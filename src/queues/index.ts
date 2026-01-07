@@ -12,6 +12,8 @@ export interface Workers {
   publishWorker: Worker;
 }
 
+const log = logger.child({ scope: 'Worker' });
+
 export async function initQueues(): Promise<Workers> {
   const generateWorker = new Worker(QUEUES.GENERATE, processGenerate, {
     connection,
@@ -24,31 +26,31 @@ export async function initQueues(): Promise<Workers> {
   });
 
   generateWorker.on('completed', (job) => {
-    logger.info(`[Worker] Generate job ${job.id} completed`);
+    log.info('generate.completed', { jobId: job.id });
   });
 
   generateWorker.on('failed', (job, err) => {
-    logger.error(`[Worker] Generate job ${job?.id} failed: ${err.message}`);
+    log.error('generate.failed', { jobId: job?.id, message: err.message });
   });
 
   publishWorker.on('completed', (job) => {
-    logger.info(`[Worker] Publish job ${job.id} completed`);
+    log.info('publish.completed', { jobId: job.id });
   });
 
   publishWorker.on('failed', (job, err) => {
-    logger.error(`[Worker] Publish job ${job?.id} failed: ${err.message}`);
+    log.error('publish.failed', { jobId: job?.id, message: err.message });
   });
 
-  logger.info('[Worker] Workers initialized');
+  log.info('init');
 
   return { generateWorker, publishWorker };
 }
 
 export async function closeWorkers(workers: Workers): Promise<void> {
-  logger.info('[Worker] Closing workers...');
+  log.info('close.start');
   await Promise.all([
     workers.generateWorker.close(),
     workers.publishWorker.close(),
   ]);
-  logger.info('[Worker] Workers closed');
+  log.info('close.done');
 }
