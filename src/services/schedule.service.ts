@@ -41,14 +41,12 @@ function addMinutesWithCap(base: Date, minutes: number): Date {
  * 예약 시간 계산 (여러 날에 걸쳐 분배)
  * - 당일: 현재 시간 기준 다음 정시부터 1시간 간격
  * - 다른날: 오전 6~10시 사이 랜덤 시작, 2~3시간 랜덤 간격
- * - 하루 최대 POSTS_PER_DAY개 (env 설정)
- * - 키워드가 POSTS_PER_DAY 초과시 다음날로 자동 분배
+ * - 하루 발행 개수: 2→1→2→1 패턴 반복
  * - 23:55 초과시 다음날로 넘김
  */
 export function calculateSchedule(keywords: string[], scheduleDate?: string): ScheduleItem[] {
   const now = new Date();
   const baseDate = scheduleDate ? new Date(`${scheduleDate}T00:00:00`) : now;
-  const postsPerDay = env.POSTS_PER_DAY;
 
   const schedule: ScheduleItem[] = [];
   let keywordIndex = 0;
@@ -57,6 +55,9 @@ export function calculateSchedule(keywords: string[], scheduleDate?: string): Sc
   while (keywordIndex < keywords.length) {
     const targetDate = new Date(baseDate);
     targetDate.setDate(targetDate.getDate() + dayOffset);
+
+    // 2→1→2→1 패턴: 짝수일(0,2,4...)은 2개, 홀수일(1,3,5...)은 1개
+    const postsPerDay = dayOffset % 2 === 0 ? 2 : 1;
 
     const isToday = isSameDay(targetDate, now);
     let currentTime: Date;
