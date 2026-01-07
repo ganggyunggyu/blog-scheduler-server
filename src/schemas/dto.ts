@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { env } from '../config/env';
 
 export const accountSchema = z.object({
   id: z.string().min(1),
@@ -17,14 +16,10 @@ export const createScheduleSchema = z.object({
       })
     )
     .min(1),
-  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  startHour: z.number().min(0).max(23).default(10),
-  postsPerDay: z.number().min(1).max(10).default(3),
-  intervalHours: z.number().min(1).max(12).default(2),
+  scheduleDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   generateImages: z.boolean().default(true),
   imageCount: z.number().min(1).max(10).default(5),
   delayBetweenPostsSeconds: z.number().min(0).max(600).default(10),
-  leadTimeMinutes: z.number().min(0).max(24 * 60).default(env.LEAD_TIME_MINUTES),
 });
 
 export type CreateScheduleDto = z.infer<typeof createScheduleSchema>;
