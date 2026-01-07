@@ -4,6 +4,8 @@ import { getBrowser } from '../lib/playwright';
 import { checkRateLimit, getSession, saveSession } from './session.service';
 import { logger } from '../lib/logger';
 
+const log = logger.child({ scope: 'Login' });
+
 async function pasteText(page: Page, selector: string, text: string): Promise<void> {
   await page.click(selector);
   await page.evaluate(
@@ -22,6 +24,7 @@ export async function naverLogin(
   id: string,
   password: string
 ): Promise<{ cookies: unknown[]; success: boolean; message: string }> {
+  const maskedAccount = `${id.slice(0, 3)}***`;
   const browser = await getBrowser();
   const context = await browser.newContext({
     userAgent:
@@ -30,31 +33,66 @@ export async function naverLogin(
   const page = await context.newPage();
 
   try {
-    await page.goto('https://nid.naver.com/nidlogin.login', { waitUntil: 'domcontentloaded' });
+    const url = 'https://nid.naver.com/nidlogin.login';
+    log.info('navigate', { account: maskedAccount, url });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
+    // 캡챠 먼저 확인 (로그인 시도 전)
+    const captchaBefore = await page.$(SELECTORS.login.captcha);
+    if (captchaBefore) {
+      log.warn('captcha.detected', { account: maskedAccount, stage: 'before' });
+      return { cookies: [], success: false, message: '캡차 필요' };
+    }
+
+    log.info('credentials.enter', { account: maskedAccount });
     await pasteText(page, SELECTORS.login.id, id);
     await page.waitForTimeout(300);
     await pasteText(page, SELECTORS.login.pw, password);
     await page.waitForTimeout(500);
 
+    log.info('submit', { account: maskedAccount });
     await page.click(SELECTORS.login.btn);
 
-    const captcha = await page.$(SELECTORS.login.captcha);
-    if (captcha) {
-      logger.warn('Captcha detected for account:', id.slice(0, 3) + '***');
-      return { cookies: [], success: false, message: '캡차 필요' };
+    // 로그인 결과 대기: 성공(naver.com) 또는 에러 메시지
+    log.info('result.wait', { account: maskedAccount });
+    try {
+      await Promise.race([
+        page.waitForURL((url) => !url.href.includes('nid.naver.com/nidlogin'), { timeout: 15000 }),
+        page.waitForSelector('#err_common, .error_message, #captcha', { timeout: 15000 }),
+      ]);
+    } catch {
+      // 타임아웃 시 현재 상태로 진행
     }
 
-    await page.waitForURL('https://www.naver.com/', { timeout: 30000 });
+    await page.waitForTimeout(1000);
+
+    // 아직 로그인 페이지면 에러 확인
+    if (page.url().includes('nid.naver.com')) {
+      const errorEl = await page.$('#err_common, .error_message');
+      if (errorEl) {
+        const errorText = await errorEl.textContent();
+        log.warn('error', { account: maskedAccount, message: errorText?.trim() ?? '로그인 실패' });
+        return { cookies: [], success: false, message: errorText?.trim() || '로그인 실패' };
+      }
+
+      const captchaEl = await page.$('#captcha');
+      if (captchaEl) {
+        log.warn('captcha.required', { account: maskedAccount });
+        return { cookies: [], success: false, message: '캡차 필요' };
+      }
+
+      log.warn('page.still_login', { account: maskedAccount });
+      return { cookies: [], success: false, message: '로그인 실패 (페이지 이동 안됨)' };
+    }
 
     const cookies = await context.cookies();
-    logger.info('Login success:', id.slice(0, 3) + '***');
+    log.info('success', { account: maskedAccount, cookies: cookies.length });
 
     return { cookies, success: true, message: 'Login success' };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
-    logger.error('Login failed:', id.slice(0, 3) + '***', message);
+    log.error('failed', { account: maskedAccount, message });
     return { cookies: [], success: false, message };
   } finally {
     await context.close();

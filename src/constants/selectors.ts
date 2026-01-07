@@ -7,24 +7,31 @@ export const SELECTORS = {
   },
 
   editor: {
-    title: '.se-title-input',
-    content: '.se-text-paragraph',
-    imageUpload: 'input[type="file"]',
+    // 에디터 영역 (클릭해서 포커스)
+    content: 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph',
+    // 이미지 버튼
+    imageBtn: 'button[data-name="image"], button.se-toolbar-button-image',
+    // 정렬 드롭다운
+    alignDropdown: 'button[data-name="align-drop-down-with-justify"]',
+    alignCenter: 'button[data-value="center"], button.se-toolbar-option-align-center-button',
   },
 
   publish: {
     btn: "button.publish_btn__m9KHH, button[data-click-area='tpb.publish']",
     confirm: "button.confirm_btn__WEaBq, button[data-testid='seOnePublishBtn']",
-    publicRadio: 'input#open_public',
-    privateRadio: 'input#open_private',
+    publicRadio: "label[for='open_public']",
+    privateRadio: "label[for='open_private']",
     scheduleRadio: "label[for='radio_time2'], label.radio_label__mB6ia",
+    timeSetting: "div.time_setting__v6YRU, div[class*='time_setting']",
     hourSelect: 'select.hour_option__J_heO',
     minuteSelect: 'select.minute_option__Vb3xB',
-    dateInput: "input.input_date__QmA0s",
+    dateInput: 'input.input_date__QmA0s',
     datepickerNextMonth: 'button.ui-datepicker-next',
     datepickerPrevMonth: 'button.ui-datepicker-prev',
     datepickerYear: 'span.ui-datepicker-year',
     datepickerMonth: 'span.ui-datepicker-month',
+    datepickerHeader: '.ui-datepicker-header',
+    tagInput: 'input#tag-input, input.tag_input__rvUB5',
   },
 
   popup: {

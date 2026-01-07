@@ -29,6 +29,8 @@ const envSchema = z.object({
   SESSION_TTL_SECONDS: z.coerce.number().default(60 * 60 * 2),
   LOGIN_RATE_LIMIT: z.coerce.number().default(3),
   LOGIN_RATE_WINDOW_SECONDS: z.coerce.number().default(60),
+
+  POSTS_PER_DAY: z.coerce.number().default(3),
 });
 
 export const env = envSchema.parse(process.env);

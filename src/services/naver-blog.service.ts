@@ -2,18 +2,16 @@ import type { Frame, Page } from 'playwright';
 import { SELECTORS } from '../constants/selectors';
 import { getBrowser } from '../lib/playwright';
 import { logger } from '../lib/logger';
+import { ProgressBar } from '../lib/progress';
+
+const log = logger.child({ scope: 'WritePost' });
 
 interface WritePostParams {
   cookies: unknown[];
   title: string;
   content: string;
   images?: string[];
-  scheduleTime?: Date;
-}
-
-export function shouldPublishImmediately(scheduleTime?: Date): boolean {
-  if (!scheduleTime) return true;
-  return scheduleTime.getTime() <= Date.now();
+  scheduleTime?: string; // ISO format: "2026-01-07T14:00:00+09:00"
 }
 
 async function waitForFrame(page: Page, name: string, timeout = 10000): Promise<Frame> {
@@ -75,18 +73,70 @@ function matchImagesToSubheadings(paragraphs: string[], images: string[]): Map<n
 }
 
 async function uploadImage(page: Page, frame: Frame, imagePath: string): Promise<boolean> {
+  const fileName = imagePath.split('/').pop();
+  log.info('image.upload.start', { fileName, path: imagePath });
+
+  // 파일 존재 확인
+  const fs = await import('fs/promises');
   try {
-    const imageBtn = 'button[data-name="image"], button.se-toolbar-button-image';
+    await fs.access(imagePath);
+  } catch {
+    log.warn('image.missing', { path: imagePath });
+    return false;
+  }
+
+  try {
+    // 이미지 버튼 찾기 (여러 셀렉터 시도)
+    const selectors = [
+      'button[data-name="image"]',
+      'button.se-toolbar-button-image',
+      'button[data-name=image]',
+      '.se-toolbar button[data-name="image"]',
+    ];
+
+    let imageBtn = null;
+    for (const selector of selectors) {
+      imageBtn = await frame.$(selector);
+      if (imageBtn) {
+        log.info('image.button.found', { selector });
+        break;
+      }
+    }
+
+    if (!imageBtn) {
+      log.warn('image.button.missing');
+      // 현재 프레임의 버튼들 로깅
+      const buttons = await frame.$$('button');
+      log.info('image.button.scan', { count: buttons.length });
+      return false;
+    }
+
+    // 버튼이 보이는지 확인
+    const isVisible = await imageBtn.isVisible();
+    log.info('image.button.visible', { visible: isVisible });
+
+    if (!isVisible) {
+      // 스크롤해서 보이게
+      await imageBtn.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(500);
+    }
+
+    // file_chooser 이벤트 대기하면서 버튼 클릭
+    log.info('image.click');
     const [fileChooser] = await Promise.all([
-      page.waitForEvent('filechooser', { timeout: 5000 }),
-      frame.click(imageBtn, { timeout: 5000 }),
+      page.waitForEvent('filechooser', { timeout: 10000 }),
+      imageBtn.click({ force: true }),
     ]);
+
+    log.info('image.filechooser');
     await fileChooser.setFiles(imagePath);
-    await page.waitForTimeout(2000);
-    logger.info(`[WritePost] Image uploaded: ${imagePath.split('/').pop()}`);
+    await page.waitForTimeout(3000);
+
+    log.info('image.uploaded', { fileName });
     return true;
   } catch (error) {
-    logger.warn(`[WritePost] Image upload failed: ${imagePath.split('/').pop()}`);
+    const msg = error instanceof Error ? error.message : String(error);
+    log.warn('image.upload.failed', { fileName, message: msg });
     return false;
   }
 }
@@ -99,16 +149,15 @@ async function typeContentWithImages(
 ): Promise<void> {
   const paragraphs = content.split('\n');
   const imageMap = images?.length ? matchImagesToSubheadings(paragraphs, images) : new Map();
+  const uploadTotal = imageMap.size;
+  const uploadProgress =
+    uploadTotal > 0
+      ? new ProgressBar({ label: 'upload', total: uploadTotal, width: 14, showStatus: true })
+      : null;
 
-  const editorSelector = 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph';
-  try {
-    const editor = await frame.waitForSelector(editorSelector, { timeout: 5000 });
-    if (editor) {
-      await editor.click();
-      await page.waitForTimeout(500);
-    }
-  } catch {
-    await frame.click(SELECTORS.editor.content);
+  log.info('content.type.start', { paragraphs: paragraphs.length, images: uploadTotal });
+  if (uploadProgress) {
+    log.info(uploadProgress.start());
   }
 
   let prevWasList = false;
@@ -136,10 +185,17 @@ async function typeContentWithImages(
     if (imagePath) {
       await page.keyboard.press('Enter');
       await page.waitForTimeout(300);
-      await uploadImage(page, frame, imagePath);
+      const uploaded = await uploadImage(page, frame, imagePath);
+      if (uploadProgress) {
+        log.info(uploadProgress.tick(uploaded ? 'ok' : 'fail'));
+      }
       await page.keyboard.press('Enter');
       await page.waitForTimeout(300);
     }
+  }
+
+  if (uploadProgress) {
+    log.info(uploadProgress.done('done'));
   }
 }
 
@@ -149,6 +205,14 @@ export async function writePost(params: WritePostParams): Promise<{
   message: string;
 }> {
   const { cookies, title, content, images, scheduleTime } = params;
+  const progress = new ProgressBar({ label: 'publish', total: 5, width: 14 });
+
+  // 예약 시간 파싱 (있으면 네이버 예약발행 UI 사용)
+  let scheduleDate: Date | null = null;
+  if (scheduleTime) {
+    scheduleDate = new Date(scheduleTime);
+    log.info('schedule.time', { scheduleTime, parsed: scheduleDate.toISOString() });
+  }
 
   const browser = await getBrowser();
   const context = await browser.newContext({
@@ -159,93 +223,291 @@ export async function writePost(params: WritePostParams): Promise<{
   const page = await context.newPage();
 
   try {
-    logger.info('[WritePost] Opening blog write page');
-    await page.goto('https://blog.naver.com/GoBlogWrite.naver', { waitUntil: 'domcontentloaded' });
+    const url = 'https://blog.naver.com/GoBlogWrite.naver';
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3000);
+    log.info(progress.step('page.open'), { url });
 
     const frame = await waitForFrame(page, 'mainFrame');
-    logger.info('[WritePost] mainFrame found');
+    await page.waitForTimeout(2000);
 
     await dismissPopups(frame);
 
-    logger.info('[WritePost] Entering title');
-    await frame.locator(SELECTORS.editor.title).waitFor({ state: 'visible', timeout: 10000 });
-    await frame.fill(SELECTORS.editor.title, title);
+    // 에디터 영역 클릭해서 포커스
+    const editorSelector = 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph';
+    try {
+      const editor = await frame.waitForSelector(editorSelector, { timeout: 10000 });
+      if (editor) {
+        await editor.click();
+        await page.waitForTimeout(500);
+      }
+    } catch {
+      log.warn('editor.selector.missing');
+      await frame.click(SELECTORS.editor.content);
+    }
 
-    logger.info('[WritePost] Entering content');
-    await typeContentWithImages(page, frame, content, images);
+    // 가운데 정렬 설정
+    try {
+      await frame.click(SELECTORS.editor.alignDropdown, { timeout: 3000 });
+      await page.waitForTimeout(300);
+      await frame.click(SELECTORS.editor.alignCenter, { timeout: 3000 });
+      await page.waitForTimeout(300);
+      log.info('align.center');
+    } catch {
+      log.warn('align.center.failed');
+    }
 
-    logger.info('[WritePost] Opening publish dialog');
+    log.info(progress.step('editor.ready'));
+
+    // 제목 + 본문을 한번에 입력 (Python 방식)
+    const fullText = `${title}\n${content}`;
+    await typeContentWithImages(page, frame, fullText, images);
+    log.info(progress.step('content.entered'));
+
     await frame.click(SELECTORS.publish.btn);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
+    log.info(progress.step('publish.dialog'));
 
-    const publishNow = shouldPublishImmediately(scheduleTime);
+    // 발행 다이얼로그 컨텍스트 결정 (frame 또는 page)
+    // 네이버 블로그는 발행 다이얼로그가 mainFrame 내에 있음
+    const dialogCtx = frame;
 
-    if (!publishNow && scheduleTime) {
-      logger.info('[WritePost] Setting schedule time');
-      await frame.click(SELECTORS.publish.scheduleRadio);
-      await page.waitForTimeout(500);
+    // 공개 설정
+    try {
+      await dialogCtx.click(SELECTORS.publish.publicRadio);
+      await page.waitForTimeout(300);
+    } catch {
+      // page에서 시도
+      await page.click(SELECTORS.publish.publicRadio);
+      await page.waitForTimeout(300);
+    }
 
-      const now = new Date();
-      const isSameDate =
-        now.getFullYear() === scheduleTime.getFullYear() &&
-        now.getMonth() === scheduleTime.getMonth() &&
-        now.getDate() === scheduleTime.getDate();
+    // 예약 발행 처리
+    if (scheduleDate) {
+      log.info('schedule.mode', { scheduleDate: scheduleDate.toISOString() });
 
-      if (!isSameDate) {
-        logger.info('[WritePost] Setting date via datepicker');
-        await frame.click(SELECTORS.publish.dateInput, { timeout: 5000 });
-        await frame.locator('.ui-datepicker-header').waitFor({ state: 'visible', timeout: 5000 });
+      // 1. 예약 라디오 버튼 클릭 (frame과 page 모두 시도)
+      const scheduleRadioSelectors = [
+        'label[for="radio_time2"]',
+        'label.radio_label__mB6ia',
+        SELECTORS.publish.scheduleRadio,
+      ];
 
-        const monthDiff =
-          (scheduleTime.getFullYear() - now.getFullYear()) * 12 +
-          (scheduleTime.getMonth() - now.getMonth());
+      let radioClicked = false;
 
-        const nextClicks = Math.max(0, monthDiff);
-        const prevClicks = Math.max(0, -monthDiff);
-
-        for (let i = 0; i < nextClicks; i += 1) {
-          await frame.click(SELECTORS.publish.datepickerNextMonth, { timeout: 3000 });
-          await page.waitForTimeout(300);
-        }
-
-        for (let i = 0; i < prevClicks; i += 1) {
-          await frame.click(SELECTORS.publish.datepickerPrevMonth, { timeout: 3000 });
-          await page.waitForTimeout(300);
-        }
-
-        const dayButtons = await frame.$$('td:not(.ui-state-disabled) button.ui-state-default');
-        const targetDay = String(scheduleTime.getDate());
-        for (const button of dayButtons) {
-          const text = (await button.textContent())?.trim();
-          if (text === targetDay) {
-            await button.click();
-            await page.waitForTimeout(300);
+      // frame에서 시도
+      for (const selector of scheduleRadioSelectors) {
+        try {
+          const el = await frame.$(selector);
+          if (el && (await el.isVisible())) {
+            await el.click();
+            await page.waitForTimeout(1000);
+            log.info('schedule.radio.clicked', { selector, ctx: 'frame' });
+            radioClicked = true;
             break;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      // page에서 시도
+      if (!radioClicked) {
+        for (const selector of scheduleRadioSelectors) {
+          try {
+            const el = await page.$(selector);
+            if (el && (await el.isVisible())) {
+              await el.click();
+              await page.waitForTimeout(1000);
+              log.info('schedule.radio.clicked', { selector, ctx: 'page' });
+              radioClicked = true;
+              break;
+            }
+          } catch {
+            continue;
           }
         }
       }
 
-      const hour = scheduleTime.getHours().toString().padStart(2, '0');
-      const minute = (Math.floor(scheduleTime.getMinutes() / 10) * 10).toString().padStart(2, '0');
-      logger.info(`[WritePost] Setting time: ${hour}:${minute}`);
-      await frame.selectOption(SELECTORS.publish.hourSelect, hour);
-      await frame.selectOption(SELECTORS.publish.minuteSelect, minute);
+      // 텍스트로 찾기 시도
+      if (!radioClicked) {
+        try {
+          await frame.getByText('예약', { exact: true }).click();
+          await page.waitForTimeout(1000);
+          log.info('schedule.radio.clicked', { method: 'getByText', ctx: 'frame' });
+          radioClicked = true;
+        } catch {
+          try {
+            await page.getByText('예약', { exact: true }).click();
+            await page.waitForTimeout(1000);
+            log.info('schedule.radio.clicked', { method: 'getByText', ctx: 'page' });
+            radioClicked = true;
+          } catch {
+            log.warn('schedule.radio.getByText.failed');
+          }
+        }
+      }
+
+      if (!radioClicked) {
+        throw new Error('예약 라디오 버튼을 찾을 수 없음');
+      }
+
+      // time_setting 영역이 나타나는지 확인 (frame과 page 모두)
+      let timeSettingVisible = false;
+      try {
+        await frame.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 3000 });
+        log.info('schedule.timeSetting.visible', { ctx: 'frame' });
+        timeSettingVisible = true;
+      } catch {
+        try {
+          await page.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 3000 });
+          log.info('schedule.timeSetting.visible', { ctx: 'page' });
+          timeSettingVisible = true;
+        } catch {
+          log.warn('schedule.timeSetting.notFound');
+        }
+      }
+
+      if (!timeSettingVisible) {
+        // 재클릭 시도
+        log.warn('schedule.timeSetting.retry');
+        try {
+          await frame.getByText('예약', { exact: true }).click({ force: true });
+        } catch {
+          await page.getByText('예약', { exact: true }).click({ force: true });
+        }
+        await page.waitForTimeout(1000);
+      }
+
+      // 시간 선택기 확인 (frame과 page 모두 시도)
+      const hourSelectors = [
+        'select.hour_option__J_heO',
+        'select[class*="hour"]',
+        '.time_setting__v6YRU select:first-of-type',
+        'div[class*="time_setting"] select:first-of-type',
+      ];
+
+      let hourSelectFound = false;
+      let hourSelectCtx: typeof frame | typeof page = frame;
+
+      // frame에서 시도
+      for (const selector of hourSelectors) {
+        try {
+          const el = await frame.waitForSelector(selector, { timeout: 1500 });
+          if (el) {
+            log.info('schedule.hourSelect.found', { selector, ctx: 'frame' });
+            hourSelectFound = true;
+            hourSelectCtx = frame;
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      // page에서 시도
+      if (!hourSelectFound) {
+        for (const selector of hourSelectors) {
+          try {
+            const el = await page.waitForSelector(selector, { timeout: 1500 });
+            if (el) {
+              log.info('schedule.hourSelect.found', { selector, ctx: 'page' });
+              hourSelectFound = true;
+              hourSelectCtx = page;
+              break;
+            }
+          } catch {
+            continue;
+          }
+        }
+      }
+
+      if (!hourSelectFound) {
+        // 디버그: 모든 select 요소 개수
+        const frameSelects = await frame.$$('select');
+        const pageSelects = await page.$$('select');
+        log.error('schedule.hourSelect.missing', {
+          frameSelectCount: frameSelects.length,
+          pageSelectCount: pageSelects.length,
+        });
+        throw new Error('시간 선택기를 찾을 수 없음');
+      }
+
+      // 2. 날짜 설정 (오늘이 아닌 경우에만)
+      const today = new Date();
+      const isToday =
+        scheduleDate.getFullYear() === today.getFullYear() &&
+        scheduleDate.getMonth() === today.getMonth() &&
+        scheduleDate.getDate() === today.getDate();
+
+      if (!isToday) {
+        // 날짜 입력 필드 클릭해서 캘린더 열기
+        await hourSelectCtx.click(SELECTORS.publish.dateInput, { timeout: 3000 });
+        await page.waitForTimeout(500);
+
+        // 캘린더가 열렸는지 확인
+        await hourSelectCtx.waitForSelector(SELECTORS.publish.datepickerHeader, { timeout: 3000 });
+        log.info('schedule.datepicker.opened');
+
+        // 월 이동 계산
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        const targetMonth = scheduleDate.getMonth();
+        const targetYear = scheduleDate.getFullYear();
+        const monthDiff = (targetYear - currentYear) * 12 + (targetMonth - currentMonth);
+
+        for (let i = 0; i < monthDiff; i += 1) {
+          await hourSelectCtx.click(SELECTORS.publish.datepickerNextMonth, { timeout: 3000 });
+          await page.waitForTimeout(300);
+        }
+
+        // 날짜 버튼 클릭
+        const daySelector = 'td:not(.ui-state-disabled) button.ui-state-default';
+        const dayButtons = await hourSelectCtx.$$(daySelector);
+        const targetDay = scheduleDate.getDate().toString();
+        let daySelected = false;
+
+        for (const btn of dayButtons) {
+          const text = await btn.textContent();
+          if (text && text.trim() === targetDay) {
+            await btn.click();
+            await page.waitForTimeout(500);
+            log.info('schedule.date.selected', { day: targetDay });
+            daySelected = true;
+            break;
+          }
+        }
+
+        if (!daySelected) {
+          throw new Error(`날짜 선택 실패: ${targetDay}일`);
+        }
+      }
+
+      // 3. 시간 설정
+      const hourStr = scheduleDate.getHours().toString().padStart(2, '0');
+      const minuteStr = (Math.floor(scheduleDate.getMinutes() / 10) * 10).toString().padStart(2, '0');
+
+      await hourSelectCtx.selectOption(SELECTORS.publish.hourSelect, hourStr);
+      await page.waitForTimeout(300);
+      await hourSelectCtx.selectOption(SELECTORS.publish.minuteSelect, minuteStr);
+      await page.waitForTimeout(300);
+
+      log.info('schedule.time.set', { hour: hourStr, minute: minuteStr });
     }
 
-    logger.info('[WritePost] Setting public visibility and confirming');
-    await frame.click(SELECTORS.publish.publicRadio);
-    await page.waitForTimeout(300);
+    // 최종 발행 버튼 클릭
     await frame.click(SELECTORS.publish.confirm);
+    log.info(progress.step('publish.confirm'));
 
     await page.waitForTimeout(3000);
 
     const postUrl = page.url();
-    logger.info(`[WritePost] Completed: ${postUrl}`);
+    log.info(progress.done('publish.done'), { postUrl });
 
     return { success: true, postUrl, message: 'Publish success' };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Publish failed';
-    logger.error(`[WritePost] Failed: ${message}`);
+    log.error('publish.failed', { message });
     return { success: false, message };
   } finally {
     await context.close();
