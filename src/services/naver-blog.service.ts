@@ -179,6 +179,23 @@ async function typeContentWithImages(
     if (i < paragraphs.length - 1) {
       await page.keyboard.press('Enter');
       await page.waitForTimeout(100);
+
+      // 제목(첫 줄) 입력 후 본문 시작할 때 가운데 정렬 다시 설정
+      if (i === 0) {
+        try {
+          const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
+          if (alignBtn && (await alignBtn.isVisible())) {
+            await alignBtn.click();
+            await page.waitForTimeout(500);
+            await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 2000 });
+            await frame.click(SELECTORS.editor.alignCenter);
+            await page.waitForTimeout(300);
+            log.info('align.center.body');
+          }
+        } catch {
+          // 무시
+        }
+      }
     }
 
     const imagePath = imageMap.get(i);
@@ -248,11 +265,16 @@ export async function writePost(params: WritePostParams): Promise<{
 
     // 가운데 정렬 설정
     try {
-      await frame.click(SELECTORS.editor.alignDropdown, { timeout: 3000 });
-      await page.waitForTimeout(300);
-      await frame.click(SELECTORS.editor.alignCenter, { timeout: 3000 });
-      await page.waitForTimeout(300);
-      log.info('align.center');
+      const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
+      if (alignBtn && (await alignBtn.isVisible())) {
+        await alignBtn.click();
+        await page.waitForTimeout(500);
+        // 드롭다운 메뉴가 열릴 때까지 대기
+        await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 3000 });
+        await frame.click(SELECTORS.editor.alignCenter);
+        await page.waitForTimeout(300);
+        log.info('align.center');
+      }
     } catch {
       log.warn('align.center.failed');
     }

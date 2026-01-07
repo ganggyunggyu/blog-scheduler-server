@@ -12,8 +12,8 @@ export const SELECTORS = {
     // 이미지 버튼
     imageBtn: 'button[data-name="image"], button.se-toolbar-button-image',
     // 정렬 드롭다운
-    alignDropdown: 'button[data-name="align-drop-down-with-justify"]',
-    alignCenter: 'button[data-value="center"], button.se-toolbar-option-align-center-button',
+    alignDropdown: 'button[data-name="align-drop-down-with-justify"], button.se-align-left-toolbar-button',
+    alignCenter: 'button.se-toolbar-option-align-center-button[data-value="center"]',
   },
 
   publish: {
