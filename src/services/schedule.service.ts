@@ -1,12 +1,51 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
-import { env } from '../config/env';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+
+const SCHEDULE_MODE = '2';
+
+const getPostsPerDay = (mode: string, dayOffset: number): number => {
+  switch (mode) {
+    case '2':
+      return 2;
+    case '3':
+      return 3;
+    case '2121':
+      return dayOffset % 2 === 0 ? 2 : 1;
+    default:
+      return 3;
+  }
+};
 
 export interface ScheduleItem {
   keyword: string;
+  category?: string;
   scheduledAt: Date;
   slot: number;
 }
+
+export const parseKeywordWithCategory = (input: string): { keyword: string; category?: string } => {
+  const trimmed = input.trim();
+
+  if (trimmed.includes(':')) {
+    const colonIndex = trimmed.lastIndexOf(':');
+    const keyword = trimmed.slice(0, colonIndex).trim();
+    const category = trimmed.slice(colonIndex + 1).trim();
+
+    if (keyword && category) {
+      return { keyword, category };
+    }
+  }
+
+  const parts = trimmed.split(/\s+/);
+  if (parts.length <= 1) {
+    return { keyword: trimmed };
+  }
+  const category = parts.pop()!;
+  return {
+    keyword: parts.join(' '),
+    category,
+  };
+};
 
 export interface CreateScheduleInput {
   accountId: string;
@@ -19,11 +58,10 @@ export interface CreateScheduleInput {
   keywords: string[];
 }
 
-function randomBetween(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const randomBetween = (min: number, max: number): number =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
-function addMinutesWithCap(base: Date, minutes: number): Date {
+const addMinutesWithCap = (base: Date, minutes: number): Date => {
   const result = new Date(base.getTime() + minutes * 60 * 1000);
 
   if (result.getDate() !== base.getDate()) {
@@ -35,16 +73,9 @@ function addMinutesWithCap(base: Date, minutes: number): Date {
   }
 
   return result;
-}
+};
 
-/**
- * 예약 시간 계산 (여러 날에 걸쳐 분배)
- * - 당일: 현재 시간 기준 다음 정시부터 1시간 간격
- * - 다른날: 오전 6~10시 사이 랜덤 시작, 2~3시간 랜덤 간격
- * - 하루 발행 개수: 2→1→2→1 패턴 반복
- * - 23:55 초과시 다음날로 넘김
- */
-export function calculateSchedule(keywords: string[], scheduleDate?: string): ScheduleItem[] {
+export const calculateSchedule = (keywords: string[], scheduleDate?: string): ScheduleItem[] => {
   const now = new Date();
   const baseDate = scheduleDate ? new Date(`${scheduleDate}T00:00:00`) : now;
 
@@ -56,8 +87,7 @@ export function calculateSchedule(keywords: string[], scheduleDate?: string): Sc
     const targetDate = new Date(baseDate);
     targetDate.setDate(targetDate.getDate() + dayOffset);
 
-    // 2→1→2→1 패턴: 짝수일(0,2,4...)은 2개, 홀수일(1,3,5...)은 1개
-    const postsPerDay = dayOffset % 2 === 0 ? 2 : 1;
+    const postsPerDay = getPostsPerDay(SCHEDULE_MODE, dayOffset);
 
     const isToday = isSameDay(targetDate, now);
     let currentTime: Date;
@@ -77,20 +107,20 @@ export function calculateSchedule(keywords: string[], scheduleDate?: string): Sc
 
     let postsThisDay = 0;
 
-    // 예약 시간이 현재보다 최소 30분 뒤여야 함
     const minScheduleTime = new Date(now.getTime() + 30 * 60 * 1000);
     if (currentTime < minScheduleTime) {
       currentTime = new Date(minScheduleTime);
     }
 
     while (keywordIndex < keywords.length && postsThisDay < postsPerDay) {
-      // 23:55 초과하면 다음날로
       if (currentTime.getHours() === 23 && currentTime.getMinutes() >= 55) {
         break;
       }
 
+      const parsed = parseKeywordWithCategory(keywords[keywordIndex]);
       schedule.push({
-        keyword: keywords[keywordIndex],
+        keyword: parsed.keyword,
+        category: parsed.category,
         scheduledAt: new Date(currentTime),
         slot: keywordIndex + 1,
       });
@@ -104,13 +134,11 @@ export function calculateSchedule(keywords: string[], scheduleDate?: string): Sc
   }
 
   return schedule;
-}
+};
 
-export function formatKst(date: Date): string {
-  return format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
-}
+export const formatKst = (date: Date): string => format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
-export async function createSchedule(input: CreateScheduleInput) {
+export const createSchedule = async (input: CreateScheduleInput) => {
   const items = calculateSchedule(input.keywords, input.scheduleDate);
 
   const schedule = await ScheduleModel.create({
@@ -129,6 +157,7 @@ export async function createSchedule(input: CreateScheduleInput) {
     items.map((item) => ({
       scheduleId: schedule._id,
       keyword: item.keyword,
+      category: item.category,
       scheduledAt: formatKst(item.scheduledAt),
       slot: item.slot,
       status: 'pending',
@@ -136,4 +165,4 @@ export async function createSchedule(input: CreateScheduleInput) {
   );
 
   return { schedule, jobs, items };
-}
+};
