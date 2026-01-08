@@ -14,6 +14,7 @@ export const SELECTORS = {
     // 정렬 드롭다운
     alignDropdown: 'button[data-name="align-drop-down-with-justify"], button.se-align-left-toolbar-button',
     alignCenter: 'button.se-toolbar-option-align-center-button[data-value="center"]',
+    alignLeft: 'button.se-toolbar-option-align-left-button[data-value="left"]',
   },
 
   publish: {
