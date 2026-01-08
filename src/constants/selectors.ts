@@ -7,11 +7,8 @@ export const SELECTORS = {
   },
 
   editor: {
-    // 에디터 영역 (클릭해서 포커스)
     content: 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph',
-    // 이미지 버튼
     imageBtn: 'button[data-name="image"], button.se-toolbar-button-image',
-    // 정렬 드롭다운
     alignDropdown: 'button[data-name="align-drop-down-with-justify"], button.se-align-left-toolbar-button',
     alignCenter: 'button.se-toolbar-option-align-center-button[data-value="center"]',
     alignLeft: 'button.se-toolbar-option-align-left-button[data-value="left"]',
@@ -33,6 +30,9 @@ export const SELECTORS = {
     datepickerMonth: 'span.ui-datepicker-month',
     datepickerHeader: '.ui-datepicker-header',
     tagInput: 'input#tag-input, input.tag_input__rvUB5',
+    categoryBtn: "button[data-click-area='tpb*i.category']",
+    categoryList: 'div.option_list_layer__YX1Tq ul.list__RcvVA',
+    categoryItem: 'span.text__sraQE',
   },
 
   popup: {

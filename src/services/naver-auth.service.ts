@@ -6,7 +6,7 @@ import { logger } from '../lib/logger';
 
 const log = logger.child({ scope: 'Login' });
 
-async function pasteText(page: Page, selector: string, text: string): Promise<void> {
+const pasteText = async (page: Page, selector: string, text: string): Promise<void> => {
   await page.click(selector);
   await page.evaluate(
     ({ sel, value }) => {
@@ -18,12 +18,12 @@ async function pasteText(page: Page, selector: string, text: string): Promise<vo
     },
     { sel: selector, value: text }
   );
-}
+};
 
-export async function naverLogin(
+export const naverLogin = async (
   id: string,
   password: string
-): Promise<{ cookies: unknown[]; success: boolean; message: string }> {
+): Promise<{ cookies: unknown[]; success: boolean; message: string }> => {
   const maskedAccount = `${id.slice(0, 3)}***`;
   const browser = await getBrowser();
   const context = await browser.newContext({
@@ -38,7 +38,6 @@ export async function naverLogin(
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
-    // 캡챠 먼저 확인 (로그인 시도 전)
     const captchaBefore = await page.$(SELECTORS.login.captcha);
     if (captchaBefore) {
       log.warn('captcha.detected', { account: maskedAccount, stage: 'before' });
@@ -54,7 +53,6 @@ export async function naverLogin(
     log.info('submit', { account: maskedAccount });
     await page.click(SELECTORS.login.btn);
 
-    // 로그인 결과 대기: 성공(naver.com) 또는 에러 메시지
     log.info('result.wait', { account: maskedAccount });
     try {
       await Promise.race([
@@ -62,12 +60,11 @@ export async function naverLogin(
         page.waitForSelector('#err_common, .error_message, #captcha', { timeout: 15000 }),
       ]);
     } catch {
-      // 타임아웃 시 현재 상태로 진행
+      // timeout
     }
 
     await page.waitForTimeout(1000);
 
-    // 아직 로그인 페이지면 에러 확인
     if (page.url().includes('nid.naver.com')) {
       const errorEl = await page.$('#err_common, .error_message');
       if (errorEl) {
@@ -97,12 +94,12 @@ export async function naverLogin(
   } finally {
     await context.close();
   }
-}
+};
 
-export async function getValidCookies(
+export const getValidCookies = async (
   accountId: string,
   password: string
-): Promise<{ cookies: unknown[]; fromCache: boolean }> {
+): Promise<{ cookies: unknown[]; fromCache: boolean }> => {
   const cached = await getSession(accountId);
   if (cached) {
     return { cookies: cached, fromCache: true };
@@ -121,4 +118,4 @@ export async function getValidCookies(
   await saveSession(accountId, result.cookies);
 
   return { cookies: result.cookies, fromCache: false };
-}
+};

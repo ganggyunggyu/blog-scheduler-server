@@ -10,7 +10,7 @@ interface CachedSession {
   lastUsed: number;
 }
 
-export async function getSession(accountId: string): Promise<unknown[] | null> {
+export const getSession = async (accountId: string): Promise<unknown[] | null> => {
   const key = `${SESSION_PREFIX}${accountId}`;
   const cached = await redis.get(key);
 
@@ -29,7 +29,7 @@ export async function getSession(accountId: string): Promise<unknown[] | null> {
   return session.cookies;
 }
 
-export async function saveSession(accountId: string, cookies: unknown[]): Promise<void> {
+export const saveSession = async (accountId: string, cookies: unknown[]): Promise<void> => {
   const key = `${SESSION_PREFIX}${accountId}`;
   const session: CachedSession = {
     cookies,
@@ -40,11 +40,11 @@ export async function saveSession(accountId: string, cookies: unknown[]): Promis
   await redis.setex(key, env.SESSION_TTL_SECONDS, JSON.stringify(session));
 }
 
-export async function invalidateSession(accountId: string): Promise<void> {
+export const invalidateSession = async (accountId: string): Promise<void> => {
   await redis.del(`${SESSION_PREFIX}${accountId}`);
 }
 
-export async function checkRateLimit(accountId: string): Promise<boolean> {
+export const checkRateLimit = async (accountId: string): Promise<boolean> => {
   const key = `${RATE_PREFIX}${accountId}`;
   const count = await redis.incr(key);
 

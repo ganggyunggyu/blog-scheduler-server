@@ -29,6 +29,7 @@ export const scheduleJobSchema = new Schema(
     _id: { type: String, default: () => `job_${randomUUID()}` },
     scheduleId: { type: String, required: true, index: true },
     keyword: { type: String, required: true },
+    category: { type: String },
     scheduledAt: { type: String, required: true, index: true },
     slot: { type: Number, required: true },
     generateJobId: { type: String },

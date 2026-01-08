@@ -3,7 +3,7 @@ import { env } from '../config/env';
 
 let browser: Browser | null = null;
 
-export async function getBrowser(): Promise<Browser> {
+export const getBrowser = async (): Promise<Browser> => {
   if (!browser) {
     browser = await chromium.launch({
       headless: env.PLAYWRIGHT_HEADLESS,
@@ -13,7 +13,7 @@ export async function getBrowser(): Promise<Browser> {
   return browser;
 }
 
-export async function closeBrowser(): Promise<void> {
+export const closeBrowser = async (): Promise<void> => {
   if (browser) {
     await browser.close();
     browser = null;

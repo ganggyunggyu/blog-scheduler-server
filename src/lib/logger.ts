@@ -16,11 +16,10 @@ interface Logger {
 
 const INCLUDE_STACK = process.env.NODE_ENV !== 'production';
 
-function isRecord(value: unknown): value is LogContext {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+const isRecord = (value: unknown): value is LogContext =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
 
-function formatTimestamp(date: Date = new Date()): string {
+const formatTimestamp = (date: Date = new Date()): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -29,9 +28,9 @@ function formatTimestamp(date: Date = new Date()): string {
   const second = String(date.getSeconds()).padStart(2, '0');
   const ms = String(date.getMilliseconds()).padStart(3, '0');
   return `${year}-${month}-${day} ${hour}:${minute}:${second}.${ms}`;
-}
+};
 
-function safeStringify(value: unknown): string {
+const safeStringify = (value: unknown): string => {
   const seen = new WeakSet();
   return JSON.stringify(value, (_, val) => {
     if (typeof val === 'bigint') return val.toString();
@@ -42,15 +41,15 @@ function safeStringify(value: unknown): string {
     }
     return val;
   });
-}
+};
 
-function formatString(value: string): string {
+const formatString = (value: string): string => {
   if (value.length === 0) return '""';
   if (/[\s=|"]/g.test(value)) return JSON.stringify(value);
   return value;
-}
+};
 
-function formatValue(value: unknown): string {
+const formatValue = (value: unknown): string => {
   if (value instanceof Date) return formatTimestamp(value);
   if (typeof value === 'string') return formatString(value);
   if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
@@ -59,9 +58,9 @@ function formatValue(value: unknown): string {
   if (value === null) return 'null';
   if (value === undefined) return 'undefined';
   return safeStringify(value);
-}
+};
 
-function errorToContext(error: unknown): LogContext {
+const errorToContext = (error: unknown): LogContext => {
   if (error instanceof Error) {
     const result: LogContext = {
       errorName: error.name,
@@ -78,9 +77,9 @@ function errorToContext(error: unknown): LogContext {
   }
 
   return { error };
-}
+};
 
-function summarizeRequest(req: LogContext): LogContext {
+const summarizeRequest = (req: LogContext): LogContext => {
   const socket = (req as { socket?: { remoteAddress?: string; remotePort?: number } }).socket;
   return {
     id: req.id ?? req.requestId,
@@ -89,15 +88,13 @@ function summarizeRequest(req: LogContext): LogContext {
     remoteAddress: req.remoteAddress ?? req.ip ?? socket?.remoteAddress,
     remotePort: req.remotePort ?? socket?.remotePort,
   };
-}
+};
 
-function summarizeResponse(res: LogContext): LogContext {
-  return {
-    statusCode: res.statusCode,
-  };
-}
+const summarizeResponse = (res: LogContext): LogContext => ({
+  statusCode: res.statusCode,
+});
 
-function normalizeContext(context: LogContext): LogContext {
+const normalizeContext = (context: LogContext): LogContext => {
   const normalized: LogContext = {};
 
   for (const [key, value] of Object.entries(context)) {
@@ -122,9 +119,9 @@ function normalizeContext(context: LogContext): LogContext {
   }
 
   return normalized;
-}
+};
 
-function normalizeArgs(args: any[], bindings: LogContext): { message: string; context: LogContext } {
+const normalizeArgs = (args: any[], bindings: LogContext): { message: string; context: LogContext } => {
   let message = '';
   let context: LogContext = { ...bindings };
 
@@ -174,9 +171,9 @@ function normalizeArgs(args: any[], bindings: LogContext): { message: string; co
   if (!message) message = '-';
 
   return { message, context: normalizeContext(context) };
-}
+};
 
-function formatContext(context: LogContext): string {
+const formatContext = (context: LogContext): string => {
   const entries = Object.entries(context).filter(([, value]) => value !== undefined);
   if (entries.length === 0) return '';
 
@@ -187,9 +184,9 @@ function formatContext(context: LogContext): string {
   });
 
   return entries.map(([key, value]) => `${key}=${formatValue(value)}`).join(' ');
-}
+};
 
-function formatLine(level: LogLevel, message: string, context: LogContext): string {
+const formatLine = (level: LogLevel, message: string, context: LogContext): string => {
   const timestamp = formatTimestamp();
   const label = level.toUpperCase().padEnd(5);
   const contextText = formatContext(context);
@@ -197,9 +194,9 @@ function formatLine(level: LogLevel, message: string, context: LogContext): stri
     return `${timestamp} ${label} ${message}`;
   }
   return `${timestamp} ${label} ${message} | ${contextText}`;
-}
+};
 
-function createLogger(bindings: LogContext = {}): Logger {
+const createLogger = (bindings: LogContext = {}): Logger => {
   const emit = (level: LogLevel): LogFn => {
     if (level === 'silent') return () => {};
 
@@ -232,6 +229,6 @@ function createLogger(bindings: LogContext = {}): Logger {
     silent: emit('silent'),
     child: (childBindings: LogContext) => createLogger({ ...bindings, ...childBindings }),
   };
-}
+};
 
 export const logger = createLogger();
