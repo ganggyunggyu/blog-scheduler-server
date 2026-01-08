@@ -77,6 +77,12 @@ export function calculateSchedule(keywords: string[], scheduleDate?: string): Sc
 
     let postsThisDay = 0;
 
+    // 예약 시간이 현재보다 최소 30분 뒤여야 함
+    const minScheduleTime = new Date(now.getTime() + 30 * 60 * 1000);
+    if (currentTime < minScheduleTime) {
+      currentTime = new Date(minScheduleTime);
+    }
+
     while (keywordIndex < keywords.length && postsThisDay < postsPerDay) {
       // 23:55 초과하면 다음날로
       if (currentTime.getHours() === 23 && currentTime.getMinutes() >= 55) {
