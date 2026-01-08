@@ -1,16 +1,13 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { FastifyAdapter } from '@bull-board/fastify';
 import { registerRoutes } from './routes';
 import { connectMongo } from './config/mongo';
-import { initQueues, type Workers } from './queues';
-import { generateQueue, publishQueue } from './queues/queues';
+import { logger } from './lib/logger';
+
+const log = logger.child({ scope: 'App' });
 
 export interface AppContext {
   app: ReturnType<typeof Fastify>;
-  workers: Workers;
 }
 
 export async function buildApp(): Promise<AppContext> {
@@ -18,20 +15,12 @@ export async function buildApp(): Promise<AppContext> {
 
   await app.register(cors, { origin: true });
 
-  const serverAdapter = new FastifyAdapter();
-  serverAdapter.setBasePath('/admin/queues');
-
-  createBullBoard({
-    queues: [new BullMQAdapter(generateQueue), new BullMQAdapter(publishQueue)],
-    serverAdapter,
-  });
-
-  await app.register(serverAdapter.registerPlugin(), { prefix: '/admin/queues' });
-
   await connectMongo();
-  const workers = await initQueues();
+
+  // 계정별 동적 큐/워커는 요청 시 자동 생성됨
+  log.info('queues.dynamic', { message: '계정별 큐/워커는 요청 시 자동 생성됩니다' });
 
   await registerRoutes(app);
 
-  return { app, workers };
+  return { app };
 }

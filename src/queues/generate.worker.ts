@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 import { prepareJob } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
-import { publishQueue } from './queues';
+import { getPublishQueue } from './queue-manager';
 import { logger } from '../lib/logger';
 
 interface GenerateJobData {
@@ -61,7 +61,9 @@ export async function processGenerate(job: Job<GenerateJobData>) {
       manuscriptId: prepared.manuscriptId,
     });
 
-    const publishJob = await publishQueue.add(
+    // 계정별 publish 큐에 추가
+    const accountPublishQueue = getPublishQueue(account.id);
+    const publishJob = await accountPublishQueue.add(
       'publish',
       {
         scheduleId,

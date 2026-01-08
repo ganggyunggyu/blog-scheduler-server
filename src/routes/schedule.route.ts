@@ -1,9 +1,8 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
-// [Legacy: BullMQ delay 방식] import { parseISO } from 'date-fns';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto';
 import { createSchedule } from '../services/schedule.service';
-import { generateQueue, publishQueue } from '../queues/queues';
+import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
 // [Legacy: BullMQ delay 방식 - 현재는 네이버 예약발행 UI 사용]
@@ -63,26 +62,22 @@ export async function scheduleRoutes(app: FastifyInstance) {
 
       totalJobs += jobs.length;
 
-      for (const jobItem of jobs) {
-        // [Legacy: BullMQ delay 방식]
-        // const delay = calculateDelay(jobItem.scheduledAt);
+      // 계정별 generate 큐에 작업 추가
+      const accountGenerateQueue = getGenerateQueue(queue.account.id);
 
-        const generateJob = await generateQueue.add(
-          'generate',
-          {
-            scheduleId: schedule._id,
-            scheduleJobId: jobItem._id,
-            keyword: jobItem.keyword,
-            account: queue.account,
-            service: body.service,
-            ref: body.ref,
-            generateImages: body.generateImages,
-            imageCount: body.imageCount,
-            delayBetweenPostsSeconds: body.delayBetweenPostsSeconds,
-            scheduledAt: jobItem.scheduledAt, // 네이버 예약발행 시간 전달
-          }
-          // [Legacy: BullMQ delay 방식] { delay }
-        );
+      for (const jobItem of jobs) {
+        const generateJob = await accountGenerateQueue.add('generate', {
+          scheduleId: schedule._id,
+          scheduleJobId: jobItem._id,
+          keyword: jobItem.keyword,
+          account: queue.account,
+          service: body.service,
+          ref: body.ref,
+          generateImages: body.generateImages,
+          imageCount: body.imageCount,
+          delayBetweenPostsSeconds: body.delayBetweenPostsSeconds,
+          scheduledAt: jobItem.scheduledAt,
+        });
 
         await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
           generateJobId: String(generateJob.id),
@@ -138,12 +133,13 @@ export async function scheduleRoutes(app: FastifyInstance) {
 
     const jobs = await ScheduleJobModel.find({ scheduleId: id });
 
+    // 계정별 큐에서 작업 제거
     for (const jobItem of jobs) {
       if (jobItem.generateJobId) {
-        await generateQueue.remove(jobItem.generateJobId).catch(() => {});
+        await removeJobFromQueue(schedule.accountId, jobItem.generateJobId, 'generate');
       }
       if (jobItem.publishJobId) {
-        await publishQueue.remove(jobItem.publishJobId).catch(() => {});
+        await removeJobFromQueue(schedule.accountId, jobItem.publishJobId, 'publish');
       }
     }
 
@@ -172,26 +168,22 @@ export async function scheduleRoutes(app: FastifyInstance) {
 
     const jobs = await ScheduleJobModel.find({ scheduleId: id, status: 'pending' });
 
-    for (const jobItem of jobs) {
-      // [Legacy: BullMQ delay 방식]
-      // const delay = calculateDelay(jobItem.scheduledAt);
+    // 계정별 generate 큐에 작업 추가
+    const accountGenerateQueue = getGenerateQueue(body.account.id);
 
-      const generateJob = await generateQueue.add(
-        'generate',
-        {
-          scheduleId: schedule._id,
-          scheduleJobId: jobItem._id,
-          keyword: jobItem.keyword,
-          account: body.account,
-          service: schedule.service,
-          ref: schedule.ref,
-          generateImages: schedule.generateImages,
-          imageCount: schedule.imageCount,
-          delayBetweenPostsSeconds: schedule.delayBetweenPostsSeconds,
-          scheduledAt: jobItem.scheduledAt, // 네이버 예약발행 시간 전달
-        }
-        // [Legacy: BullMQ delay 방식] { delay }
-      );
+    for (const jobItem of jobs) {
+      const generateJob = await accountGenerateQueue.add('generate', {
+        scheduleId: schedule._id,
+        scheduleJobId: jobItem._id,
+        keyword: jobItem.keyword,
+        account: body.account,
+        service: schedule.service,
+        ref: schedule.ref,
+        generateImages: schedule.generateImages,
+        imageCount: schedule.imageCount,
+        delayBetweenPostsSeconds: schedule.delayBetweenPostsSeconds,
+        scheduledAt: jobItem.scheduledAt,
+      });
 
       await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
         generateJobId: String(generateJob.id),
@@ -228,26 +220,22 @@ export async function scheduleRoutes(app: FastifyInstance) {
 
       totalJobs += jobs.length;
 
-      for (const jobItem of jobs) {
-        // [Legacy: BullMQ delay 방식]
-        // const delay = calculateDelay(jobItem.scheduledAt);
+      // 계정별 generate 큐에 작업 추가
+      const accountGenerateQueue = getGenerateQueue(queue.account.id);
 
-        const generateJob = await generateQueue.add(
-          'generate',
-          {
-            scheduleId: schedule._id,
-            scheduleJobId: jobItem._id,
-            keyword: jobItem.keyword,
-            account: queue.account,
-            service: body.service,
-            ref: body.ref,
-            generateImages: body.generate_images,
-            imageCount: body.image_count,
-            delayBetweenPostsSeconds: body.delay_between_posts,
-            scheduledAt: jobItem.scheduledAt, // 네이버 예약발행 시간 전달
-          }
-          // [Legacy: BullMQ delay 방식] { delay }
-        );
+      for (const jobItem of jobs) {
+        const generateJob = await accountGenerateQueue.add('generate', {
+          scheduleId: schedule._id,
+          scheduleJobId: jobItem._id,
+          keyword: jobItem.keyword,
+          account: queue.account,
+          service: body.service,
+          ref: body.ref,
+          generateImages: body.generate_images,
+          imageCount: body.image_count,
+          delayBetweenPostsSeconds: body.delay_between_posts,
+          scheduledAt: jobItem.scheduledAt,
+        });
 
         await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
           generateJobId: String(generateJob.id),

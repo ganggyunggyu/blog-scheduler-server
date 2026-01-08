@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { buildApp, type AppContext } from './app';
 import { env } from './config/env';
-import { closeWorkers } from './queues';
+import { closeAllQueues } from './queues/queue-manager';
 import { closeBrowser } from './lib/playwright';
 import { redis } from './config/redis';
 import { logger } from './lib/logger';
@@ -22,8 +22,8 @@ async function gracefulShutdown(signal: string): Promise<void> {
       log.info('shutdown.http.close');
       await context.app.close();
 
-      log.info('shutdown.workers.close');
-      await closeWorkers(context.workers);
+      log.info('shutdown.queues.close');
+      await closeAllQueues();
 
       log.info('shutdown.browser.close');
       await closeBrowser();

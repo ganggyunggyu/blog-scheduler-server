@@ -1,16 +1,13 @@
 import type { FastifyInstance } from 'fastify';
-import { generateQueue, publishQueue } from '../queues/queues';
+import { getActiveAccounts } from '../queues/queue-manager';
 
 export async function queueRoutes(app: FastifyInstance) {
   app.get('/queues/stats', async () => {
-    const [generateCounts, publishCounts] = await Promise.all([
-      generateQueue.getJobCounts(),
-      publishQueue.getJobCounts(),
-    ]);
+    const activeAccounts = getActiveAccounts();
 
     return {
-      generate: generateCounts,
-      publish: publishCounts,
+      activeAccounts: activeAccounts.length,
+      accounts: activeAccounts.map((id) => id.slice(0, 6) + '***'),
     };
   });
 }

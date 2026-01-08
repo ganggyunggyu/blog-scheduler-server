@@ -1,15 +1,7 @@
-import { Queue, type ConnectionOptions } from 'bullmq';
-import { redis } from '../config/redis';
-import { QUEUES, defaultJobOptions } from './constants';
+/**
+ * @deprecated 계정별 동적 큐 시스템으로 대체됨
+ * @see queue-manager.ts
+ */
 
-const connection = redis as unknown as ConnectionOptions;
-
-export const generateQueue = new Queue(QUEUES.GENERATE, {
-  connection,
-  defaultJobOptions,
-});
-
-export const publishQueue = new Queue(QUEUES.PUBLISH, {
-  connection,
-  defaultJobOptions,
-});
+// 이 파일은 더 이상 사용되지 않음
+// 계정별 큐는 queue-manager.ts의 getGenerateQueue, getPublishQueue 사용
