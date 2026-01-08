@@ -13,25 +13,23 @@ interface PublishJobData {
   account: { id: string; password: string };
   jobDir: string;
   manuscript: { title: string; content: string; images?: string[] };
+  category?: string;
   throttleSeconds?: number;
-  scheduledAt: string; // 네이버 예약발행 시간 (ISO format)
+  scheduledAt: string;
 }
 
 const log = logger.child({ scope: 'Publish' });
 
-function isSessionError(message: string): boolean {
+const isSessionError = (message: string): boolean => {
   const normalized = message.toLowerCase();
   return normalized.includes('login') || normalized.includes('session') || message.includes('로그인');
-}
+};
 
-async function markScheduleProcessing(scheduleId: string): Promise<void> {
-  await ScheduleModel.findOneAndUpdate(
-    { _id: scheduleId, status: 'pending' },
-    { status: 'processing' }
-  );
-}
+const markScheduleProcessing = async (scheduleId: string): Promise<void> => {
+  await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
+};
 
-async function updateScheduleCompletion(scheduleId: string, failed: boolean): Promise<void> {
+const updateScheduleCompletion = async (scheduleId: string, failed: boolean): Promise<void> => {
   const schedule = await ScheduleModel.findByIdAndUpdate(
     scheduleId,
     { $inc: failed ? { failedJobs: 1 } : { completedJobs: 1 } },
@@ -45,11 +43,10 @@ async function updateScheduleCompletion(scheduleId: string, failed: boolean): Pr
     const status = schedule.failedJobs > 0 ? 'failed' : 'completed';
     await ScheduleModel.findByIdAndUpdate(scheduleId, { status });
   }
-}
+};
 
-
-export async function processPublish(job: Job<PublishJobData>) {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, throttleSeconds, scheduledAt } = job.data;
+export const processPublish = async (job: Job<PublishJobData>) => {
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
   log.info('start', {
@@ -78,7 +75,8 @@ export async function processPublish(job: Job<PublishJobData>) {
         title: manuscript.title,
         content: manuscript.content,
         images: manuscript.images,
-        scheduleTime: scheduledAt, // 네이버 예약발행 시간
+        category,
+        scheduleTime: scheduledAt,
       });
 
       if (result.success) {
@@ -111,7 +109,8 @@ export async function processPublish(job: Job<PublishJobData>) {
       title: manuscript.title,
       content: manuscript.content,
       images: manuscript.images,
-      scheduleTime: scheduledAt, // 네이버 예약발행 시간
+      category,
+      scheduleTime: scheduledAt,
     });
 
     if (!publishResult.success) {
@@ -148,4 +147,4 @@ export async function processPublish(job: Job<PublishJobData>) {
 
     throw error;
   }
-}
+};

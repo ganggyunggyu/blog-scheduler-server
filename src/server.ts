@@ -11,7 +11,7 @@ let isShuttingDown = false;
 
 const log = logger.child({ scope: 'Server' });
 
-async function gracefulShutdown(signal: string): Promise<void> {
+const gracefulShutdown = async (signal: string): Promise<void> => {
   if (isShuttingDown) return;
   isShuttingDown = true;
 
@@ -43,7 +43,7 @@ async function gracefulShutdown(signal: string): Promise<void> {
   process.exit(0);
 }
 
-async function main() {
+const main = async () => {
   context = await buildApp();
 
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

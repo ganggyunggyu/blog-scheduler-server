@@ -8,22 +8,24 @@ interface GenerateJobData {
   scheduleId: string;
   scheduleJobId: string;
   keyword: string;
+  category?: string;
   account: { id: string; password: string };
   service: string;
   ref: string;
   generateImages: boolean;
   imageCount: number;
   delayBetweenPostsSeconds: number;
-  scheduledAt: string; // 네이버 예약발행 시간 (ISO format)
+  scheduledAt: string;
 }
 
 const log = logger.child({ scope: 'Generate' });
 
-export async function processGenerate(job: Job<GenerateJobData>) {
+export const processGenerate = async (job: Job<GenerateJobData>) => {
   const {
     scheduleId,
     scheduleJobId,
     keyword,
+    category,
     account,
     service,
     ref,
@@ -40,15 +42,11 @@ export async function processGenerate(job: Job<GenerateJobData>) {
     scheduleJobId,
   });
 
-  await ScheduleModel.findOneAndUpdate(
-    { _id: scheduleId, status: 'pending' },
-    { status: 'processing' }
-  );
+  await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
 
   await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'generating' });
 
   try {
-    // 원고 + 이미지를 한 폴더에 준비
     const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
@@ -61,24 +59,21 @@ export async function processGenerate(job: Job<GenerateJobData>) {
       manuscriptId: prepared.manuscriptId,
     });
 
-    // 계정별 publish 큐에 추가
     const accountPublishQueue = getPublishQueue(account.id);
-    const publishJob = await accountPublishQueue.add(
-      'publish',
-      {
-        scheduleId,
-        scheduleJobId,
-        account,
-        jobDir: prepared.jobDir,
-        manuscript: {
-          title: prepared.title,
-          content: prepared.content,
-          images: prepared.images,
-        },
-        throttleSeconds: delayBetweenPostsSeconds,
-        scheduledAt, // 네이버 예약발행 시간 전달
-      }
-    );
+    const publishJob = await accountPublishQueue.add('publish', {
+      scheduleId,
+      scheduleJobId,
+      account,
+      jobDir: prepared.jobDir,
+      manuscript: {
+        title: prepared.title,
+        content: prepared.content,
+        images: prepared.images,
+      },
+      category,
+      throttleSeconds: delayBetweenPostsSeconds,
+      scheduledAt,
+    });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       publishJobId: String(publishJob.id),
@@ -124,4 +119,4 @@ export async function processGenerate(job: Job<GenerateJobData>) {
 
     throw error;
   }
-}
+};

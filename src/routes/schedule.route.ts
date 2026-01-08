@@ -5,13 +5,6 @@ import { createSchedule } from '../services/schedule.service';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-// [Legacy: BullMQ delay 방식 - 현재는 네이버 예약발행 UI 사용]
-// function calculateDelay(scheduledAt: string): number {
-//   const targetTime = parseISO(scheduledAt).getTime();
-//   const now = Date.now();
-//   return Math.max(0, targetTime - now);
-// }
-
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
@@ -27,15 +20,15 @@ const pythonCompatSchema = z.object({
   delay_between_posts: z.number().default(10),
 });
 
-function maskAccountId(accountId: string): string {
+const maskAccountId = (accountId: string): string => {
   const [user, domain] = accountId.split('@');
   if (domain) {
     return `${user.slice(0, 3)}***@${domain}`;
   }
   return `${accountId.slice(0, 3)}***`;
-}
+};
 
-export async function scheduleRoutes(app: FastifyInstance) {
+export const scheduleRoutes = async (app: FastifyInstance) => {
   app.post('/schedules', async (req) => {
     const body = createScheduleSchema.parse(req.body);
 
@@ -70,6 +63,7 @@ export async function scheduleRoutes(app: FastifyInstance) {
           scheduleId: schedule._id,
           scheduleJobId: jobItem._id,
           keyword: jobItem.keyword,
+          category: jobItem.category,
           account: queue.account,
           service: body.service,
           ref: body.ref,
@@ -176,6 +170,7 @@ export async function scheduleRoutes(app: FastifyInstance) {
         scheduleId: schedule._id,
         scheduleJobId: jobItem._id,
         keyword: jobItem.keyword,
+        category: jobItem.category,
         account: body.account,
         service: schedule.service,
         ref: schedule.ref,
@@ -228,6 +223,7 @@ export async function scheduleRoutes(app: FastifyInstance) {
           scheduleId: schedule._id,
           scheduleJobId: jobItem._id,
           keyword: jobItem.keyword,
+          category: jobItem.category,
           account: queue.account,
           service: body.service,
           ref: body.ref,

@@ -10,15 +10,14 @@ export interface AppContext {
   app: ReturnType<typeof Fastify>;
 }
 
-export async function buildApp(): Promise<AppContext> {
+export const buildApp = async (): Promise<AppContext> => {
   const app = Fastify({ logger: false });
 
   await app.register(cors, { origin: true });
 
   await connectMongo();
 
-  // 계정별 동적 큐/워커는 요청 시 자동 생성됨
-  log.info('queues.dynamic', { message: '계정별 큐/워커는 요청 시 자동 생성됩니다' });
+  log.info('queues.dynamic');
 
   await registerRoutes(app);
 

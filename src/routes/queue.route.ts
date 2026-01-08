@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { getActiveAccounts } from '../queues/queue-manager';
 
-export async function queueRoutes(app: FastifyInstance) {
+export const queueRoutes = async (app: FastifyInstance) => {
   app.get('/queues/stats', async () => {
     const activeAccounts = getActiveAccounts();
 

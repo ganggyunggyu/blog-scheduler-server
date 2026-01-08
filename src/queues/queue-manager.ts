@@ -8,22 +8,17 @@ import { logger } from '../lib/logger';
 const connection = redis as unknown as ConnectionOptions;
 const log = logger.child({ scope: 'QueueManager' });
 
-// 계정별 큐 저장소
 const generateQueues = new Map<string, Queue>();
 const publishQueues = new Map<string, Queue>();
-
-// 계정별 워커 저장소
 const generateWorkers = new Map<string, Worker>();
 const publishWorkers = new Map<string, Worker>();
 
-// 큐 이름 생성 (BullMQ는 콜론 사용 불가)
-function getQueueName(type: 'generate' | 'publish', accountId: string): string {
+const getQueueName = (type: 'generate' | 'publish', accountId: string): string => {
   const safeAccountId = accountId.replace(/[^a-zA-Z0-9]/g, '_');
   return `${type}_${safeAccountId}`;
-}
+};
 
-// Generate 큐 가져오기 (없으면 생성)
-export function getGenerateQueue(accountId: string): Queue {
+export const getGenerateQueue = (accountId: string): Queue => {
   const existing = generateQueues.get(accountId);
   if (existing) return existing;
 
@@ -32,15 +27,12 @@ export function getGenerateQueue(accountId: string): Queue {
 
   generateQueues.set(accountId, queue);
   log.info('queue.created', { type: 'generate', accountId: accountId.slice(0, 6) + '***' });
-
-  // 워커도 함께 생성
   ensureGenerateWorker(accountId);
 
   return queue;
-}
+};
 
-// Publish 큐 가져오기 (없으면 생성)
-export function getPublishQueue(accountId: string): Queue {
+export const getPublishQueue = (accountId: string): Queue => {
   const existing = publishQueues.get(accountId);
   if (existing) return existing;
 
@@ -49,22 +41,19 @@ export function getPublishQueue(accountId: string): Queue {
 
   publishQueues.set(accountId, queue);
   log.info('queue.created', { type: 'publish', accountId: accountId.slice(0, 6) + '***' });
-
-  // 워커도 함께 생성
   ensurePublishWorker(accountId);
 
   return queue;
-}
+};
 
-// Generate 워커 생성 (계정당 concurrency: 1)
-function ensureGenerateWorker(accountId: string): Worker {
+const ensureGenerateWorker = (accountId: string): Worker => {
   const existing = generateWorkers.get(accountId);
   if (existing) return existing;
 
   const queueName = getQueueName('generate', accountId);
   const worker = new Worker(queueName, processGenerate, {
     connection,
-    concurrency: 1, // 계정당 1개씩 순차 처리
+    concurrency: 1,
   });
 
   worker.on('completed', (job) => {
@@ -86,17 +75,16 @@ function ensureGenerateWorker(accountId: string): Worker {
   log.info('worker.created', { type: 'generate', accountId: accountId.slice(0, 6) + '***' });
 
   return worker;
-}
+};
 
-// Publish 워커 생성 (계정당 concurrency: 1)
-function ensurePublishWorker(accountId: string): Worker {
+const ensurePublishWorker = (accountId: string): Worker => {
   const existing = publishWorkers.get(accountId);
   if (existing) return existing;
 
   const queueName = getQueueName('publish', accountId);
   const worker = new Worker(queueName, processPublish, {
     connection,
-    concurrency: 1, // 계정당 1개씩 순차 처리
+    concurrency: 1,
   });
 
   worker.on('completed', (job) => {
@@ -118,10 +106,9 @@ function ensurePublishWorker(accountId: string): Worker {
   log.info('worker.created', { type: 'publish', accountId: accountId.slice(0, 6) + '***' });
 
   return worker;
-}
+};
 
-// 모든 워커/큐 종료
-export async function closeAllQueues(): Promise<void> {
+export const closeAllQueues = async (): Promise<void> => {
   log.info('close.start', {
     generateWorkers: generateWorkers.size,
     publishWorkers: publishWorkers.size,
@@ -129,7 +116,6 @@ export async function closeAllQueues(): Promise<void> {
 
   const closePromises: Promise<void>[] = [];
 
-  // 워커 먼저 종료
   for (const [accountId, worker] of generateWorkers) {
     closePromises.push(
       worker.close().then(() => {
@@ -148,7 +134,6 @@ export async function closeAllQueues(): Promise<void> {
 
   await Promise.all(closePromises);
 
-  // 큐 종료
   const queueClosePromises: Promise<void>[] = [];
 
   for (const [, queue] of generateQueues) {
@@ -161,26 +146,21 @@ export async function closeAllQueues(): Promise<void> {
 
   await Promise.all(queueClosePromises);
 
-  // Map 초기화
   generateQueues.clear();
   publishQueues.clear();
   generateWorkers.clear();
   publishWorkers.clear();
 
   log.info('close.done');
-}
+};
 
-// 활성 계정 목록 조회
-export function getActiveAccounts(): string[] {
-  return Array.from(generateQueues.keys());
-}
+export const getActiveAccounts = (): string[] => Array.from(generateQueues.keys());
 
-// 특정 계정의 큐에서 작업 제거
-export async function removeJobFromQueue(
+export const removeJobFromQueue = async (
   accountId: string,
   jobId: string,
   type: 'generate' | 'publish'
-): Promise<boolean> {
+): Promise<boolean> => {
   const queue = type === 'generate'
     ? generateQueues.get(accountId)
     : publishQueues.get(accountId);
@@ -193,4 +173,4 @@ export async function removeJobFromQueue(
   } catch {
     return false;
   }
-}
+};
