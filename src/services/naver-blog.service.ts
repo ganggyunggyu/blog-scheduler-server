@@ -57,6 +57,37 @@ function isSubheading(line: string): boolean {
   return patterns.some((pattern) => pattern.test(trimmed));
 }
 
+// "1. 텍스트" 패턴을 타이핑 (네이버 에디터 자동 리스트 변환 방지)
+// 흐름: 1. → 1.ㅁ → 1.|ㅁ → 1. |ㅁ → 1. ㅁ| → 1. | → 1. 텍스트
+async function typeLineAvoidingAutoList(page: Page, line: string): Promise<void> {
+  const match = line.match(/^(\d+)\.\s(.+)$/);
+  if (match) {
+    const [, number, text] = match;
+    // 1. 숫자와 점 입력: "1."
+    await page.keyboard.type(`${number}.`, { delay: 50 });
+    await page.waitForTimeout(50);
+    // 2. 임시 문자 입력: "1.ㅁ"
+    await page.keyboard.type('ㅁ', { delay: 50 });
+    await page.waitForTimeout(50);
+    // 3. 커서를 임시 문자 앞으로: "1.|ㅁ"
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForTimeout(30);
+    // 4. 공백 입력: "1. |ㅁ"
+    await page.keyboard.type(' ', { delay: 50 });
+    await page.waitForTimeout(50);
+    // 5. 커서를 임시 문자 뒤로: "1. ㅁ|"
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(30);
+    // 6. 임시 문자 삭제: "1. |"
+    await page.keyboard.press('Backspace');
+    await page.waitForTimeout(50);
+    // 7. 나머지 텍스트 입력
+    await page.keyboard.type(text, { delay: 10 });
+  } else {
+    await page.keyboard.type(line, { delay: 10 });
+  }
+}
+
 function matchImagesToSubheadings(paragraphs: string[], images: string[]): Map<number, string> {
   const result = new Map<number, string>();
   const subheadingIndices = paragraphs
@@ -170,7 +201,7 @@ async function typeContentWithImages(
       if (isList && prevWasList) {
         line = line.slice(2);
       }
-      await page.keyboard.type(line, { delay: 10 });
+      await typeLineAvoidingAutoList(page, line);
       prevWasList = isList;
     } else {
       prevWasList = false;
