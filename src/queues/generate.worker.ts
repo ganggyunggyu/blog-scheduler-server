@@ -1,7 +1,9 @@
-import { Job } from 'bullmq';
+import { Job, UnrecoverableError } from 'bullmq';
 import { prepareJob } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
-import { getPublishQueue } from './queue-manager';
+import { getPublishQueue, drainAccountQueues } from './queue-manager';
+import { getValidCookies } from '../services/naver-auth.service';
+import { failAccountSchedules } from '../services/schedule-failure.service';
 import { logger } from '../lib/logger';
 
 interface GenerateJobData {
@@ -20,6 +22,16 @@ interface GenerateJobData {
 
 const log = logger.child({ scope: 'Generate' });
 
+class LoginPrecheckError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LoginPrecheckError';
+  }
+}
+
+const normalizeLoginFailure = (message: string): string =>
+  message.includes('로그인') ? message : `로그인 실패: ${message}`;
+
 export const processGenerate = async (job: Job<GenerateJobData>) => {
   const {
     scheduleId,
@@ -34,6 +46,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     delayBetweenPostsSeconds,
     scheduledAt,
   } = job.data;
+  const maskedAccount = account.id.slice(0, 3) + '***';
 
   log.info('start', {
     jobId: job.id,
@@ -47,6 +60,15 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
   await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'generating' });
 
   try {
+    log.info('login.precheck.start', { account: maskedAccount });
+    try {
+      await getValidCookies(account.id, account.password);
+      log.info('login.precheck.success', { account: maskedAccount });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new LoginPrecheckError(message);
+    }
+
     const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
@@ -86,6 +108,26 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     const message = error instanceof Error ? error.message : String(error);
     const attempts = job.opts.attempts ?? 1;
     const isFinalAttempt = job.attemptsMade + 1 >= attempts;
+
+    if (error instanceof LoginPrecheckError) {
+      const reason = normalizeLoginFailure(message);
+      log.error('login.precheck.failed', {
+        jobId: job.id,
+        account: maskedAccount,
+        message: reason,
+      });
+
+      await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+        status: 'failed',
+        error: reason,
+        completedAt: new Date(),
+      });
+
+      await failAccountSchedules(account.id, reason);
+      await drainAccountQueues(account.id);
+
+      throw new UnrecoverableError(reason);
+    }
 
     log.error('failed', {
       jobId: job.id,

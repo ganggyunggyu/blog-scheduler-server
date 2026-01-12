@@ -5,6 +5,8 @@ import { getValidCookies } from '../services/naver-auth.service';
 import { writePost } from '../services/naver-blog.service';
 import { updateJobStatus } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+import { drainAccountQueues } from './queue-manager';
+import { failAccountSchedules } from '../services/schedule-failure.service';
 import { logger } from '../lib/logger';
 
 interface PublishJobData {
@@ -24,6 +26,9 @@ const isSessionError = (message: string): boolean => {
   const normalized = message.toLowerCase();
   return normalized.includes('login') || normalized.includes('session') || message.includes('로그인');
 };
+
+const isLoginFailure = (message: string): boolean =>
+  isSessionError(message) || NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern));
 
 const markScheduleProcessing = async (scheduleId: string): Promise<void> => {
   await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
@@ -139,6 +144,14 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     });
     await updateScheduleCompletion(scheduleId, true);
     await updateJobStatus(jobDir, 'failed', { error: message });
+
+    if (isLoginFailure(message)) {
+      const reason = message.includes('로그인') ? message : `로그인 실패: ${message}`;
+      await failAccountSchedules(account.id, reason);
+      await drainAccountQueues(account.id);
+      log.warn('login.failure.drain', { account: maskedAccount, message: reason });
+      throw new UnrecoverableError(reason);
+    }
 
     if (NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern))) {
       log.error('failed.non_retryable', { jobId: job.id, message });

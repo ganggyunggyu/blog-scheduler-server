@@ -6,8 +6,10 @@ import { logger } from '../lib/logger';
 
 const log = logger.child({ scope: 'Login' });
 
-const pasteText = async (page: Page, selector: string, text: string): Promise<void> => {
-  await page.click(selector);
+const AUTH_COOKIE_NAMES = ['NID_AUT', 'NID_SES'];
+
+const setInputValue = async (page: Page, selector: string, text: string): Promise<void> => {
+  await page.waitForSelector(selector, { timeout: 10000 });
   await page.evaluate(
     ({ sel, value }) => {
       const input = document.querySelector(sel) as HTMLInputElement | null;
@@ -20,6 +22,37 @@ const pasteText = async (page: Page, selector: string, text: string): Promise<vo
   );
 };
 
+const getLoginError = async (page: Page): Promise<string | null> => {
+  const selectors = ['.error_message', '#err_common'];
+  for (const selector of selectors) {
+    const el = await page.$(selector);
+    if (!el) continue;
+    const text = (await el.textContent())?.replace(/\s+/g, ' ').trim();
+    if (text) {
+      return text;
+    }
+  }
+  return null;
+};
+
+const hasCaptcha = async (page: Page): Promise<boolean> => {
+  const selectors = [SELECTORS.login.captcha];
+  for (const selector of selectors) {
+    const el = await page.$(selector);
+    if (el) return true;
+  }
+  return false;
+};
+
+const hasTwoFactor = async (page: Page): Promise<boolean> => {
+  const selectors = ['#new_device_confirm', '.sp_ti_login'];
+  for (const selector of selectors) {
+    const el = await page.$(selector);
+    if (el) return true;
+  }
+  return false;
+};
+
 export const naverLogin = async (
   id: string,
   password: string
@@ -28,7 +61,7 @@ export const naverLogin = async (
   const browser = await getBrowser();
   const context = await browser.newContext({
     userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   });
   const page = await context.newPage();
 
@@ -38,16 +71,15 @@ export const naverLogin = async (
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1000);
 
-    const captchaBefore = await page.$(SELECTORS.login.captcha);
-    if (captchaBefore) {
+    if (await hasCaptcha(page)) {
       log.warn('captcha.detected', { account: maskedAccount, stage: 'before' });
       return { cookies: [], success: false, message: '캡차 필요' };
     }
 
     log.info('credentials.enter', { account: maskedAccount });
-    await pasteText(page, SELECTORS.login.id, id);
+    await setInputValue(page, SELECTORS.login.id, id);
     await page.waitForTimeout(300);
-    await pasteText(page, SELECTORS.login.pw, password);
+    await setInputValue(page, SELECTORS.login.pw, password);
     await page.waitForTimeout(500);
 
     log.info('submit', { account: maskedAccount });
@@ -55,37 +87,36 @@ export const naverLogin = async (
 
     log.info('result.wait', { account: maskedAccount });
     try {
-      await Promise.race([
-        page.waitForURL((url) => !url.href.includes('nid.naver.com/nidlogin'), { timeout: 15000 }),
-        page.waitForSelector('#err_common, .error_message, #captcha', { timeout: 15000 }),
-      ]);
+      await page.waitForURL((url) => !url.href.includes('nid.naver.com/nidlogin'), { timeout: 10000 });
     } catch {
       // timeout
     }
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
-    if (page.url().includes('nid.naver.com')) {
-      const errorEl = await page.$('#err_common, .error_message');
-      if (errorEl) {
-        const errorText = await errorEl.textContent();
-        log.warn('error', { account: maskedAccount, message: errorText?.trim() ?? '로그인 실패' });
-        return { cookies: [], success: false, message: errorText?.trim() || '로그인 실패' };
-      }
+    const errorMessage = await getLoginError(page);
+    if (errorMessage) {
+      log.warn('error', { account: maskedAccount, message: errorMessage });
+      return { cookies: [], success: false, message: `로그인 실패: ${errorMessage}` };
+    }
 
-      const captchaEl = await page.$('#captcha');
-      if (captchaEl) {
-        log.warn('captcha.required', { account: maskedAccount });
-        return { cookies: [], success: false, message: '캡차 필요' };
-      }
-
-      log.warn('page.still_login', { account: maskedAccount });
-      return { cookies: [], success: false, message: '로그인 실패 (페이지 이동 안됨)' };
+    if (await hasTwoFactor(page)) {
+      log.warn('twofactor.required', { account: maskedAccount });
+      return { cookies: [], success: false, message: '2차 인증이 필요합니다.' };
     }
 
     const cookies = await context.cookies();
-    log.info('success', { account: maskedAccount, cookies: cookies.length });
+    const cookieNames = new Set(
+      cookies.map((cookie) => cookie.name).filter((name): name is string => Boolean(name))
+    );
+    const hasRequiredCookies = AUTH_COOKIE_NAMES.every((name) => cookieNames.has(name));
 
+    if (!hasRequiredCookies && page.url().includes('nid.naver.com')) {
+      log.warn('page.still_login', { account: maskedAccount, url: page.url() });
+      return { cookies: [], success: false, message: '로그인이 완료되지 않았습니다.' };
+    }
+
+    log.info('success', { account: maskedAccount, cookies: cookies.length });
     return { cookies, success: true, message: 'Login success' };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';

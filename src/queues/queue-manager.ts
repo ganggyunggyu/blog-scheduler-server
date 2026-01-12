@@ -156,6 +156,30 @@ export const closeAllQueues = async (): Promise<void> => {
 
 export const getActiveAccounts = (): string[] => Array.from(generateQueues.keys());
 
+export const drainAccountQueues = async (
+  accountId: string
+): Promise<{ generate: number; publish: number }> => {
+  const maskedAccount = accountId.slice(0, 3) + '***';
+  const result = { generate: 0, publish: 0 };
+
+  const generateQueue = generateQueues.get(accountId);
+  if (generateQueue) {
+    const counts = await generateQueue.getJobCounts('waiting', 'delayed', 'paused');
+    result.generate = (counts.waiting ?? 0) + (counts.delayed ?? 0) + (counts.paused ?? 0);
+    await generateQueue.drain(true);
+  }
+
+  const publishQueue = publishQueues.get(accountId);
+  if (publishQueue) {
+    const counts = await publishQueue.getJobCounts('waiting', 'delayed', 'paused');
+    result.publish = (counts.waiting ?? 0) + (counts.delayed ?? 0) + (counts.paused ?? 0);
+    await publishQueue.drain(true);
+  }
+
+  log.warn('queue.drained', { accountId: maskedAccount, ...result });
+  return result;
+};
+
 export const removeJobFromQueue = async (
   accountId: string,
   jobId: string,

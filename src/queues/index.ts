@@ -3,5 +3,6 @@ export {
   getPublishQueue,
   closeAllQueues,
   getActiveAccounts,
+  drainAccountQueues,
   removeJobFromQueue,
 } from './queue-manager';
