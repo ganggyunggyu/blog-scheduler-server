@@ -320,12 +320,21 @@ export const writePost = async (
             }
           }
 
-          if (!categorySelected) {
-            log.warn('category.not_found', { category });
+          if (!categorySelected && categoryItems.length > 0) {
+            await categoryItems[0].click();
+            await page.waitForTimeout(300);
+            const firstCategoryText = await categoryItems[0].textContent();
+            log.warn('category.fallback', { requested: category, selected: firstCategoryText?.trim() });
+          } else if (!categorySelected) {
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(300);
+            log.warn('category.skip', { category });
           }
         }
       } catch (err) {
         log.warn('category.failed', { category, message: err instanceof Error ? err.message : String(err) });
+        await page.keyboard.press('Escape').catch(() => {});
+        await page.waitForTimeout(300);
       }
     }
 
