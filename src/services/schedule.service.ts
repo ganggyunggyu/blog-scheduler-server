@@ -1,7 +1,7 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-const SCHEDULE_MODE = '2';
+const SCHEDULE_MODE = '3';
 
 const getPostsPerDay = (mode: string, dayOffset: number): number => {
   switch (mode) {
@@ -23,7 +23,9 @@ export interface ScheduleItem {
   slot: number;
 }
 
-export const parseKeywordWithCategory = (input: string): { keyword: string; category?: string } => {
+export const parseKeywordWithCategory = (
+  input: string
+): { keyword: string; category?: string } => {
   const trimmed = input.trim();
 
   if (trimmed.includes(':')) {
@@ -75,7 +77,10 @@ const addMinutesWithCap = (base: Date, minutes: number): Date => {
   return result;
 };
 
-export const calculateSchedule = (keywords: string[], scheduleDate?: string): ScheduleItem[] => {
+export const calculateSchedule = (
+  keywords: string[],
+  scheduleDate?: string
+): ScheduleItem[] => {
   const now = new Date();
   const baseDate = scheduleDate ? new Date(`${scheduleDate}T00:00:00`) : now;
 
@@ -101,7 +106,10 @@ export const calculateSchedule = (keywords: string[], scheduleDate?: string): Sc
       intervalMinutes = 60;
     } else {
       const startHour = randomBetween(6, 10);
-      currentTime = setSeconds(setMinutes(setHours(targetDate, startHour), 0), 0);
+      currentTime = setSeconds(
+        setMinutes(setHours(targetDate, startHour), 0),
+        0
+      );
       intervalMinutes = randomBetween(120, 180);
     }
 
@@ -136,7 +144,8 @@ export const calculateSchedule = (keywords: string[], scheduleDate?: string): Sc
   return schedule;
 };
 
-export const formatKst = (date: Date): string => format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
+export const formatKst = (date: Date): string =>
+  format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
 export const createSchedule = async (input: CreateScheduleInput) => {
   const items = calculateSchedule(input.keywords, input.scheduleDate);
