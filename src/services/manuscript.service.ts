@@ -72,7 +72,9 @@ export const generateManuscript = async (
   return { id: raw._id ?? '', title, content, raw };
 };
 
-export const generateImageUrls = async (
+export type ImageSource = 'ai' | 'google';
+
+const generateImageUrlsFromAI = async (
   keyword: string,
   imageCount: number,
   category?: string
@@ -84,6 +86,7 @@ export const generateImageUrls = async (
     keyword,
     category: category ?? '',
     imageCount,
+    source: 'ai',
   });
 
   const response = await axios.post(
@@ -108,6 +111,55 @@ export const generateImageUrls = async (
   imageLog.info(progress.done('done'), { count: urls.length });
 
   return urls;
+};
+
+const generateImageUrlsFromGoogle = async (
+  keyword: string,
+  imageCount: number
+): Promise<string[]> => {
+  const url = `${env.IMAGE_API_URL}/api/image/random-frames`;
+  const progress = new ProgressBar({ label: 'image', total: 1, width: 16 });
+  imageLog.info(progress.start('request'), {
+    url,
+    keyword,
+    imageCount,
+    source: 'google',
+  });
+
+  const response = await axios.post(
+    url,
+    { keyword, count: imageCount },
+    { timeout: 300000 }
+  );
+
+  const data = response.data as {
+    images?: Array<{ url: string }>;
+    total?: number;
+    failed?: number;
+  };
+
+  const raw = data.images ?? [];
+  if (!Array.isArray(raw)) {
+    imageLog.warn('response.invalid', { source: 'google' });
+    return [];
+  }
+
+  const urls = raw.map((item) => item.url).filter(Boolean);
+  imageLog.info(progress.done('done'), { count: urls.length, failed: data.failed ?? 0 });
+
+  return urls;
+};
+
+export const generateImageUrls = async (
+  keyword: string,
+  imageCount: number,
+  category?: string,
+  imageSource: ImageSource = 'ai'
+): Promise<string[]> => {
+  if (imageSource === 'google') {
+    return generateImageUrlsFromGoogle(keyword, imageCount);
+  }
+  return generateImageUrlsFromAI(keyword, imageCount, category);
 };
 
 const isValidUrl = (str: string): boolean => {
@@ -169,7 +221,8 @@ export const prepareJob = async (
   service: string,
   ref: string,
   generateImages: boolean,
-  imageCount: number
+  imageCount: number,
+  imageSource: ImageSource = 'ai'
 ): Promise<PreparedJob> => {
   const { dir, imagesDir } = await createJobDir(keyword);
   manuscriptLog.info('job.dir.created', { dir });
@@ -184,6 +237,7 @@ export const prepareJob = async (
     service,
     ref,
     manuscriptId: manuscript.id,
+    imageSource,
     createdAt: new Date().toISOString(),
     status: 'generated',
   };
@@ -191,7 +245,7 @@ export const prepareJob = async (
 
   let images: string[] = [];
   if (generateImages) {
-    const imageUrls = await generateImageUrls(keyword, imageCount);
+    const imageUrls = await generateImageUrls(keyword, imageCount, undefined, imageSource);
     images = await downloadImagesToDir(imageUrls.slice(0, imageCount), imagesDir);
   }
 

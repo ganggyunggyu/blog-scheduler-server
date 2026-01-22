@@ -13,6 +13,7 @@ const envSchema = z.object({
   MONGO_URI: z.string(),
 
   MANUSCRIPT_API_URL: z.string().default('http://localhost:8000'),
+  IMAGE_API_URL: z.string().default('http://localhost:3001'),
 
   PLAYWRIGHT_HEADLESS: z.preprocess((value) => {
     if (typeof value === 'boolean') return value;
