@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto';
 import { createSchedule } from '../services/schedule.service';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager';
+import { getPostList, getPostsByRange } from '../services/naver-blog.service';
+import { getValidCookies } from '../services/naver-auth.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+
+const imageSourceSchema = z.enum(['ai', 'google']).default('ai');
 
 const pythonCompatSchema = z.object({
   queues: z.array(
@@ -17,6 +21,7 @@ const pythonCompatSchema = z.object({
   ref: z.string().default(''),
   generate_images: z.boolean().default(true),
   image_count: z.number().default(5),
+  image_source: imageSourceSchema,
   delay_between_posts: z.number().default(10),
 });
 
@@ -229,6 +234,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           ref: body.ref,
           generateImages: body.generate_images,
           imageCount: body.image_count,
+          imageSource: body.image_source,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: jobItem.scheduledAt,
         });
@@ -252,5 +258,99 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     }
 
     return { success: true, totalJobs, schedules: results };
+  });
+
+  const updateCompatSchema = z.object({
+    queues: z.array(
+      z.object({
+        account: z.object({ id: z.string(), password: z.string() }),
+        keywords: z.array(z.string()),
+        update_count: z.number().min(1).optional(),
+        start_index: z.number().min(0).optional(),
+        end_index: z.number().min(0).optional(),
+      })
+    ),
+    service: z.string().default('default'),
+    ref: z.string().default(''),
+    generate_images: z.boolean().default(true),
+    image_count: z.number().default(5),
+    image_source: imageSourceSchema,
+    delay_between_posts: z.number().default(10),
+  });
+
+  app.post('/bot/auto-update', async (req: { body: unknown }) => {
+    const body = updateCompatSchema.parse(req.body);
+
+    const results: Array<{
+      account: string;
+      totalJobs: number;
+      posts: Array<{ logNo: string; title: string; keyword: string; index: number }>;
+    }> = [];
+
+    let totalJobs = 0;
+
+    for (const queue of body.queues) {
+      const auth = await getValidCookies(queue.account.id, queue.account.password);
+
+      let posts: Array<{ logNo: string; title: string; index: number }>;
+      let blogId: string;
+
+      if (queue.start_index !== undefined && queue.end_index !== undefined) {
+        const result = await getPostsByRange(auth.cookies, queue.start_index, queue.end_index);
+        posts = result.posts;
+        blogId = result.blogId;
+      } else {
+        const count = queue.update_count ?? queue.keywords.length;
+        const result = await getPostList(auth.cookies, count);
+        posts = result.posts;
+        blogId = result.blogId;
+      }
+
+      if (posts.length === 0) {
+        results.push({
+          account: maskAccountId(queue.account.id),
+          totalJobs: 0,
+          posts: [],
+        });
+        continue;
+      }
+
+      const keywordsToUse = queue.keywords.slice(0, posts.length);
+      const jobsToCreate: Array<{ logNo: string; title: string; keyword: string; index: number }> = [];
+
+      const accountGenerateQueue = getGenerateQueue(queue.account.id);
+
+      for (let i = 0; i < posts.length && i < keywordsToUse.length; i++) {
+        const post = posts[i];
+        const keyword = keywordsToUse[i];
+
+        await accountGenerateQueue.add('generate', {
+          scheduleId: `update_${Date.now()}_${i}`,
+          scheduleJobId: `update_job_${Date.now()}_${i}`,
+          keyword,
+          account: { ...queue.account, blogId },
+          service: body.service,
+          ref: body.ref,
+          generateImages: body.generate_images,
+          imageCount: body.image_count,
+          imageSource: body.image_source,
+          delayBetweenPostsSeconds: body.delay_between_posts,
+          scheduledAt: new Date().toISOString(),
+          mode: 'update' as const,
+          logNo: post.logNo,
+        });
+
+        jobsToCreate.push({ logNo: post.logNo, title: post.title, keyword, index: post.index });
+        totalJobs++;
+      }
+
+      results.push({
+        account: maskAccountId(queue.account.id),
+        totalJobs: jobsToCreate.length,
+        posts: jobsToCreate,
+      });
+    }
+
+    return { success: true, totalJobs, updates: results };
   });
 }

@@ -559,3 +559,431 @@ export const writePost = async (
     await context.close();
   }
 };
+
+interface PostListItem {
+  logNo: string;
+  title: string;
+  index: number;
+}
+
+const setListViewTo30 = async (frame: Awaited<ReturnType<typeof waitForFrame>>, page: Awaited<ReturnType<Awaited<ReturnType<typeof getBrowser>>['newPage']>>) => {
+  try {
+    const listCountToggle = await frame.$('a._ListCountToggle');
+    if (listCountToggle && (await listCountToggle.isVisible())) {
+      await listCountToggle.click();
+      await page.waitForTimeout(500);
+
+      const option30 = await frame.$('a.option._returnFalse[data-value="30"]');
+      if (option30) {
+        await option30.click();
+        await page.waitForTimeout(1000);
+        log.info('postList.viewCount.set', { count: 30 });
+        return true;
+      }
+    }
+  } catch (err) {
+    log.warn('postList.viewCount.failed', { error: err instanceof Error ? err.message : String(err) });
+  }
+  return false;
+};
+
+const collectPostsFromPage = async (
+  frame: Awaited<ReturnType<typeof waitForFrame>>,
+  page: Awaited<ReturnType<Awaited<ReturnType<typeof getBrowser>>['newPage']>>,
+  startIndex: number
+): Promise<PostListItem[]> => {
+  const posts: PostListItem[] = [];
+
+  await page.waitForTimeout(1000);
+
+  const checkboxes = await frame.$$('input[name="logNo"]');
+  log.info('collectPosts.checkboxes', { count: checkboxes.length });
+
+  if (checkboxes.length === 0) {
+    const rows = await frame.$$('tr');
+    log.info('collectPosts.fallback.rows', { count: rows.length });
+  }
+
+  for (let i = 0; i < checkboxes.length; i++) {
+    const checkbox = checkboxes[i];
+    const logNo = await checkbox.getAttribute('value');
+    if (!logNo) continue;
+
+    const row = await checkbox.evaluateHandle((el) => el.closest('tr'));
+    const linkEl = await row.asElement()?.$('a._setTopListUrl');
+    const title = linkEl ? ((await linkEl.textContent()) || '').trim() : '';
+
+    posts.push({ logNo, title, index: startIndex + i });
+  }
+
+  return posts;
+};
+
+const getVisiblePageNumbers = async (frame: Awaited<ReturnType<typeof waitForFrame>>): Promise<number[]> => {
+  const pageLinks = await frame.$$('.blog2_paginate .page, .blog2_paginate strong.page');
+  const pageSet = new Set<number>();
+
+  for (const link of pageLinks) {
+    const text = await link.textContent();
+    const num = parseInt(text?.trim() || '', 10);
+    if (!isNaN(num)) pageSet.add(num);
+  }
+
+  return [...pageSet].sort((a, b) => a - b);
+};
+
+const hasNextPageGroup = async (frame: Awaited<ReturnType<typeof waitForFrame>>): Promise<boolean> => {
+  const nextBtn = await frame.$('a.next._goPageTop[class*="_param"]');
+  return nextBtn !== null;
+};
+
+const clickNextPageGroup = async (
+  frame: Awaited<ReturnType<typeof waitForFrame>>,
+  page: Awaited<ReturnType<Awaited<ReturnType<typeof getBrowser>>['newPage']>>
+): Promise<boolean> => {
+  const nextBtn = await frame.$('a.next._goPageTop[class*="_param"]');
+  if (nextBtn) {
+    await nextBtn.click();
+    await page.waitForTimeout(1500);
+    return true;
+  }
+  return false;
+};
+
+const clickPage = async (
+  frame: Awaited<ReturnType<typeof waitForFrame>>,
+  page: Awaited<ReturnType<Awaited<ReturnType<typeof getBrowser>>['newPage']>>,
+  pageNum: number
+): Promise<boolean> => {
+  const currentPage = await frame.$(`strong.page._goPageTop._param\\(${pageNum}\\)`);
+  if (currentPage) return true;
+
+  const pageLink = await frame.$(`a.page._goPageTop._param\\(${pageNum}\\)`);
+  if (pageLink) {
+    await pageLink.click();
+    await page.waitForTimeout(1000);
+    return true;
+  }
+  return false;
+};
+
+export const indexAllPosts = async (
+  cookies: unknown[]
+): Promise<{ posts: PostListItem[]; blogId: string; totalCount: number }> => {
+  const browser = await getBrowser();
+  const context = await browser.newContext({
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  });
+  await context.addCookies(cookies as any[]);
+  const page = await context.newPage();
+
+  try {
+    await page.goto('https://www.naver.com', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+
+    const blogTab = await page.$('a.MyView-module__item_link___Dzbpq');
+    if (blogTab) {
+      await blogTab.click();
+      await page.waitForTimeout(1000);
+    }
+
+    const myBlogLink = await page.$('a[href="https://blog.naver.com/MyBlog.naver"]');
+    if (myBlogLink) {
+      await myBlogLink.click();
+      await page.waitForTimeout(3000);
+    } else {
+      await page.goto('https://blog.naver.com/MyBlog.naver', { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(3000);
+    }
+
+    const currentUrl = page.url();
+    const blogIdMatch = currentUrl.match(/blog\.naver\.com\/([^/?]+)/);
+    const blogId = blogIdMatch ? blogIdMatch[1] : '';
+    log.info('indexAllPosts.blogId', { blogId, url: currentUrl });
+
+    const frame = await waitForFrame(page, 'mainFrame');
+    await page.waitForTimeout(1000);
+
+    const openListBtn = await frame.$('a._toggleTopList');
+    if (openListBtn && (await openListBtn.isVisible())) {
+      await openListBtn.click();
+      await page.waitForTimeout(1500);
+      log.info('indexAllPosts.openList.clicked');
+    }
+
+    await setListViewTo30(frame, page);
+
+    const allPosts: PostListItem[] = [];
+    let globalIndex = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const visiblePages = await getVisiblePageNumbers(frame);
+      log.info('indexAllPosts.pageGroup', { pages: visiblePages });
+
+      for (const pageNum of visiblePages) {
+        const clicked = await clickPage(frame, page, pageNum);
+        if (!clicked) {
+          log.info('indexAllPosts.page.notFound', { pageNum });
+          continue;
+        }
+        const pagePosts = await collectPostsFromPage(frame, page, globalIndex);
+        allPosts.push(...pagePosts);
+        globalIndex += pagePosts.length;
+        log.info('indexAllPosts.page.done', { pageNum, collected: pagePosts.length, total: allPosts.length });
+      }
+
+      if (await hasNextPageGroup(frame)) {
+        await clickNextPageGroup(frame, page);
+      } else {
+        hasMore = false;
+      }
+    }
+
+    log.info('indexAllPosts.complete', { blogId, totalCount: allPosts.length });
+    return { posts: allPosts, blogId, totalCount: allPosts.length };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to index posts';
+    log.error('indexAllPosts.failed', { message });
+    return { posts: [], blogId: '', totalCount: 0 };
+  } finally {
+    await context.close();
+  }
+};
+
+export const getPostList = async (
+  cookies: unknown[],
+  count: number
+): Promise<{ posts: PostListItem[]; blogId: string }> => {
+  const { posts, blogId } = await indexAllPosts(cookies);
+  return { posts: posts.slice(0, count), blogId };
+};
+
+export const getPostsByRange = async (
+  cookies: unknown[],
+  startIndex: number,
+  endIndex: number
+): Promise<{ posts: PostListItem[]; blogId: string }> => {
+  const { posts, blogId } = await indexAllPosts(cookies);
+  return { posts: posts.slice(startIndex, endIndex + 1), blogId };
+};
+
+interface UpdatePostParams {
+  cookies: unknown[];
+  blogId: string;
+  logNo: string;
+  title: string;
+  content: string;
+  images?: string[];
+  category?: string;
+}
+
+export const updatePost = async (
+  params: UpdatePostParams
+): Promise<{
+  success: boolean;
+  postUrl?: string;
+  message: string;
+}> => {
+  const { cookies, blogId, logNo, title, content, images, category } = params;
+  const progress = new ProgressBar({ label: 'update', total: 6, width: 14 });
+
+  const browser = await getBrowser();
+  const context = await browser.newContext({
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  });
+  await context.addCookies(cookies as any[]);
+  const page = await context.newPage();
+
+  try {
+    const url = `https://blog.naver.com/${blogId}?Redirect=Update&logNo=${logNo}`;
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3000);
+    log.info(progress.step('page.open'), { url, logNo });
+
+    const frame = await waitForFrame(page, 'mainFrame');
+    await page.waitForTimeout(2000);
+
+    await dismissPopups(frame);
+
+    const editorSelector = 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph';
+    try {
+      const editor = await frame.waitForSelector(editorSelector, { timeout: 10000 });
+      if (editor) {
+        await editor.click();
+        await page.waitForTimeout(500);
+      }
+    } catch {
+      log.warn('editor.selector.missing');
+      await frame.click(SELECTORS.editor.content);
+    }
+
+    log.info(progress.step('editor.ready'));
+
+    const clickTitleArea = async (): Promise<void> => {
+      const placeholder = await frame.$('span.se-placeholder.__se_placeholder');
+      if (placeholder && (await placeholder.isVisible())) {
+        await placeholder.click();
+        return;
+      }
+      const titleText = await frame.$('div.se-title-text p.se-text-paragraph');
+      if (titleText && (await titleText.isVisible())) {
+        await titleText.click();
+        return;
+      }
+      await frame.click(SELECTORS.editor.content);
+    };
+
+    const clickContentArea = async (): Promise<void> => {
+      const allTextComponents = await frame.$$('.se-component.se-text');
+      for (const component of allTextComponents) {
+        const isTitle = await component.evaluate((el) => el.closest('.se-documentTitle') !== null);
+        if (isTitle) continue;
+
+        const paragraph = await component.$('p.se-text-paragraph');
+        if (paragraph && (await paragraph.isVisible())) {
+          await paragraph.click();
+          log.info('content.area.clicked', { method: 'text-component' });
+          return;
+        }
+      }
+
+      const contentSelectors = [
+        '.se-content .se-component.se-text p.se-text-paragraph',
+        'div.se-component-content p.se-text-paragraph:not(:first-child)',
+      ];
+      for (const selector of contentSelectors) {
+        const el = await frame.$(selector);
+        if (el && (await el.isVisible())) {
+          await el.click();
+          log.info('content.area.clicked', { selector });
+          return;
+        }
+      }
+
+      await page.keyboard.press('Tab');
+      log.info('content.area.fallback.tab');
+    };
+
+    await clickTitleArea();
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Meta+a');
+    await page.waitForTimeout(200);
+    await page.keyboard.press('Backspace');
+    await page.waitForTimeout(300);
+    log.info('title.cleared');
+
+    await clickContentArea();
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Meta+a');
+    await page.waitForTimeout(200);
+    await page.keyboard.press('Backspace');
+    await page.waitForTimeout(300);
+    log.info('content.cleared');
+
+    await clickTitleArea();
+    await page.waitForTimeout(300);
+
+    try {
+      const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
+      if (alignBtn && (await alignBtn.isVisible())) {
+        await alignBtn.click();
+        await page.waitForTimeout(500);
+        await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 3000 });
+        await frame.click(SELECTORS.editor.alignCenter);
+        await page.waitForTimeout(300);
+        log.info('align.center');
+      }
+    } catch {
+      log.warn('align.center.failed');
+    }
+
+    const fullText = `${title}\n${content}`;
+    log.info('content.typing', { titlePreview: title.slice(0, 30), lines: content.split('\n').length });
+    await typeContentWithImages(page, frame, fullText, images);
+    log.info(progress.step('content.entered'));
+
+    await frame.click(SELECTORS.publish.btn);
+    await page.waitForTimeout(2000);
+    log.info(progress.step('publish.dialog'));
+
+    if (category) {
+      try {
+        const categoryBtn = await frame.$(SELECTORS.publish.categoryBtn);
+        if (categoryBtn && (await categoryBtn.isVisible())) {
+          await categoryBtn.click();
+          await page.waitForTimeout(500);
+
+          const categoryItems = await frame.$$(SELECTORS.publish.categoryItem);
+          let categorySelected = false;
+
+          for (const item of categoryItems) {
+            const text = await item.textContent();
+            if (text && text.includes(category)) {
+              await item.click();
+              await page.waitForTimeout(300);
+              log.info('category.selected', { category });
+              categorySelected = true;
+              break;
+            }
+          }
+
+          if (!categorySelected && categoryItems.length > 0) {
+            await categoryItems[0].click();
+            await page.waitForTimeout(300);
+            const firstCategoryText = await categoryItems[0].textContent();
+            log.warn('category.fallback', { requested: category, selected: firstCategoryText?.trim() });
+          } else if (!categorySelected) {
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(300);
+            log.warn('category.skip', { category });
+          }
+        }
+      } catch (err) {
+        log.warn('category.failed', { category, message: err instanceof Error ? err.message : String(err) });
+        await page.keyboard.press('Escape').catch(() => {});
+        await page.waitForTimeout(300);
+      }
+    }
+
+    try {
+      const privateRadio = await frame.$('input#open_private');
+      if (privateRadio) {
+        const isPrivate = await privateRadio.isChecked();
+        if (isPrivate) {
+          await frame.click(SELECTORS.publish.publicRadio);
+          await page.waitForTimeout(300);
+          log.info('visibility.changed', { from: 'private', to: 'public' });
+        } else {
+          log.info('visibility.already', { status: 'public' });
+        }
+      }
+    } catch {
+      try {
+        await frame.click(SELECTORS.publish.publicRadio);
+        await page.waitForTimeout(300);
+      } catch {
+        await page.click(SELECTORS.publish.publicRadio);
+        await page.waitForTimeout(300);
+      }
+    }
+
+    await frame.click(SELECTORS.publish.confirm);
+    log.info(progress.step('publish.confirm'));
+
+    await page.waitForTimeout(3000);
+
+    const postUrl = page.url();
+    log.info(progress.done('update.done'), { postUrl, logNo });
+
+    return { success: true, postUrl, message: 'Update success' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Update failed';
+    log.error('update.failed', { message, logNo });
+    return { success: false, message };
+  } finally {
+    await context.close();
+  }
+};

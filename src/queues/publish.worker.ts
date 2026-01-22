@@ -2,7 +2,7 @@ import { Job, UnrecoverableError } from 'bullmq';
 import { NON_RETRYABLE_ERRORS } from './constants';
 import { getSession, invalidateSession } from '../services/session.service';
 import { getValidCookies } from '../services/naver-auth.service';
-import { writePost } from '../services/naver-blog.service';
+import { writePost, updatePost } from '../services/naver-blog.service';
 import { updateJobStatus } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { drainAccountQueues } from './queue-manager';
@@ -12,12 +12,14 @@ import { logger } from '../lib/logger';
 interface PublishJobData {
   scheduleId: string;
   scheduleJobId: string;
-  account: { id: string; password: string };
+  account: { id: string; password: string; blogId?: string };
   jobDir: string;
   manuscript: { title: string; content: string; images?: string[] };
   category?: string;
   throttleSeconds?: number;
   scheduledAt: string;
+  mode?: 'create' | 'update';
+  logNo?: string;
 }
 
 const log = logger.child({ scope: 'Publish' });
@@ -50,8 +52,39 @@ const updateScheduleCompletion = async (scheduleId: string, failed: boolean): Pr
   }
 };
 
+const executePost = async (
+  mode: 'create' | 'update',
+  cookies: unknown[],
+  manuscript: { title: string; content: string; images?: string[] },
+  category?: string,
+  scheduledAt?: string,
+  blogId?: string,
+  logNo?: string
+) => {
+  if (mode === 'update' && blogId && logNo) {
+    return updatePost({
+      cookies,
+      blogId,
+      logNo,
+      title: manuscript.title,
+      content: manuscript.content,
+      images: manuscript.images,
+      category,
+    });
+  }
+  return writePost({
+    cookies,
+    title: manuscript.title,
+    content: manuscript.content,
+    images: manuscript.images,
+    category,
+    scheduleTime: scheduledAt,
+  });
+};
+
 export const processPublish = async (job: Job<PublishJobData>) => {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt } = job.data;
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt, mode = 'create', logNo } = job.data;
+  const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
 
   log.info('start', {
@@ -74,15 +107,8 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     let cookies = await getSession(account.id);
 
     if (cookies) {
-      log.info('session.cache', { account: maskedAccount });
-      const result = await writePost({
-        cookies,
-        title: manuscript.title,
-        content: manuscript.content,
-        images: manuscript.images,
-        category,
-        scheduleTime: scheduledAt,
-      });
+      log.info('session.cache', { account: maskedAccount, mode });
+      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo);
 
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
@@ -105,18 +131,11 @@ export const processPublish = async (job: Job<PublishJobData>) => {
       }
     }
 
-    log.info('auth.start', { account: maskedAccount });
+    log.info('auth.start', { account: maskedAccount, mode });
     const auth = await getValidCookies(account.id, account.password);
     log.info('auth.success', { account: maskedAccount, fromCache: auth.fromCache });
 
-    const publishResult = await writePost({
-      cookies: auth.cookies,
-      title: manuscript.title,
-      content: manuscript.content,
-      images: manuscript.images,
-      category,
-      scheduleTime: scheduledAt,
-    });
+    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo);
 
     if (!publishResult.success) {
       throw new Error(publishResult.message);

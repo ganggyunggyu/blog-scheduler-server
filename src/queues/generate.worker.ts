@@ -1,5 +1,5 @@
 import { Job, UnrecoverableError } from 'bullmq';
-import { prepareJob } from '../services/manuscript.service';
+import { prepareJob, type ImageSource } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
@@ -11,13 +11,16 @@ interface GenerateJobData {
   scheduleJobId: string;
   keyword: string;
   category?: string;
-  account: { id: string; password: string };
+  account: { id: string; password: string; blogId?: string };
   service: string;
   ref: string;
   generateImages: boolean;
   imageCount: number;
+  imageSource?: ImageSource;
   delayBetweenPostsSeconds: number;
   scheduledAt: string;
+  mode?: 'create' | 'update';
+  logNo?: string;
 }
 
 const log = logger.child({ scope: 'Generate' });
@@ -43,8 +46,11 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     ref,
     generateImages,
     imageCount,
+    imageSource = 'ai',
     delayBetweenPostsSeconds,
     scheduledAt,
+    mode = 'create',
+    logNo,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -53,6 +59,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     keyword,
     scheduleId,
     scheduleJobId,
+    generateImages,
   });
 
   await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
@@ -69,7 +76,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       throw new LoginPrecheckError(message);
     }
 
-    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount);
+    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),
@@ -95,6 +102,8 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       category,
       throttleSeconds: delayBetweenPostsSeconds,
       scheduledAt,
+      mode,
+      logNo,
     });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
