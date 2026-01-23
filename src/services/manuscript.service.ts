@@ -44,7 +44,39 @@ export const generateManuscript = async (
   service: string,
   ref: string = ''
 ): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/gemini-new`;
+  const url = `${env.MANUSCRIPT_API_URL}/generate/blog-filler`;
+  const progress = new ProgressBar({
+    label: 'manuscript',
+    total: 1,
+    width: 16,
+  });
+  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref });
+
+  const response = await axios.post<Manuscript>(
+    url,
+    { service, keyword, ref },
+    { timeout: 300000 }
+  );
+
+  const raw = response.data;
+  const lines = (raw.content ?? '').split('\n');
+  const title = (lines[0] ?? '').trim() || keyword;
+  const content = lines.slice(1).join('\n').trim();
+
+  manuscriptLog.info(progress.done('done'), {
+    id: raw._id ?? '',
+    titlePreview: title.slice(0, 30),
+    length: content.length,
+  });
+
+  return { id: raw._id ?? '', title, content, raw };
+};
+export const generateUpdateRestaurantManuscript = async (
+  keyword: string,
+  service: string,
+  ref: string = ''
+): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
+  const url = `${env.MANUSCRIPT_API_URL}/generate/update-restaurant`;
   const progress = new ProgressBar({
     label: 'manuscript',
     total: 1,
@@ -73,6 +105,7 @@ export const generateManuscript = async (
 };
 
 export type ImageSource = 'ai' | 'google';
+export type ManuscriptType = 'default' | 'update-restaurant';
 
 const generateImageUrlsFromAI = async (
   keyword: string,
@@ -107,7 +140,9 @@ const generateImageUrlsFromAI = async (
     return [];
   }
 
-  const urls = raw.map((item) => (typeof item === 'string' ? item : item.url)).filter(Boolean);
+  const urls = raw
+    .map((item) => (typeof item === 'string' ? item : item.url))
+    .filter(Boolean);
   imageLog.info(progress.done('done'), { count: urls.length });
 
   return urls;
@@ -145,7 +180,10 @@ const generateImageUrlsFromGoogle = async (
   }
 
   const urls = raw.map((item) => item.url).filter(Boolean);
-  imageLog.info(progress.done('done'), { count: urls.length, failed: data.failed ?? 0 });
+  imageLog.info(progress.done('done'), {
+    count: urls.length,
+    failed: data.failed ?? 0,
+  });
 
   return urls;
 };
@@ -171,7 +209,10 @@ const isValidUrl = (str: string): boolean => {
   }
 };
 
-const downloadImagesToDir = async (imageUrls: string[], imagesDir: string): Promise<string[]> => {
+const downloadImagesToDir = async (
+  imageUrls: string[],
+  imagesDir: string
+): Promise<string[]> => {
   const validUrls = imageUrls.filter((url) => url && isValidUrl(url));
   if (validUrls.length === 0) {
     imageLog.warn('download.skip', { reason: 'no_valid_urls' });
@@ -194,7 +235,9 @@ const downloadImagesToDir = async (imageUrls: string[], imagesDir: string): Prom
       const ext = path.extname(url.pathname) || '.png';
       const filePath = path.join(imagesDir, `${i + 1}${ext}`);
 
-      const response = await axios.get<ArrayBuffer>(imageUrl, { responseType: 'arraybuffer' });
+      const response = await axios.get<ArrayBuffer>(imageUrl, {
+        responseType: 'arraybuffer',
+      });
       await writeFile(filePath, Buffer.from(response.data));
       saved.push(filePath);
       imageLog.info(progress.tick('ok'));
@@ -222,15 +265,22 @@ export const prepareJob = async (
   ref: string,
   generateImages: boolean,
   imageCount: number,
-  imageSource: ImageSource = 'ai'
+  imageSource: ImageSource = 'ai',
+  manuscriptType: ManuscriptType = 'default'
 ): Promise<PreparedJob> => {
   const { dir, imagesDir } = await createJobDir(keyword);
-  manuscriptLog.info('job.dir.created', { dir });
+  manuscriptLog.info('job.dir.created', { dir, manuscriptType });
 
-  const manuscript = await generateManuscript(keyword, service, ref);
+  const manuscript =
+    manuscriptType === 'update-restaurant'
+      ? await generateUpdateRestaurantManuscript(keyword, service, ref)
+      : await generateManuscript(keyword, service, ref);
 
   const manuscriptPath = path.join(dir, 'manuscript.txt');
-  await writeFile(manuscriptPath, `${manuscript.title}\n\n${manuscript.content}`);
+  await writeFile(
+    manuscriptPath,
+    `${manuscript.title}\n\n${manuscript.content}`
+  );
 
   const meta = {
     keyword,
@@ -238,6 +288,7 @@ export const prepareJob = async (
     ref,
     manuscriptId: manuscript.id,
     imageSource,
+    manuscriptType,
     createdAt: new Date().toISOString(),
     status: 'generated',
   };
@@ -245,8 +296,16 @@ export const prepareJob = async (
 
   let images: string[] = [];
   if (generateImages) {
-    const imageUrls = await generateImageUrls(keyword, imageCount, undefined, imageSource);
-    images = await downloadImagesToDir(imageUrls.slice(0, imageCount), imagesDir);
+    const imageUrls = await generateImageUrls(
+      keyword,
+      imageCount,
+      undefined,
+      imageSource
+    );
+    images = await downloadImagesToDir(
+      imageUrls.slice(0, imageCount),
+      imagesDir
+    );
   }
 
   manuscriptLog.info('job.prepared', {
@@ -271,7 +330,9 @@ export const updateJobStatus = async (
 ): Promise<void> => {
   const metaPath = path.join(jobDir, 'meta.json');
   try {
-    const metaRaw = await import('fs/promises').then((fs) => fs.readFile(metaPath, 'utf-8'));
+    const metaRaw = await import('fs/promises').then((fs) =>
+      fs.readFile(metaPath, 'utf-8')
+    );
     const meta = JSON.parse(metaRaw);
     meta.status = status;
     meta.completedAt = new Date().toISOString();

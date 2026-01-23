@@ -1,5 +1,5 @@
 import { Job, UnrecoverableError } from 'bullmq';
-import { prepareJob, type ImageSource } from '../services/manuscript.service';
+import { prepareJob, type ImageSource, type ManuscriptType } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
@@ -17,6 +17,7 @@ interface GenerateJobData {
   generateImages: boolean;
   imageCount: number;
   imageSource?: ImageSource;
+  manuscriptType?: ManuscriptType;
   delayBetweenPostsSeconds: number;
   scheduledAt: string;
   mode?: 'create' | 'update';
@@ -47,6 +48,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     generateImages,
     imageCount,
     imageSource = 'ai',
+    manuscriptType = 'default',
     delayBetweenPostsSeconds,
     scheduledAt,
     mode = 'create',
@@ -76,7 +78,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       throw new LoginPrecheckError(message);
     }
 
-    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource);
+    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource, manuscriptType);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),

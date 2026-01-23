@@ -8,6 +8,7 @@ import { getValidCookies } from '../services/naver-auth.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
 const imageSourceSchema = z.enum(['ai', 'google']).default('ai');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant']).default('default');
 
 const pythonCompatSchema = z.object({
   queues: z.array(
@@ -22,6 +23,7 @@ const pythonCompatSchema = z.object({
   generate_images: z.boolean().default(true),
   image_count: z.number().default(5),
   image_source: imageSourceSchema,
+  manuscript_type: manuscriptTypeSchema,
   delay_between_posts: z.number().default(10),
 });
 
@@ -235,6 +237,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           generateImages: body.generate_images,
           imageCount: body.image_count,
           imageSource: body.image_source,
+          manuscriptType: body.manuscript_type,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: jobItem.scheduledAt,
         });
@@ -275,6 +278,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     generate_images: z.boolean().default(true),
     image_count: z.number().default(5),
     image_source: imageSourceSchema,
+    manuscript_type: manuscriptTypeSchema,
     delay_between_posts: z.number().default(10),
   });
 
@@ -334,6 +338,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           generateImages: body.generate_images,
           imageCount: body.image_count,
           imageSource: body.image_source,
+          manuscriptType: body.manuscript_type,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: new Date().toISOString(),
           mode: 'update' as const,
