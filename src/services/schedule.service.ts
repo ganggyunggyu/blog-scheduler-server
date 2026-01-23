@@ -1,7 +1,7 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-const SCHEDULE_MODE = '3';
+const SCHEDULE_MODE = '2';
 
 const getPostsPerDay = (mode: string, dayOffset: number): number => {
   switch (mode) {
