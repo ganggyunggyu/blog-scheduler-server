@@ -47,15 +47,15 @@ const dismissPopups = async (frame: Frame): Promise<void> => {
 };
 
 const isSubheading = (line: string): boolean => {
-  const patterns = [/^\d+\.\s/, /^[①②③④⑤⑥⑦⑧⑨⑩]/, /^【\d+】/, /^\[\d+\]/, /^▶\s*\d+/];
+  const patterns = [/^\d+\.(?:\s|[가-힣a-zA-Z])/, /^【\d+】/, /^\[\d+\]/, /^▶\s*\d+/];
   const trimmed = line.trim();
   return patterns.some((pattern) => pattern.test(trimmed));
 };
 
 const typeLineAvoidingAutoList = async (page: Page, line: string): Promise<void> => {
-  const match = line.match(/^(\d+)\.\s(.+)$/);
+  const match = line.match(/^(\d+)\.(\s?)([가-힣a-zA-Z].*)$/);
   if (match) {
-    const [, number, text] = match;
+    const [, number, , text] = match;
     await page.keyboard.type(`${number}.`, { delay: 50 });
     await page.waitForTimeout(50);
     await page.keyboard.type('ㅁ', { delay: 50 });
