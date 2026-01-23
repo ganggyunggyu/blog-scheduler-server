@@ -7,6 +7,7 @@ import {
   retryFailedJob,
   cleanCompletedJobs,
   drainAccountQueues,
+  drainAllQueues,
 } from '../queues/queue-manager';
 
 const jobQuerySchema = z.object({
@@ -91,7 +92,7 @@ export const queueRoutes = async (app: FastifyInstance) => {
     return { success: true, removed };
   });
 
-  // 큐 전체 비우기 (waiting/delayed/paused)
+  // 특정 계정 큐 비우기 (waiting/delayed/paused)
   app.post('/api/queues/:accountId/drain', async (req) => {
     const { accountId } = req.params as { accountId: string };
 
@@ -101,6 +102,16 @@ export const queueRoutes = async (app: FastifyInstance) => {
       success: true,
       accountId: accountId.slice(0, 3) + '***',
       drained: result,
+    };
+  });
+
+  // 전체 큐 초기화 (모든 계정의 대기 작업 삭제)
+  app.post('/api/queues/drain-all', async () => {
+    const result = await drainAllQueues();
+
+    return {
+      success: true,
+      ...result,
     };
   });
 }

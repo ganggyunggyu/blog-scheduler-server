@@ -228,6 +228,37 @@ export const drainAccountQueues = async (
   return result;
 };
 
+export const drainAllQueues = async (): Promise<{
+  totalAccounts: number;
+  totalDrained: { generate: number; publish: number };
+  accounts: Array<{ accountId: string; generate: number; publish: number }>;
+}> => {
+  const accountIds = [...generateQueues.keys()];
+  const results: Array<{ accountId: string; generate: number; publish: number }> = [];
+  const totals = { generate: 0, publish: 0 };
+
+  for (const accountId of accountIds) {
+    const result = await drainAccountQueues(accountId);
+    results.push({
+      accountId: accountId.slice(0, 3) + '***',
+      ...result,
+    });
+    totals.generate += result.generate;
+    totals.publish += result.publish;
+  }
+
+  log.warn('queues.all.drained', {
+    accounts: accountIds.length,
+    ...totals,
+  });
+
+  return {
+    totalAccounts: accountIds.length,
+    totalDrained: totals,
+    accounts: results,
+  };
+};
+
 export const removeJobFromQueue = async (
   accountId: string,
   jobId: string,
