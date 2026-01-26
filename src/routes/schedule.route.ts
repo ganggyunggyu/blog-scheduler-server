@@ -8,7 +8,7 @@ import { getValidCookies } from '../services/naver-auth.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
 const imageSourceSchema = z.enum(['ai', 'google']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant']).default('default');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet']).default('default');
 
 const pythonCompatSchema = z.object({
   queues: z.array(

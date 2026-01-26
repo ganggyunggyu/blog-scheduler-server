@@ -104,8 +104,41 @@ export const generateUpdateRestaurantManuscript = async (
   return { id: raw._id ?? '', title, content, raw };
 };
 
+export const generatePetManuscript = async (
+  keyword: string,
+  service: string,
+  ref: string = ''
+): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
+  const url = `${env.MANUSCRIPT_API_URL}/generate/blog-filler-pet`;
+  const progress = new ProgressBar({
+    label: 'manuscript',
+    total: 1,
+    width: 16,
+  });
+  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref });
+
+  const response = await axios.post<Manuscript>(
+    url,
+    { service, keyword, ref },
+    { timeout: 300000 }
+  );
+
+  const raw = response.data;
+  const lines = (raw.content ?? '').split('\n');
+  const title = (lines[0] ?? '').trim() || keyword;
+  const content = lines.slice(1).join('\n').trim();
+
+  manuscriptLog.info(progress.done('done'), {
+    id: raw._id ?? '',
+    titlePreview: title.slice(0, 30),
+    length: content.length,
+  });
+
+  return { id: raw._id ?? '', title, content, raw };
+};
+
 export type ImageSource = 'ai' | 'google';
-export type ManuscriptType = 'default' | 'update-restaurant';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'pet';
 
 const generateImageUrlsFromAI = async (
   keyword: string,
@@ -271,10 +304,17 @@ export const prepareJob = async (
   const { dir, imagesDir } = await createJobDir(keyword);
   manuscriptLog.info('job.dir.created', { dir, manuscriptType });
 
-  const manuscript =
-    manuscriptType === 'update-restaurant'
-      ? await generateUpdateRestaurantManuscript(keyword, service, ref)
-      : await generateManuscript(keyword, service, ref);
+  const getManuscript = async () => {
+    switch (manuscriptType) {
+      case 'update-restaurant':
+        return generateUpdateRestaurantManuscript(keyword, service, ref);
+      case 'pet':
+        return generatePetManuscript(keyword, service, ref);
+      default:
+        return generateManuscript(keyword, service, ref);
+    }
+  };
+  const manuscript = await getManuscript();
 
   const manuscriptPath = path.join(dir, 'manuscript.txt');
   await writeFile(
