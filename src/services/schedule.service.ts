@@ -1,9 +1,9 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-const SCHEDULE_MODE = '2';
+export type ScheduleMode = '2' | '3' | '2121';
 
-const getPostsPerDay = (mode: string, dayOffset: number): number => {
+const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
     case '2':
       return 2;
@@ -12,7 +12,7 @@ const getPostsPerDay = (mode: string, dayOffset: number): number => {
     case '2121':
       return dayOffset % 2 === 0 ? 2 : 1;
     default:
-      return 3;
+      return 2;
   }
 };
 
@@ -54,6 +54,7 @@ export interface CreateScheduleInput {
   service: string;
   ref: string;
   scheduleDate?: string;
+  scheduleMode?: ScheduleMode;
   generateImages: boolean;
   imageCount: number;
   delayBetweenPostsSeconds: number;
@@ -79,7 +80,8 @@ const addMinutesWithCap = (base: Date, minutes: number): Date => {
 
 export const calculateSchedule = (
   keywords: string[],
-  scheduleDate?: string
+  scheduleDate?: string,
+  scheduleMode: ScheduleMode = '2'
 ): ScheduleItem[] => {
   const now = new Date();
   const baseDate = scheduleDate ? new Date(`${scheduleDate}T00:00:00`) : now;
@@ -92,7 +94,7 @@ export const calculateSchedule = (
     const targetDate = new Date(baseDate);
     targetDate.setDate(targetDate.getDate() + dayOffset);
 
-    const postsPerDay = getPostsPerDay(SCHEDULE_MODE, dayOffset);
+    const postsPerDay = getPostsPerDay(scheduleMode, dayOffset);
 
     const isToday = isSameDay(targetDate, now);
     let currentTime: Date;
@@ -148,7 +150,7 @@ export const formatKst = (date: Date): string =>
   format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
 export const createSchedule = async (input: CreateScheduleInput) => {
-  const items = calculateSchedule(input.keywords, input.scheduleDate);
+  const items = calculateSchedule(input.keywords, input.scheduleDate, input.scheduleMode);
 
   const schedule = await ScheduleModel.create({
     accountId: input.accountId,

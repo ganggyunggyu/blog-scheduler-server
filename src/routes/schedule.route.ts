@@ -10,6 +10,8 @@ import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 const imageSourceSchema = z.enum(['ai', 'google']).default('ai');
 const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet']).default('default');
 
+const scheduleModeSchema = z.enum(['2', '3', '2121']).default('2');
+
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
@@ -18,6 +20,7 @@ const pythonCompatSchema = z.object({
     })
   ),
   schedule_date: z.string().optional(),
+  schedule_mode: scheduleModeSchema,
   service: z.string().default('default'),
   ref: z.string().default(''),
   generate_images: z.boolean().default(true),
@@ -214,6 +217,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         service: body.service,
         ref: body.ref,
         scheduleDate: body.schedule_date,
+        scheduleMode: body.schedule_mode,
         generateImages: body.generate_images,
         imageCount: body.image_count,
         delayBetweenPostsSeconds: body.delay_between_posts,
