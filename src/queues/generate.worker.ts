@@ -1,10 +1,10 @@
 import { Job, UnrecoverableError } from 'bullmq';
-import { prepareJob, type ImageSource, type ManuscriptType } from '../services/manuscript.service';
+import { prepareJob, getProductMetadata, type ImageSource, type ManuscriptType } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
 import { failAccountSchedules } from '../services/schedule-failure.service';
-import { logger } from '../lib/logger';
+import { logger } from '../lib/logging/logger';
 
 interface GenerateJobData {
   scheduleId: string;
@@ -78,12 +78,23 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       throw new LoginPrecheckError(message);
     }
 
-    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource, manuscriptType);
+    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource, manuscriptType, category);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),
       images: prepared.images.length,
     });
+
+    // 메타데이터 조회 (product 이미지 소스일 때만)
+    const metadata = imageSource === 'product' ? await getProductMetadata(keyword) : null;
+    if (metadata) {
+      log.info('metadata.loaded', {
+        keyword,
+        mapQueries: metadata.mapQueries?.length ?? 0,
+        hasPhone: !!metadata.phone,
+        hasUrl: !!metadata.url,
+      });
+    }
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       status: 'generated',
@@ -106,6 +117,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       scheduledAt,
       mode,
       logNo,
+      metadata: metadata ?? undefined,
     });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {

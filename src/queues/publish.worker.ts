@@ -7,7 +7,8 @@ import { updateJobStatus } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { drainAccountQueues } from './queue-manager';
 import { failAccountSchedules } from '../services/schedule-failure.service';
-import { logger } from '../lib/logger';
+import { logger } from '../lib/logging/logger';
+import type { ProductMetadata } from '../types/metadata';
 
 interface PublishJobData {
   scheduleId: string;
@@ -20,13 +21,21 @@ interface PublishJobData {
   scheduledAt: string;
   mode?: 'create' | 'update';
   logNo?: string;
+  metadata?: ProductMetadata;
 }
 
 const log = logger.child({ scope: 'Publish' });
 
 const isSessionError = (message: string): boolean => {
   const normalized = message.toLowerCase();
-  return normalized.includes('login') || normalized.includes('session') || message.includes('로그인');
+  return (
+    normalized.includes('login') ||
+    normalized.includes('session') ||
+    message.includes('로그인') ||
+    message.includes('세션') ||
+    message.includes('mainFrame') ||
+    (normalized.includes('frame') && normalized.includes('not found'))
+  );
 };
 
 const isLoginFailure = (message: string): boolean =>
@@ -59,7 +68,8 @@ const executePost = async (
   category?: string,
   scheduledAt?: string,
   blogId?: string,
-  logNo?: string
+  logNo?: string,
+  metadata?: ProductMetadata
 ) => {
   if (mode === 'update' && blogId && logNo) {
     return updatePost({
@@ -70,6 +80,7 @@ const executePost = async (
       content: manuscript.content,
       images: manuscript.images,
       category,
+      metadata,
     });
   }
   return writePost({
@@ -79,11 +90,12 @@ const executePost = async (
     images: manuscript.images,
     category,
     scheduleTime: scheduledAt,
+    metadata,
   });
 };
 
 export const processPublish = async (job: Job<PublishJobData>) => {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt, mode = 'create', logNo } = job.data;
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata } = job.data;
   const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -108,7 +120,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
 
     if (cookies) {
       log.info('session.cache', { account: maskedAccount, mode });
-      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo);
+      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata);
 
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
@@ -135,7 +147,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     const auth = await getValidCookies(account.id, account.password);
     log.info('auth.success', { account: maskedAccount, fromCache: auth.fromCache });
 
-    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo);
+    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo, metadata);
 
     if (!publishResult.success) {
       throw new Error(publishResult.message);
