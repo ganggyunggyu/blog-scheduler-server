@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 import { buildApp, type AppContext } from './app';
 import { env } from './config/env';
 import { closeAllQueues } from './queues/queue-manager';
-import { closeBrowser } from './lib/playwright';
+import { closeBrowser } from './lib/browser/playwright';
 import { redis } from './config/redis';
-import { logger } from './lib/logger';
+import { logger } from './lib/logging/logger';
 
 let context: AppContext | null = null;
 let isShuttingDown = false;

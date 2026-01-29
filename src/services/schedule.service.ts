@@ -1,10 +1,12 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-export type ScheduleMode = '2' | '3' | '2121';
+export type ScheduleMode = '1' | '2' | '3' | '2121';
 
 const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
+    case '1':
+      return 1;
     case '2':
       return 2;
     case '3':

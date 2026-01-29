@@ -6,7 +6,7 @@ import { FastifyAdapter } from '@bull-board/fastify';
 import { registerRoutes } from './routes';
 import { connectMongo } from './config/mongo';
 import { getAllQueues, initializeExistingQueues } from './queues/queue-manager';
-import { logger } from './lib/logger';
+import { logger } from './lib/logging/logger';
 
 const log = logger.child({ scope: 'App' });
 

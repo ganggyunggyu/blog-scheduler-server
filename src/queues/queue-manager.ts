@@ -3,7 +3,7 @@ import { redis } from '../config/redis';
 import { defaultJobOptions } from './constants';
 import { processGenerate } from './generate.worker';
 import { processPublish } from './publish.worker';
-import { logger } from '../lib/logger';
+import { logger } from '../lib/logging/logger';
 import { refreshBullBoard } from '../app';
 
 const connection = redis as unknown as ConnectionOptions;

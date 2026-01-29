@@ -7,10 +7,10 @@ import { getPostList, getPostsByRange } from '../services/naver-blog.service';
 import { getValidCookies } from '../services/naver-auth.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
-const imageSourceSchema = z.enum(['ai', 'google']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet']).default('default');
+const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default('ai');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo']).default('default');
 
-const scheduleModeSchema = z.enum(['2', '3', '2121']).default('2');
+const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
 
 const pythonCompatSchema = z.object({
   queues: z.array(
