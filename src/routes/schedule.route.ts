@@ -8,14 +8,14 @@ import { getValidCookies } from '../services/naver-auth.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 
 const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo']).default('default');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
 
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
-      account: z.object({ id: z.string(), password: z.string() }),
+      account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
       keywords: z.array(z.string()),
     })
   ),
@@ -28,6 +28,7 @@ const pythonCompatSchema = z.object({
   image_source: imageSourceSchema,
   manuscript_type: manuscriptTypeSchema,
   delay_between_posts: z.number().default(10),
+  keyword_category: z.string().optional(),
 });
 
 const maskAccountId = (accountId: string): string => {
@@ -244,6 +245,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           manuscriptType: body.manuscript_type,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: jobItem.scheduledAt,
+          keywordCategory: body.keyword_category,
         });
 
         await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
@@ -270,7 +272,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   const updateCompatSchema = z.object({
     queues: z.array(
       z.object({
-        account: z.object({ id: z.string(), password: z.string() }),
+        account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
         keywords: z.array(z.string()),
         update_count: z.number().min(1).optional(),
         start_index: z.number().min(0).optional(),
@@ -284,6 +286,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     image_source: imageSourceSchema,
     manuscript_type: manuscriptTypeSchema,
     delay_between_posts: z.number().default(10),
+    keyword_category: z.string().optional(),
   });
 
   app.post('/bot/auto-update', async (req: { body: unknown }) => {
@@ -347,6 +350,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           scheduledAt: new Date().toISOString(),
           mode: 'update' as const,
           logNo: post.logNo,
+          keywordCategory: body.keyword_category,
         });
 
         jobsToCreate.push({ logNo: post.logNo, title: post.title, keyword, index: post.index });

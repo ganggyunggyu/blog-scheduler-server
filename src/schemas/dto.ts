@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const accountSchema = z.object({
   id: z.string().min(1),
   password: z.string().min(1),
+  blogId: z.string().optional(),
 });
 
 export const createScheduleSchema = z.object({
