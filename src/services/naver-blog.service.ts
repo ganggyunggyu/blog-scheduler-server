@@ -5,6 +5,7 @@ import {
   createSession,
   closeSession,
   getMainFrame,
+  waitForFrame,
   dismissPopups,
   focusEditor,
   setAlignCenter,
@@ -22,10 +23,14 @@ import {
   uploadExcludedImage,
   insertMaps,
   insertLink,
+  insertExcludeLibraryLinks,
   insertPhone,
+  uploadFromMultiImageData,
+  addSpacing,
+  type MultiImageData,
+  type WriteResult,
 } from '../lib/naver-editor';
-import type { ProductMetadata } from '../types/metadata';
-import { getBrowser } from '../lib/browser/playwright';
+import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata';
 
 const log = logger.child({ scope: 'NaverBlog' });
 
@@ -49,20 +54,21 @@ const checkLoginStatus = (page: Page): { loggedIn: boolean; redirectedUrl?: stri
 // Types
 // ============================================================
 
-interface WritePostParams {
+interface BasePostParams {
   cookies: unknown[];
   title: string;
   content: string;
   images?: string[];
+  multiImages?: MultiImageData;
+  excludeLibrary?: string[];
+  excludeLibraryLink?: ExcludeLibraryLinkItem[];
   category?: string;
-  scheduleTime?: string;
   metadata?: ProductMetadata;
+  keywordCategory?: string;
 }
 
-interface WriteResult {
-  success: boolean;
-  postUrl?: string;
-  message: string;
+interface WritePostParams extends BasePostParams {
+  scheduleTime?: string;
 }
 
 // ============================================================
@@ -73,6 +79,46 @@ const prepareEditorForWriting = async (page: Page, frame: Frame): Promise<void> 
   await dismissPopups(frame);
   await focusEditor(page, frame);
   await setAlignCenter(page, frame);
+};
+
+interface ClassifiedImages {
+  normalImages: string[];
+  excluded1?: string;
+  excluded2?: string;
+  excluded3?: string;
+}
+
+const classifyImages = (
+  images?: string[],
+  excludeLibrary?: string[],
+): ClassifiedImages => {
+  if (excludeLibrary?.length) {
+    return {
+      normalImages: images || [],
+      excluded1: excludeLibrary[0],
+      excluded2: excludeLibrary[1],
+      excluded3: excludeLibrary[2],
+    };
+  }
+
+  const excludedImages = findExcludedImages(images || []);
+  return {
+    normalImages: filterNormalImages(images || [], excludedImages),
+    excluded1: excludedImages.find((e) => e.order === 1)?.path,
+    excluded2: excludedImages.find((e) => e.order === 2)?.path,
+    excluded3: excludedImages.find((e) => e.order === 3)?.path,
+  };
+};
+
+const enterTitle = async (page: Page, frame: Frame, title: string): Promise<void> => {
+  await clickTitleArea(frame);
+  await page.waitForTimeout(500);
+  await page.keyboard.type(title, { delay: 30 });
+  await page.waitForTimeout(500);
+  log.info('title.entered');
+
+  await clickContentArea(page, frame);
+  await page.waitForTimeout(500);
 };
 
 const handlePublishDialog = async (
@@ -98,11 +144,117 @@ const handlePublishDialog = async (
 };
 
 // ============================================================
+// Content Pipeline
+// ============================================================
+
+type ContentBlock = 'excluded1' | 'excluded2' | 'excluded3' | 'allExcluded' | 'maps' | 'phone' | 'content' | 'excludeLibraryLinks' | 'spacing' | 'link' | 'multiImages';
+
+const DEFAULT_PIPELINE: ContentBlock[] = [
+  'excluded1', 'maps', 'phone', 'excluded2', 'content', 'excluded3', 'link', 'multiImages',
+];
+
+const CONTENT_PIPELINES: Record<string, ContentBlock[]> = {
+  default: DEFAULT_PIPELINE,
+  '애견': ['excluded1', 'maps', 'phone', 'excluded2', 'content', 'excluded3', 'link'],
+  '안과': ['allExcluded', 'excludeLibraryLinks', 'maps', 'spacing', 'content', 'multiImages'],
+};
+
+const getPipeline = (keywordCategory?: string): ContentBlock[] => {
+  if (keywordCategory && CONTENT_PIPELINES[keywordCategory]) {
+    return CONTENT_PIPELINES[keywordCategory];
+  }
+  return CONTENT_PIPELINES.default;
+};
+
+interface ContentBlockContext {
+  page: Page;
+  frame: Frame;
+  content: string;
+  normalImages: string[];
+  excluded1?: string;
+  excluded2?: string;
+  excluded3?: string;
+  metadata?: ProductMetadata;
+  multiImages?: MultiImageData;
+  excludeLibrary?: string[];
+  excludeLibraryLink?: ExcludeLibraryLinkItem[];
+}
+
+const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promise<void>> = {
+  excluded1: async ({ page, excluded1 }) => {
+    if (!excluded1) return;
+    await uploadExcludedImage(page, excluded1);
+    await page.waitForTimeout(500);
+    log.info('excluded.1.uploaded');
+  },
+  maps: async ({ page, frame, metadata }) => {
+    if (!metadata?.mapQueries?.length) return;
+    const result = await insertMaps(page, frame, metadata.mapQueries);
+    log.info('maps.inserted', { success: result.success, failed: result.failed });
+  },
+  phone: async ({ page, frame, metadata }) => {
+    if (!metadata?.phone) return;
+    const result = await insertPhone(page, frame, metadata.phone);
+    log.info('phone.inserted', { success: result, phone: metadata.phone });
+  },
+  excluded2: async ({ page, excluded2 }) => {
+    if (!excluded2) return;
+    await uploadExcludedImage(page, excluded2);
+    await page.waitForTimeout(500);
+    log.info('excluded.2.uploaded');
+  },
+  content: async ({ page, frame, content, normalImages }) => {
+    await typeContentWithImages(page, frame, content, normalImages);
+    log.info('content.entered');
+  },
+  excluded3: async ({ page, excluded3 }) => {
+    if (!excluded3) return;
+    await uploadExcludedImage(page, excluded3);
+    await page.waitForTimeout(500);
+    log.info('excluded.3.uploaded');
+  },
+  allExcluded: async ({ page, excludeLibrary }) => {
+    if (!excludeLibrary?.length) return;
+    for (const imagePath of excludeLibrary) {
+      await uploadExcludedImage(page, imagePath);
+      await page.waitForTimeout(500);
+    }
+    log.info('allExcluded.uploaded', { count: excludeLibrary.length });
+  },
+  spacing: async ({ page }) => {
+    await addSpacing(page);
+  },
+  excludeLibraryLinks: async ({ page, frame, excludeLibraryLink }) => {
+    if (!excludeLibraryLink?.length) return;
+    const result = await insertExcludeLibraryLinks(page, frame, excludeLibraryLink);
+    log.info('excludeLibraryLinks.done', result);
+  },
+  link: async ({ page, frame, metadata }) => {
+    if (!metadata?.url) return;
+    const result = await insertLink(page, frame, metadata.url);
+    log.info('link.inserted', { success: result, url: metadata.url });
+  },
+  multiImages: async ({ page, frame, multiImages }) => {
+    if (!multiImages) return;
+    const result = await uploadFromMultiImageData(page, frame, multiImages);
+    log.info('multiImages.uploaded', { total: result.total, success: result.success, failed: result.failed });
+  },
+};
+
+const executeContentPipeline = async (ctx: ContentBlockContext, keywordCategory?: string): Promise<void> => {
+  const pipeline = getPipeline(keywordCategory);
+  log.info('pipeline.start', { category: keywordCategory ?? 'default', blocks: pipeline });
+  for (const block of pipeline) {
+    await BLOCK_EXECUTORS[block](ctx);
+  }
+};
+
+// ============================================================
 // Write Post
 // ============================================================
 
 export const writePost = async (params: WritePostParams): Promise<WriteResult> => {
-  const { cookies, title, content, images, category, scheduleTime, metadata } = params;
+  const { cookies, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory } = params;
   const progress = new ProgressBar({ label: 'publish', total: 5, width: 14 });
 
   const session = await createSession(cookies);
@@ -126,72 +278,17 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
     await prepareEditorForWriting(page, frame);
     log.info(progress.step('editor.ready'));
 
-    // 라이브러리제외 이미지 분류
-    const excludedImages = findExcludedImages(images || []);
-    const normalImages = filterNormalImages(images || [], excludedImages);
-    const excluded1 = excludedImages.find((e) => e.order === 1)?.path;
-    const excluded2 = excludedImages.find((e) => e.order === 2)?.path;
-    const excluded3 = excludedImages.find((e) => e.order === 3)?.path;
-    log.info('images.classified', {
-      excluded: excludedImages.length,
-      normal: normalImages.length,
-    });
+    const { normalImages, excluded1, excluded2, excluded3 } = classifyImages(images, excludeLibrary);
+    log.info('images.classified', { excluded: excludeLibrary?.length ?? 0, normal: normalImages.length });
 
-    // 제목 입력
-    await clickTitleArea(frame);
-    await page.waitForTimeout(500);
-    await page.keyboard.type(title, { delay: 30 });
-    await page.waitForTimeout(500);
-    log.info('title.entered');
+    await enterTitle(page, frame, title);
 
-    // 본문으로 이동
-    await clickContentArea(page, frame);
-    await page.waitForTimeout(500);
-
-    // 라이브러리제외_1 업로드 (클립보드 방식)
-    if (excluded1) {
-      await uploadExcludedImage(page, excluded1);
-      await page.waitForTimeout(500);
-      log.info('excluded.1.uploaded');
-    }
-
-    // 지도 삽입
-    if (metadata?.mapQueries?.length) {
-      const mapResult = await insertMaps(page, frame, metadata.mapQueries);
-      log.info('maps.inserted', { success: mapResult.success, failed: mapResult.failed });
-    }
-
-    // 전화번호 삽입
-    if (metadata?.phone) {
-      const phoneResult = await insertPhone(page, frame, metadata.phone);
-      log.info('phone.inserted', { success: phoneResult, phone: metadata.phone });
-    }
-
-    // 라이브러리제외_2 업로드 (클립보드 방식)
-    if (excluded2) {
-      await uploadExcludedImage(page, excluded2);
-      await page.waitForTimeout(500);
-      log.info('excluded.2.uploaded');
-    }
-
-    // 본문 + 일반 이미지 입력
-    await typeContentWithImages(page, frame, content, normalImages);
+    await executeContentPipeline(
+      { page, frame, content, normalImages, excluded1, excluded2, excluded3, metadata, multiImages, excludeLibrary, excludeLibraryLink },
+      keywordCategory
+    );
     log.info(progress.step('content.entered'));
 
-    // 라이브러리제외_3 업로드 (클립보드 방식)
-    if (excluded3) {
-      await uploadExcludedImage(page, excluded3);
-      await page.waitForTimeout(500);
-      log.info('excluded.3.uploaded');
-    }
-
-    // URL 링크 삽입
-    if (metadata?.url) {
-      const linkResult = await insertLink(page, frame, metadata.url);
-      log.info('link.inserted', { success: linkResult, url: metadata.url });
-    }
-
-    // 가운데 정렬 (발행 전)
     await setAlignCenter(page, frame);
     await page.waitForTimeout(500);
 
@@ -213,19 +310,13 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
 // Update Post
 // ============================================================
 
-interface UpdatePostParams {
-  cookies: unknown[];
+interface UpdatePostParams extends BasePostParams {
   blogId: string;
   logNo: string;
-  title: string;
-  content: string;
-  images?: string[];
-  category?: string;
-  metadata?: ProductMetadata;
 }
 
 export const updatePost = async (params: UpdatePostParams): Promise<WriteResult> => {
-  const { cookies, blogId, logNo, title, content, images, category, metadata } = params;
+  const { cookies, blogId, logNo, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, metadata, keywordCategory } = params;
   const progress = new ProgressBar({ label: 'update', total: 6, width: 14 });
 
   const session = await createSession(cookies);
@@ -253,73 +344,17 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
     await clearAllContent(page, frame);
     log.info(progress.step('content.cleared'));
 
-    // 라이브러리제외 이미지 분류
-    const excludedImages = findExcludedImages(images || []);
-    const normalImages = filterNormalImages(images || [], excludedImages);
-    const excluded1 = excludedImages.find((e) => e.order === 1)?.path;
-    const excluded2 = excludedImages.find((e) => e.order === 2)?.path;
-    const excluded3 = excludedImages.find((e) => e.order === 3)?.path;
-    log.info('images.classified', {
-      excluded: excludedImages.length,
-      normal: normalImages.length,
-    });
+    const { normalImages, excluded1, excluded2, excluded3 } = classifyImages(images, excludeLibrary);
+    log.info('images.classified', { excluded: excludeLibrary?.length ?? 0, normal: normalImages.length });
 
-    // 제목 입력
-    await clickTitleArea(frame);
-    await page.waitForTimeout(500);
-    await page.keyboard.type(title, { delay: 30 });
-    await page.waitForTimeout(500);
-    log.info('title.entered');
+    await enterTitle(page, frame, title);
 
-    // 본문으로 이동
-    await clickContentArea(page, frame);
-    await page.waitForTimeout(500);
-
-    // 라이브러리제외_1 업로드 (클립보드 방식)
-    if (excluded1) {
-      await uploadExcludedImage(page, excluded1);
-      await page.waitForTimeout(500);
-      log.info('excluded.1.uploaded');
-    }
-
-    // 지도 삽입
-    if (metadata?.mapQueries?.length) {
-      const mapResult = await insertMaps(page, frame, metadata.mapQueries);
-      log.info('maps.inserted', { success: mapResult.success, failed: mapResult.failed });
-    }
-
-    // 전화번호 삽입
-    if (metadata?.phone) {
-      const phoneResult = await insertPhone(page, frame, metadata.phone);
-      log.info('phone.inserted', { success: phoneResult, phone: metadata.phone });
-    }
-
-    // 라이브러리제외_2 업로드 (클립보드 방식)
-    if (excluded2) {
-      await uploadExcludedImage(page, excluded2);
-      await page.waitForTimeout(500);
-      log.info('excluded.2.uploaded');
-    }
-
-    // 본문 + 일반 이미지 입력
-    log.info('content.typing', { titlePreview: title.slice(0, 30), lines: content.split('\n').length });
-    await typeContentWithImages(page, frame, content, normalImages);
+    await executeContentPipeline(
+      { page, frame, content, normalImages, excluded1, excluded2, excluded3, metadata, multiImages, excludeLibrary, excludeLibraryLink },
+      keywordCategory
+    );
     log.info(progress.step('content.entered'));
 
-    // 라이브러리제외_3 업로드 (클립보드 방식)
-    if (excluded3) {
-      await uploadExcludedImage(page, excluded3);
-      await page.waitForTimeout(500);
-      log.info('excluded.3.uploaded');
-    }
-
-    // URL 링크 삽입
-    if (metadata?.url) {
-      const linkResult = await insertLink(page, frame, metadata.url);
-      log.info('link.inserted', { success: linkResult, url: metadata.url });
-    }
-
-    // 가운데 정렬 (발행 전)
     await setAlignCenter(page, frame);
     await page.waitForTimeout(500);
 
@@ -346,16 +381,6 @@ interface PostListItem {
   title: string;
   index: number;
 }
-
-const waitForFrame = async (page: Page, name: string, timeout = 10000): Promise<Frame> => {
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    const frame = page.frame({ name });
-    if (frame) return frame;
-    await page.waitForTimeout(500);
-  }
-  throw new Error(`Frame '${name}' not found within ${timeout}ms`);
-};
 
 const setListViewTo30 = async (
   frame: Frame,
@@ -461,13 +486,8 @@ const clickPage = async (frame: Frame, page: Page, pageNum: number): Promise<boo
 export const indexAllPosts = async (
   cookies: unknown[]
 ): Promise<{ posts: PostListItem[]; blogId: string; totalCount: number }> => {
-  const browser = await getBrowser();
-  const context = await browser.newContext({
-    userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  });
-  await context.addCookies(cookies as any[]);
-  const page = await context.newPage();
+  const session = await createSession(cookies);
+  const { page } = session;
 
   try {
     await page.goto('https://www.naver.com', { waitUntil: 'domcontentloaded' });
@@ -539,7 +559,7 @@ export const indexAllPosts = async (
     log.error('indexAllPosts.failed', { message });
     return { posts: [], blogId: '', totalCount: 0 };
   } finally {
-    await context.close();
+    await closeSession(session);
   }
 };
 
