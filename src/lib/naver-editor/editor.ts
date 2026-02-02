@@ -88,6 +88,13 @@ export const clickContentArea = async (page: Page, frame: Frame): Promise<void> 
   log.info('content.area.fallback.tab');
 };
 
+export const addSpacing = async (page: Page, count = 100): Promise<void> => {
+  for (let i = 0; i < count; i++) {
+    await page.keyboard.press('Enter');
+  }
+  log.info('spacing.added', { count });
+};
+
 export const clearAllContent = async (page: Page, frame: Frame): Promise<void> => {
   await clickTitleArea(frame);
   await page.waitForTimeout(300);
