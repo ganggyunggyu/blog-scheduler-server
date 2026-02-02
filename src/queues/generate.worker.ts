@@ -1,6 +1,6 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
-import { prepareJob, prepareProductImages, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
+import { prepareJob, prepareProductImages, generateAndDownloadAIImages, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
@@ -23,6 +23,7 @@ interface GenerateJobData {
   scheduledAt: string;
   mode?: 'create' | 'update';
   logNo?: string;
+  keywordCategory?: string;
 }
 
 const log = logger.child({ scope: 'Generate' });
@@ -54,6 +55,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     scheduledAt,
     mode = 'create',
     logNo,
+    keywordCategory: providedCategory,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -90,7 +92,8 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     let productData: PreparedProductData | null = null;
     if (imageSource === 'product') {
       const imagesDir = path.join(prepared.jobDir, 'images');
-      productData = await prepareProductImages(keyword, imagesDir);
+      const blogId = account.blogId || account.id;
+      productData = await prepareProductImages(keyword, imagesDir, blogId, providedCategory);
       log.info('product.prepared', {
         keyword,
         body: productData.bodyImages.length,
@@ -100,11 +103,24 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         slide: productData.multiImages.slide?.length ?? 0,
         collage: productData.multiImages.collage?.length ?? 0,
       });
+
+      if (productData.bodyImages.length === 0) {
+        productData.bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+        log.info('product.fallback.ai', { count: productData.bodyImages.length });
+      }
     }
 
-    // 키워드 카테고리 판별
-    const keywordCategory = await getCategory(keyword);
-    log.info('category.resolved', { keyword, keywordCategory });
+    // 키워드 카테고리 판별 (프론트에서 지정한 값 우선)
+    const keywordCategory = providedCategory || await getCategory(keyword);
+    log.info('category.resolved', { keyword, keywordCategory, source: providedCategory ? 'provided' : 'api' });
+
+    if (keywordCategory === '안과' && productData && (!productData.multiImages.slide || productData.multiImages.slide.length === 0)) {
+      const slideDir = path.join(prepared.jobDir, 'images', 'slide');
+      const fs = await import('fs/promises');
+      await fs.mkdir(slideDir, { recursive: true });
+      productData.multiImages.slide = await generateAndDownloadAIImages(keyword, 5, slideDir, category);
+      log.info('product.fallback.slide.ai', { count: productData.multiImages.slide.length });
+    }
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       status: 'generated',
