@@ -40,15 +40,56 @@ type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo'
 type ScheduleMode = '1' | '2' | '3' | '2121';
 ```
 
+## account (계정 정보)
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | string | O | 네이버 계정 ID |
+| `password` | string | O | 네이버 계정 비밀번호 |
+| `blogId` | string | X | 블로그 ID (미입력 시 계정 ID 사용) |
+
+`blogId`는 `image_source: "product"` 사용 시 상품 이미지 API에 전달됩니다.
+미입력 시 발행 단계에서 `account.id`를 기본값으로 사용합니다.
+
+```typescript
+interface Account {
+  id: string;
+  password: string;
+  blogId?: string;
+}
+```
+
 ## 요청 예시
+
+### 기본 (blogId 없이)
 
 ```json
 {
-  "queues": [...],
+  "queues": [
+    {
+      "account": { "id": "user123", "password": "pw123" },
+      "keywords": ["스마일라식회복"]
+    }
+  ],
   "image_source": "keyword",
   "manuscript_type": "grok",
   "schedule_mode": "2",
   "generate_images": true,
   "image_count": 5
+}
+```
+
+### blogId 포함
+
+```json
+{
+  "queues": [
+    {
+      "account": { "id": "user123", "password": "pw123", "blogId": "my_blog_name" },
+      "keywords": ["스마일라식회복"]
+    }
+  ],
+  "image_source": "product",
+  "schedule_mode": "1"
 }
 ```
