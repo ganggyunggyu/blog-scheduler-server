@@ -208,8 +208,42 @@ export const generateKeigoManuscript = async (
   return { id: raw._id ?? '', title, content, raw };
 };
 
+export const generateHanryeodamwonManuscript = async (
+  keyword: string,
+  service: string,
+  ref: string = ''
+): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
+  const url = `${env.MANUSCRIPT_API_URL}/generate/hanryeo`;
+  const progress = new ProgressBar({
+    label: 'manuscript',
+    total: 1,
+    width: 16,
+  });
+  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, engine: 'hanryeodamwon' });
+
+  const response = await axios.post<Manuscript>(
+    url,
+    { service, keyword, ref },
+    { timeout: 300000 }
+  );
+
+  const raw = response.data;
+  const lines = (raw.content ?? '').split('\n');
+  const title = (lines[0] ?? '').trim() || keyword;
+  const content = lines.slice(1).join('\n').trim();
+
+  manuscriptLog.info(progress.done('done'), {
+    id: raw._id ?? '',
+    titlePreview: title.slice(0, 30),
+    length: content.length,
+    engine: 'hanryeodamwon',
+  });
+
+  return { id: raw._id ?? '', title, content, raw };
+};
+
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon';
 
 export interface ImageData {
   url: string;
@@ -349,13 +383,17 @@ export interface PreparedProductData {
   metadata: ProductMetadata;
 }
 
-export const getProductData = async (keyword: string) => {
+export const getProductData = async (keyword: string, blogId?: string, category?: string) => {
   const url = `${env.IMAGE_API_URL}/api/image/product-images`;
   const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
-  imageLog.info(progress.start('request'), { url, keyword });
+  imageLog.info(progress.start('request'), { url, keyword, blogId, category });
+
+  const params: Record<string, string> = { keyword };
+  if (blogId) params.blogId = blogId;
+  if (category) params.category = category;
 
   const response = await axios.get(url, {
-    params: { keyword },
+    params,
     timeout: 300000,
   });
 
@@ -398,9 +436,11 @@ export const getProductData = async (keyword: string) => {
 
 export const prepareProductImages = async (
   keyword: string,
-  imagesDir: string
+  imagesDir: string,
+  blogId?: string,
+  category?: string
 ): Promise<PreparedProductData> => {
-  const data = await getProductData(keyword);
+  const data = await getProductData(keyword, blogId, category);
 
   const bodyImages = await downloadImagesToDir(data.bodyImages, imagesDir);
 
@@ -481,6 +521,17 @@ export const getCategory = async (keyword: string): Promise<string> => {
     });
     return '기타';
   }
+};
+
+export const generateAndDownloadAIImages = async (
+  keyword: string,
+  imageCount: number,
+  imagesDir: string,
+  category?: string,
+): Promise<string[]> => {
+  const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
+  const imageData = urls.map((url) => ({ url }));
+  return downloadImagesToDir(imageData, imagesDir);
 };
 
 export const generateImageUrls = async (
@@ -608,6 +659,8 @@ export const prepareJob = async (
         return generateGrokManuscript(keyword, service, ref, category);
       case 'keigo':
         return generateKeigoManuscript(keyword, service, ref);
+      case 'hanryeodamwon':
+        return generateHanryeodamwonManuscript(keyword, service, ref);
       default:
         return generateManuscript(keyword, service, ref);
     }

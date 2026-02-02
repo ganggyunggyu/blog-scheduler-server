@@ -157,6 +157,7 @@ const CONTENT_PIPELINES: Record<string, ContentBlock[]> = {
   default: DEFAULT_PIPELINE,
   '애견': ['excluded1', 'maps', 'phone', 'excluded2', 'content', 'excluded3', 'link'],
   '안과': ['allExcluded', 'excludeLibraryLinks', 'maps', 'spacing', 'content', 'multiImages'],
+  '한려담원': ['content', 'link'],
 };
 
 const getPipeline = (keywordCategory?: string): ContentBlock[] => {
