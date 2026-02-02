@@ -4,7 +4,8 @@ import path from 'path';
 import { env } from '../config/env';
 import { logger } from '../lib/logging/logger';
 import { ProgressBar } from '../lib/utils/progress';
-import type { ProductMetadata } from '../types/metadata';
+import type { ProductMetadata, ProductImagesResponse, ExcludeLibraryLinkItem } from '../types/metadata';
+import type { MultiImageData } from '../lib/naver-editor/image';
 
 const JOBS_DIR = path.resolve(process.cwd(), 'data', 'jobs');
 
@@ -336,86 +337,150 @@ const generateImageUrlsFromKeyword = async (
   return urls;
 };
 
-export const getProductMetadata = async (
-  keyword: string
-): Promise<ProductMetadata | null> => {
-  const url = `${env.IMAGE_API_URL}/api/image/product-metadata`;
-  imageLog.info('metadata.request', { url, keyword });
+export { type MultiImageData } from '../lib/naver-editor/image';
 
-  try {
-    const response = await axios.get(url, {
-      params: { keyword },
-      timeout: 30000,
-    });
+export type { ExcludeLibraryLinkItem } from '../types/metadata';
 
-    const data = response.data as {
-      success: boolean;
-      metadata?: ProductMetadata;
-    };
+export interface PreparedProductData {
+  bodyImages: string[];
+  excludeLibrary: string[];
+  multiImages: MultiImageData;
+  excludeLibraryLink: ExcludeLibraryLinkItem[];
+  metadata: ProductMetadata;
+}
 
-    if (data.success && data.metadata) {
-      imageLog.info('metadata.found', {
-        keyword,
-        mapQueries: data.metadata.mapQueries?.length ?? 0,
-        hasPhone: !!data.metadata.phone,
-        hasUrl: !!data.metadata.url,
-      });
-      return data.metadata;
-    }
+export const getProductData = async (keyword: string) => {
+  const url = `${env.IMAGE_API_URL}/api/image/product-images`;
+  const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
+  imageLog.info(progress.start('request'), { url, keyword });
 
-    imageLog.info('metadata.notFound', { keyword });
-    return null;
-  } catch (error) {
-    imageLog.warn('metadata.failed', {
-      keyword,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
+  const response = await axios.get(url, {
+    params: { keyword },
+    timeout: 300000,
+  });
+
+  const data = response.data as ProductImagesResponse;
+  const { images, metadata } = data;
+
+  imageLog.info(progress.done('done'), {
+    keyword,
+    body: images.body?.length ?? 0,
+    individual: images.individual?.length ?? 0,
+    slide: images.slide?.length ?? 0,
+    collage: images.collage?.length ?? 0,
+    excludeLibrary: images.excludeLibrary?.length ?? 0,
+    excludeLibraryLink: images.excludeLibraryLink?.length ?? 0,
+    total: data.total,
+  });
+
+  return {
+    bodyImages: (images.body ?? []).map((imgUrl: string, i: number): ImageData => ({
+      url: imgUrl,
+      filename: `body_${i + 1}.webp`,
+    })),
+    multiImages: {
+      individual: images.individual ?? [],
+      slide: images.slide ?? [],
+      collage: images.collage ?? [],
+    },
+    excludeLibrary: images.excludeLibrary ?? [],
+    excludeLibraryLink: (images.excludeLibraryLink ?? []).map((imgUrl: string, i: number) => ({
+      image: imgUrl,
+      url: metadata?.lib_url?.[i] ?? '',
+    })),
+    metadata: {
+      mapQueries: metadata?.mapQueries,
+      phone: metadata?.phone,
+      url: metadata?.url,
+    } as ProductMetadata,
+  };
+};
+
+export const prepareProductImages = async (
+  keyword: string,
+  imagesDir: string
+): Promise<PreparedProductData> => {
+  const data = await getProductData(keyword);
+
+  const bodyImages = await downloadImagesToDir(data.bodyImages, imagesDir);
+
+  const excludeLibrary = await downloadImagesToDir(
+    data.excludeLibrary.map((imgUrl: string, i: number): ImageData => ({
+      url: imgUrl,
+      filename: `라이브러리제외_${i + 1}.webp`,
+    })),
+    imagesDir
+  );
+
+  const multiImages: MultiImageData = {};
+  if (data.multiImages.individual.length) {
+    multiImages.individual = await downloadImagesToDir(
+      data.multiImages.individual.map((imgUrl: string, i: number): ImageData => ({
+        url: imgUrl,
+        filename: `individual_${i + 1}.webp`,
+      })),
+      imagesDir
+    );
   }
+  if (data.multiImages.slide.length) {
+    multiImages.slide = await downloadImagesToDir(
+      data.multiImages.slide.map((imgUrl: string, i: number): ImageData => ({
+        url: imgUrl,
+        filename: `slide_${i + 1}.webp`,
+      })),
+      imagesDir
+    );
+  }
+  if (data.multiImages.collage.length) {
+    multiImages.collage = await downloadImagesToDir(
+      data.multiImages.collage.map((imgUrl: string, i: number): ImageData => ({
+        url: imgUrl,
+        filename: `collage_${i + 1}.webp`,
+      })),
+      imagesDir
+    );
+  }
+
+  const excludeLibLinkFiles = await downloadImagesToDir(
+    data.excludeLibraryLink.map(({ image }: { image: string }, i: number): ImageData => ({
+      url: image,
+      filename: `라이브러리제외링크_${i + 1}.webp`,
+    })),
+    imagesDir
+  );
+  const excludeLibraryLink: ExcludeLibraryLinkItem[] = excludeLibLinkFiles.map((filePath, i) => ({
+    imagePath: filePath,
+    url: data.excludeLibraryLink[i]?.url ?? '',
+  }));
+
+  return { bodyImages, excludeLibrary, multiImages, excludeLibraryLink, metadata: data.metadata };
 };
 
 const generateImageUrlsFromProduct = async (
   keyword: string,
-  imageCount: number
+  _imageCount: number
 ): Promise<ImageData[]> => {
-  const url = `${env.IMAGE_API_URL}/api/image/product-images`;
-  const progress = new ProgressBar({ label: 'image', total: 1, width: 16 });
-  imageLog.info(progress.start('request'), {
-    url,
-    keyword,
-    imageCount,
-    source: 'product',
-  });
+  const data = await getProductData(keyword);
+  return data.bodyImages;
+};
 
-  const response = await axios.get(url, {
-    params: { keyword, count: imageCount },
-    timeout: 300000,
-  });
+export const getCategory = async (keyword: string): Promise<string> => {
+  const url = `${env.MANUSCRIPT_API_URL}/category/${encodeURIComponent(keyword)}`;
+  manuscriptLog.info('category.request', { url, keyword });
 
-  const data = response.data as {
-    images?: Array<{ url: string; filename?: string }>;
-    total?: number;
-  };
-
-  const raw = data.images ?? [];
-  if (!Array.isArray(raw)) {
-    imageLog.warn('response.invalid', { source: 'product' });
-    return [];
+  try {
+    const response = await axios.get(url, { timeout: 10000 });
+    const data = response.data;
+    const category = typeof data === 'string' ? data : data?.category ?? '기타';
+    manuscriptLog.info('category.resolved', { keyword, category });
+    return category;
+  } catch (error) {
+    manuscriptLog.warn('category.failed', {
+      keyword,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return '기타';
   }
-
-  const imageDataList: ImageData[] = raw
-    .filter((item) => item.url)
-    .map((item) => ({
-      url: item.url,
-      filename: item.filename,
-    }));
-
-  imageLog.info(progress.done('done'), {
-    count: imageDataList.length,
-    total: data.total ?? 0,
-  });
-
-  return imageDataList;
 };
 
 export const generateImageUrls = async (
