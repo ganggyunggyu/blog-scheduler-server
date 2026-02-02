@@ -9,6 +9,7 @@ import { drainAccountQueues } from './queue-manager';
 import { failAccountSchedules } from '../services/schedule-failure.service';
 import { logger } from '../lib/logging/logger';
 import type { ProductMetadata } from '../types/metadata';
+import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscript.service';
 
 interface PublishJobData {
   scheduleId: string;
@@ -16,12 +17,16 @@ interface PublishJobData {
   account: { id: string; password: string; blogId?: string };
   jobDir: string;
   manuscript: { title: string; content: string; images?: string[] };
+  multiImages?: MultiImageData;
+  excludeLibrary?: string[];
+  excludeLibraryLink?: ExcludeLibraryLinkItem[];
   category?: string;
   throttleSeconds?: number;
   scheduledAt: string;
   mode?: 'create' | 'update';
   logNo?: string;
   metadata?: ProductMetadata;
+  keywordCategory?: string;
 }
 
 const log = logger.child({ scope: 'Publish' });
@@ -69,7 +74,11 @@ const executePost = async (
   scheduledAt?: string,
   blogId?: string,
   logNo?: string,
-  metadata?: ProductMetadata
+  metadata?: ProductMetadata,
+  multiImages?: MultiImageData,
+  excludeLibrary?: string[],
+  excludeLibraryLink?: ExcludeLibraryLinkItem[],
+  keywordCategory?: string
 ) => {
   if (mode === 'update' && blogId && logNo) {
     return updatePost({
@@ -79,8 +88,12 @@ const executePost = async (
       title: manuscript.title,
       content: manuscript.content,
       images: manuscript.images,
+      multiImages,
+      excludeLibrary,
+      excludeLibraryLink,
       category,
       metadata,
+      keywordCategory,
     });
   }
   return writePost({
@@ -88,14 +101,18 @@ const executePost = async (
     title: manuscript.title,
     content: manuscript.content,
     images: manuscript.images,
+    multiImages,
+    excludeLibrary,
+    excludeLibraryLink,
     category,
     scheduleTime: scheduledAt,
     metadata,
+    keywordCategory,
   });
 };
 
 export const processPublish = async (job: Job<PublishJobData>) => {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata } = job.data;
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory } = job.data;
   const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -106,6 +123,12 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     jobDir,
     titlePreview: manuscript.title.slice(0, 30),
   });
+
+  const existing = await ScheduleJobModel.findById(scheduleJobId);
+  if (existing?.status === 'published' && existing?.postUrl) {
+    log.warn('already.published', { scheduleJobId, postUrl: existing.postUrl });
+    return { success: true, postUrl: existing.postUrl };
+  }
 
   await markScheduleProcessing(scheduleId);
   await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'publishing' });
@@ -120,7 +143,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
 
     if (cookies) {
       log.info('session.cache', { account: maskedAccount, mode });
-      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata);
+      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory);
 
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
@@ -147,7 +170,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     const auth = await getValidCookies(account.id, account.password);
     log.info('auth.success', { account: maskedAccount, fromCache: auth.fromCache });
 
-    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo, metadata);
+    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory);
 
     if (!publishResult.success) {
       throw new Error(publishResult.message);

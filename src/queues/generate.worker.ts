@@ -1,5 +1,6 @@
 import { Job, UnrecoverableError } from 'bullmq';
-import { prepareJob, getProductMetadata, type ImageSource, type ManuscriptType } from '../services/manuscript.service';
+import path from 'path';
+import { prepareJob, prepareProductImages, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
@@ -78,23 +79,32 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       throw new LoginPrecheckError(message);
     }
 
-    const prepared = await prepareJob(keyword, service, ref, generateImages, imageCount, imageSource, manuscriptType, category);
+    const prepared = await prepareJob(keyword, service, ref, imageSource === 'product' ? false : generateImages, imageCount, imageSource, manuscriptType, category);
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),
       images: prepared.images.length,
     });
 
-    // 메타데이터 조회 (product 이미지 소스일 때만)
-    const metadata = imageSource === 'product' ? await getProductMetadata(keyword) : null;
-    if (metadata) {
-      log.info('metadata.loaded', {
+    // product 이미지: 모든 상품 이미지 다운로드
+    let productData: PreparedProductData | null = null;
+    if (imageSource === 'product') {
+      const imagesDir = path.join(prepared.jobDir, 'images');
+      productData = await prepareProductImages(keyword, imagesDir);
+      log.info('product.prepared', {
         keyword,
-        mapQueries: metadata.mapQueries?.length ?? 0,
-        hasPhone: !!metadata.phone,
-        hasUrl: !!metadata.url,
+        body: productData.bodyImages.length,
+        excludeLib: productData.excludeLibrary.length,
+        excludeLibLink: productData.excludeLibraryLink.length,
+        individual: productData.multiImages.individual?.length ?? 0,
+        slide: productData.multiImages.slide?.length ?? 0,
+        collage: productData.multiImages.collage?.length ?? 0,
       });
     }
+
+    // 키워드 카테고리 판별
+    const keywordCategory = await getCategory(keyword);
+    log.info('category.resolved', { keyword, keywordCategory });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       status: 'generated',
@@ -110,14 +120,18 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       manuscript: {
         title: prepared.title,
         content: prepared.content,
-        images: prepared.images,
+        images: productData ? productData.bodyImages : prepared.images,
       },
+      multiImages: productData?.multiImages,
+      excludeLibrary: productData?.excludeLibrary,
+      excludeLibraryLink: productData?.excludeLibraryLink,
       category,
+      keywordCategory,
       throttleSeconds: delayBetweenPostsSeconds,
       scheduledAt,
       mode,
       logNo,
-      metadata: metadata ?? undefined,
+      metadata: productData?.metadata,
     });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
