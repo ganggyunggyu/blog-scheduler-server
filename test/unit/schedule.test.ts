@@ -70,7 +70,11 @@ test('parseKeywordWithCategory: 카테고리 파싱', () => {
   });
 
   assert.deepEqual(parseKeywordWithCategory('여행 정보 일상'), {
-    keyword: '여행 정보',
-    category: '일상',
+    keyword: '여행 정보 일상',
+  });
+
+  assert.deepEqual(parseKeywordWithCategory('스마일라식회복:안과'), {
+    keyword: '스마일라식회복',
+    category: '안과',
   });
 });

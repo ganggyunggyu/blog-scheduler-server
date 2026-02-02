@@ -40,15 +40,7 @@ export const parseKeywordWithCategory = (
     }
   }
 
-  const parts = trimmed.split(/\s+/);
-  if (parts.length <= 1) {
-    return { keyword: trimmed };
-  }
-  const category = parts.pop()!;
-  return {
-    keyword: parts.join(' '),
-    category,
-  };
+  return { keyword: trimmed };
 };
 
 export interface CreateScheduleInput {
