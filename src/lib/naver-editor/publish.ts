@@ -85,9 +85,29 @@ export const setPublicVisibility = async (page: Page, frame: Frame): Promise<voi
 };
 
 export const confirmPublish = async (page: Page, frame: Frame): Promise<string> => {
+  const urlBefore = page.url();
+
   await frame.click(SELECTORS.publish.confirm);
   log.info('confirm.clicked');
-  await page.waitForTimeout(3000);
+
+  try {
+    await page.waitForURL((url) => url.href !== urlBefore, { timeout: 15000 });
+    log.info('publish.navigated');
+  } catch {
+    log.warn('publish.url.unchanged', { url: urlBefore });
+
+    const errorSelectors = ['.layer_error', '.error_message', 'div[role="alert"]'];
+    for (const selector of errorSelectors) {
+      const el = await frame.$(selector).catch(() => null);
+      if (!el) continue;
+      const text = (await el.textContent())?.trim();
+      if (text) {
+        throw new Error(`발행 실패: ${text}`);
+      }
+    }
+  }
+
+  await page.waitForTimeout(1000);
   const postUrl = page.url();
   log.info('publish.done', { postUrl });
   return postUrl;

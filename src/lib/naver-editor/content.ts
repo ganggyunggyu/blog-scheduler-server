@@ -118,14 +118,10 @@ export const typeContentWithImages = async (
 
     const imagePath = imageMap.get(i);
     if (imagePath) {
-      await page.keyboard.press('Enter');
-      await page.waitForTimeout(300);
       const uploaded = await uploadImage(page, frame, imagePath);
       if (uploadProgress) {
         log.info(uploadProgress.tick(uploaded ? 'ok' : 'fail'));
       }
-      await page.keyboard.press('Enter');
-      await page.waitForTimeout(300);
     }
   }
 

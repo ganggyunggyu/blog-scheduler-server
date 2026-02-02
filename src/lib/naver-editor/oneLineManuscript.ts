@@ -123,8 +123,6 @@ export const prepareOneLineClipboard = async (
 export const pasteExcludedImage = async (page: Page): Promise<void> => {
   await page.keyboard.press('Meta+v');
   await page.waitForTimeout(1000);
-  await page.keyboard.press('Enter');
-  await page.waitForTimeout(300);
   log.info('excluded.pasted');
 };
 
