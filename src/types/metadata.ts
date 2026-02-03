@@ -23,6 +23,8 @@ export interface ProductImagesResponse {
   images: ProductImages;
   metadata: ProductMetadata;
   keyword: string;
+  blogId: string;
+  category: string;
   folder: string;
   total: number;
   failed: number;
