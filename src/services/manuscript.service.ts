@@ -4,8 +4,10 @@ import path from 'path';
 import { env } from '../config/env';
 import { logger } from '../lib/logging/logger';
 import { ProgressBar } from '../lib/utils/progress';
-import type { ProductMetadata, ProductImagesResponse, ExcludeLibraryLinkItem } from '../types/metadata';
-import type { MultiImageData } from '../lib/naver-editor/image';
+import { downloadImagesToDir, type ImageData } from './product-image.service';
+
+export { getProductData, prepareProductImages, downloadImagesToDir } from './product-image.service';
+export type { PreparedProductData, ImageData, MultiImageData, ExcludeLibraryLinkItem } from './product-image.service';
 
 const JOBS_DIR = path.resolve(process.cwd(), 'data', 'jobs');
 
@@ -41,214 +43,55 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
   return { dir, imagesDir };
 };
 
-export const generateManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = ''
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/blog-filler`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-export const generateUpdateRestaurantManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = ''
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/update-restaurant`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-
-export const generatePetManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = ''
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/blog-filler-pet`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-
-export const generateGrokManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = '',
-  category?: string
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/grok`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, category, engine: 'grok' });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref, category },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-    engine: 'grok',
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-
-export const generateKeigoManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = ''
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/keigo`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, engine: 'keigo' });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-    engine: 'keigo',
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-
-export const generateHanryeodamwonManuscript = async (
-  keyword: string,
-  service: string,
-  ref: string = ''
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const url = `${env.MANUSCRIPT_API_URL}/generate/hanryeo`;
-  const progress = new ProgressBar({
-    label: 'manuscript',
-    total: 1,
-    width: 16,
-  });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, engine: 'hanryeodamwon' });
-
-  const response = await axios.post<Manuscript>(
-    url,
-    { service, keyword, ref },
-    { timeout: 300000 }
-  );
-
-  const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
-
-  manuscriptLog.info(progress.done('done'), {
-    id: raw._id ?? '',
-    titlePreview: title.slice(0, 30),
-    length: content.length,
-    engine: 'hanryeodamwon',
-  });
-
-  return { id: raw._id ?? '', title, content, raw };
-};
-
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
 export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon';
 
-export interface ImageData {
-  url: string;
-  filename?: string;
+interface ManuscriptEndpoint {
+  path: string;
+  engine?: string;
+  sendCategory?: boolean;
 }
+
+const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
+  default: { path: '/generate/blog-filler' },
+  'update-restaurant': { path: '/generate/update-restaurant' },
+  pet: { path: '/generate/blog-filler-pet' },
+  grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
+  keigo: { path: '/generate/keigo', engine: 'keigo' },
+  hanryeodamwon: { path: '/generate/hanryeo', engine: 'hanryeodamwon' },
+};
+
+export const callManuscriptAPI = async (
+  type: ManuscriptType,
+  keyword: string,
+  service: string,
+  ref: string = '',
+  category?: string,
+): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
+  const endpoint = MANUSCRIPT_ENDPOINTS[type];
+  const url = `${env.MANUSCRIPT_API_URL}${endpoint.path}`;
+  const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
+  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, ...(endpoint.engine && { engine: endpoint.engine }) });
+
+  const body: Record<string, string> = { service, keyword, ref };
+  if (endpoint.sendCategory && category) body.category = category;
+
+  const response = await axios.post<Manuscript>(url, body, { timeout: 300000 });
+
+  const raw = response.data;
+  const lines = (raw.content ?? '').split('\n');
+  const title = (lines[0] ?? '').trim() || keyword;
+  const content = lines.slice(1).join('\n').trim();
+
+  manuscriptLog.info(progress.done('done'), {
+    id: raw._id ?? '',
+    titlePreview: title.slice(0, 30),
+    length: content.length,
+    ...(endpoint.engine && { engine: endpoint.engine }),
+  });
+
+  return { id: raw._id ?? '', title, content, raw };
+};
 
 const generateImageUrlsFromAI = async (
   keyword: string,
@@ -371,139 +214,6 @@ const generateImageUrlsFromKeyword = async (
   return urls;
 };
 
-export { type MultiImageData } from '../lib/naver-editor/image';
-
-export type { ExcludeLibraryLinkItem } from '../types/metadata';
-
-export interface PreparedProductData {
-  bodyImages: string[];
-  excludeLibrary: string[];
-  multiImages: MultiImageData;
-  excludeLibraryLink: ExcludeLibraryLinkItem[];
-  metadata: ProductMetadata;
-}
-
-export const getProductData = async (keyword: string, blogId?: string, category?: string) => {
-  const url = `${env.IMAGE_API_URL}/api/image/product-images`;
-  const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
-  imageLog.info(progress.start('request'), { url, keyword, blogId, category });
-
-  const params: Record<string, string> = { keyword };
-  if (blogId) params.blogId = blogId;
-  if (category) params.category = category;
-
-  const response = await axios.get(url, {
-    params,
-    timeout: 300000,
-  });
-
-  const data = response.data as ProductImagesResponse;
-  const { images, metadata } = data;
-
-  imageLog.info(progress.done('done'), {
-    keyword,
-    body: images.body?.length ?? 0,
-    individual: images.individual?.length ?? 0,
-    slide: images.slide?.length ?? 0,
-    collage: images.collage?.length ?? 0,
-    excludeLibrary: images.excludeLibrary?.length ?? 0,
-    excludeLibraryLink: images.excludeLibraryLink?.length ?? 0,
-    total: data.total,
-  });
-
-  return {
-    bodyImages: (images.body ?? []).map((imgUrl: string, i: number): ImageData => ({
-      url: imgUrl,
-      filename: `body_${i + 1}.webp`,
-    })),
-    multiImages: {
-      individual: images.individual ?? [],
-      slide: images.slide ?? [],
-      collage: images.collage ?? [],
-    },
-    excludeLibrary: images.excludeLibrary ?? [],
-    excludeLibraryLink: (images.excludeLibraryLink ?? []).map((imgUrl: string, i: number) => ({
-      image: imgUrl,
-      url: metadata?.lib_url?.[i] ?? '',
-    })),
-    metadata: {
-      mapQueries: metadata?.mapQueries,
-      phone: metadata?.phone,
-      url: metadata?.url,
-    } as ProductMetadata,
-  };
-};
-
-export const prepareProductImages = async (
-  keyword: string,
-  imagesDir: string,
-  blogId?: string,
-  category?: string
-): Promise<PreparedProductData> => {
-  const data = await getProductData(keyword, blogId, category);
-
-  const bodyImages = await downloadImagesToDir(data.bodyImages, imagesDir);
-
-  const excludeLibrary = await downloadImagesToDir(
-    data.excludeLibrary.map((imgUrl: string, i: number): ImageData => ({
-      url: imgUrl,
-      filename: `라이브러리제외_${i + 1}.webp`,
-    })),
-    imagesDir
-  );
-
-  const multiImages: MultiImageData = {};
-  if (data.multiImages.individual.length) {
-    multiImages.individual = await downloadImagesToDir(
-      data.multiImages.individual.map((imgUrl: string, i: number): ImageData => ({
-        url: imgUrl,
-        filename: `individual_${i + 1}.webp`,
-      })),
-      imagesDir
-    );
-  }
-  if (data.multiImages.slide.length) {
-    multiImages.slide = await downloadImagesToDir(
-      data.multiImages.slide.map((imgUrl: string, i: number): ImageData => ({
-        url: imgUrl,
-        filename: `slide_${i + 1}.webp`,
-      })),
-      imagesDir
-    );
-  }
-  if (data.multiImages.collage.length) {
-    multiImages.collage = await downloadImagesToDir(
-      data.multiImages.collage.map((imgUrl: string, i: number): ImageData => ({
-        url: imgUrl,
-        filename: `collage_${i + 1}.webp`,
-      })),
-      imagesDir
-    );
-  }
-
-  const excludeLibLinkFiles = await downloadImagesToDir(
-    data.excludeLibraryLink.map(({ image }: { image: string }, i: number): ImageData => ({
-      url: image,
-      filename: `라이브러리제외링크_${i + 1}.webp`,
-    })),
-    imagesDir
-  );
-  const excludeLibraryLink: ExcludeLibraryLinkItem[] = excludeLibLinkFiles.map((filePath, i) => ({
-    imagePath: filePath,
-    url: data.excludeLibraryLink[i]?.url ?? '',
-  }));
-
-  return { bodyImages, excludeLibrary, multiImages, excludeLibraryLink, metadata: data.metadata };
-};
-
-const generateImageUrlsFromProduct = async (
-  keyword: string,
-  _imageCount: number
-): Promise<ImageData[]> => {
-  const data = await getProductData(keyword);
-  return data.bodyImages;
-};
-
 export const getCategory = async (keyword: string): Promise<string> => {
   const url = `${env.MANUSCRIPT_API_URL}/category/${encodeURIComponent(keyword)}`;
   manuscriptLog.info('category.request', { url, keyword });
@@ -549,83 +259,12 @@ export const generateImageUrls = async (
     return urls.map((url) => ({ url }));
   }
   if (imageSource === 'product') {
-    return generateImageUrlsFromProduct(keyword, imageCount);
+    const { getProductData } = await import('./product-image.service');
+    const data = await getProductData(keyword);
+    return data.bodyImages;
   }
   const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
   return urls.map((url) => ({ url }));
-};
-
-const isBase64DataUrl = (str: string): boolean => {
-  return str.startsWith('data:image/');
-};
-
-const isValidUrl = (str: string): boolean => {
-  if (isBase64DataUrl(str)) return true;
-  try {
-    new URL(str);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const downloadImagesToDir = async (
-  imageDataList: ImageData[],
-  imagesDir: string
-): Promise<string[]> => {
-  const validImages = imageDataList.filter((img) => img.url && isValidUrl(img.url));
-  if (validImages.length === 0) {
-    imageLog.warn('download.skip', { reason: 'no_valid_urls' });
-    return [];
-  }
-
-  const progress = new ProgressBar({
-    label: 'download',
-    total: validImages.length,
-    width: 18,
-    showStatus: true,
-  });
-  imageLog.info(progress.start(), { count: validImages.length, dir: imagesDir });
-  const saved: string[] = [];
-
-  for (let i = 0; i < validImages.length; i += 1) {
-    const { url: imageUrl, filename } = validImages[i];
-    try {
-      let buffer: Buffer;
-      let ext: string;
-
-      if (isBase64DataUrl(imageUrl)) {
-        const matches = imageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
-        if (!matches) {
-          imageLog.warn('download.failed', { reason: 'invalid_base64_format' });
-          imageLog.info(progress.tick('fail'));
-          continue;
-        }
-        ext = `.${matches[1] === 'jpeg' ? 'jpg' : matches[1]}`;
-        buffer = Buffer.from(matches[2], 'base64');
-      } else {
-        const url = new URL(imageUrl);
-        ext = path.extname(url.pathname) || '.png';
-        const response = await axios.get<ArrayBuffer>(imageUrl, {
-          responseType: 'arraybuffer',
-        });
-        buffer = Buffer.from(response.data);
-      }
-
-      const finalFilename = filename || `${i + 1}${ext}`;
-      const filePath = path.join(imagesDir, finalFilename);
-
-      await writeFile(filePath, buffer);
-      saved.push(filePath);
-      imageLog.info(progress.tick('ok'), { filename: finalFilename });
-    } catch {
-      imageLog.warn('download.failed', { url: imageUrl.slice(0, 80) });
-      imageLog.info(progress.tick('fail'));
-    }
-  }
-
-  imageLog.info(progress.done('saved'), { count: saved.length });
-  return saved;
 };
 
 export interface PreparedJob {
@@ -649,23 +288,7 @@ export const prepareJob = async (
   const { dir, imagesDir } = await createJobDir(keyword);
   manuscriptLog.info('job.dir.created', { dir, manuscriptType });
 
-  const getManuscript = async () => {
-    switch (manuscriptType) {
-      case 'update-restaurant':
-        return generateUpdateRestaurantManuscript(keyword, service, ref);
-      case 'pet':
-        return generatePetManuscript(keyword, service, ref);
-      case 'grok':
-        return generateGrokManuscript(keyword, service, ref, category);
-      case 'keigo':
-        return generateKeigoManuscript(keyword, service, ref);
-      case 'hanryeodamwon':
-        return generateHanryeodamwonManuscript(keyword, service, ref);
-      default:
-        return generateManuscript(keyword, service, ref);
-    }
-  };
-  const manuscript = await getManuscript();
+  const manuscript = await callManuscriptAPI(manuscriptType, keyword, service, ref, category);
 
   const manuscriptPath = path.join(dir, 'manuscript.txt');
   await writeFile(
