@@ -1,6 +1,6 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
-import { prepareJob, prepareProductImages, generateAndDownloadAIImages, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
+import { prepareJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
 import { getPublishQueue, drainAccountQueues } from './queue-manager';
 import { getValidCookies } from '../services/naver-auth.service';
@@ -120,6 +120,18 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       await fs.mkdir(slideDir, { recursive: true });
       productData.multiImages.slide = await generateAndDownloadAIImages(keyword, 5, slideDir, category);
       log.info('product.fallback.slide.ai', { count: productData.multiImages.slide.length });
+    }
+
+    const bodyImages = productData ? productData.bodyImages : prepared.images;
+    if (bodyImages.length === 0) {
+      const imagesDir = path.join(prepared.jobDir, 'images');
+      const fallbackImages = await fetchBodyImagesFromAI(keyword, 5, imagesDir);
+      if (productData) {
+        productData.bodyImages = fallbackImages;
+      } else {
+        prepared.images = fallbackImages;
+      }
+      log.info('fallback.body.ai', { count: fallbackImages.length });
     }
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {

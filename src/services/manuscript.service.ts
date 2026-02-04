@@ -5,6 +5,7 @@ import { env } from '../config/env';
 import { logger } from '../lib/logging/logger';
 import { ProgressBar } from '../lib/utils/progress';
 import { downloadImagesToDir, type ImageData } from './product-image.service';
+import type { ProductImagesResponse } from '../types/metadata';
 
 export { getProductData, prepareProductImages, downloadImagesToDir } from './product-image.service';
 export type { PreparedProductData, ImageData, MultiImageData, ExcludeLibraryLinkItem } from './product-image.service';
@@ -44,7 +45,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang';
 
 interface ManuscriptEndpoint {
   path: string;
@@ -59,6 +60,7 @@ const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
   keigo: { path: '/generate/keigo', engine: 'keigo' },
   hanryeodamwon: { path: '/generate/hanryeo', engine: 'hanryeodamwon' },
+  nyangnyang: { path: '/generate/nyangnyang', engine: 'nyangnyang' },
 };
 
 export const callManuscriptAPI = async (
@@ -93,6 +95,37 @@ export const callManuscriptAPI = async (
   return { id: raw._id ?? '', title, content, raw };
 };
 
+const parseImageResponse = (data: unknown): string[] => {
+  const res = data as ProductImagesResponse;
+  if (res?.images?.body && Array.isArray(res.images.body)) {
+    return res.images.body.filter(Boolean);
+  }
+  return [];
+};
+
+export const fetchBodyImagesFromAI = async (
+  keyword: string,
+  count: number,
+  imagesDir: string,
+): Promise<string[]> => {
+  const url = `${env.IMAGE_API_URL}/api/image/ai-images`;
+  imageLog.info('ai-images.request', { url, keyword, count });
+
+  const response = await axios.get(url, {
+    params: { keyword, count, distort: true },
+    timeout: 300000,
+  });
+
+  const urls = parseImageResponse(response.data);
+  imageLog.info('ai-images.done', { count: urls.length });
+
+  const imageData: ImageData[] = urls.map((imgUrl, i) => ({
+    url: imgUrl,
+    filename: `body_${i + 1}.webp`,
+  }));
+  return downloadImagesToDir(imageData, imagesDir);
+};
+
 const generateImageUrlsFromAI = async (
   keyword: string,
   imageCount: number,
@@ -114,21 +147,7 @@ const generateImageUrlsFromAI = async (
     { timeout: 300000 }
   );
 
-  const data = response.data as {
-    images?: Array<{ url: string } | string>;
-    urls?: string[];
-    imageUrls?: string[];
-  };
-
-  const raw = data.images ?? data.urls ?? data.imageUrls ?? [];
-  if (!Array.isArray(raw)) {
-    imageLog.warn('response.invalid');
-    return [];
-  }
-
-  const urls = raw
-    .map((item) => (typeof item === 'string' ? item : item.url))
-    .filter(Boolean);
+  const urls = parseImageResponse(response.data);
   imageLog.info(progress.done('done'), { count: urls.length });
 
   return urls;
@@ -153,22 +172,10 @@ const generateImageUrlsFromGoogle = async (
     { timeout: 300000 }
   );
 
-  const data = response.data as {
-    images?: Array<{ url: string }>;
-    total?: number;
-    failed?: number;
-  };
-
-  const raw = data.images ?? [];
-  if (!Array.isArray(raw)) {
-    imageLog.warn('response.invalid', { source: 'google' });
-    return [];
-  }
-
-  const urls = raw.map((item) => item.url).filter(Boolean);
+  const urls = parseImageResponse(response.data);
   imageLog.info(progress.done('done'), {
     count: urls.length,
-    failed: data.failed ?? 0,
+    failed: (response.data as { failed?: number })?.failed ?? 0,
   });
 
   return urls;
@@ -193,22 +200,10 @@ const generateImageUrlsFromKeyword = async (
     { timeout: 300000 }
   );
 
-  const data = response.data as {
-    images?: Array<{ url: string }>;
-    total?: number;
-    failed?: number;
-  };
-
-  const raw = data.images ?? [];
-  if (!Array.isArray(raw)) {
-    imageLog.warn('response.invalid', { source: 'keyword' });
-    return [];
-  }
-
-  const urls = raw.map((item) => item.url).filter(Boolean);
+  const urls = parseImageResponse(response.data);
   imageLog.info(progress.done('done'), {
     count: urls.length,
-    failed: data.failed ?? 0,
+    failed: (response.data as { failed?: number })?.failed ?? 0,
   });
 
   return urls;
