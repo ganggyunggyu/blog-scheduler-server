@@ -1,8 +1,8 @@
 import type { Frame, Page } from 'playwright';
-import { SELECTORS } from '../../constants/selectors';
-import { logger } from '../logging/logger';
-import { ProgressBar } from '../utils/progress';
-import { uploadImage } from './image';
+import { SELECTORS } from '../../constants/selectors.js';
+import { logger } from '../logging/logger.js';
+import { ProgressBar } from '../utils/progress.js';
+import { uploadImage } from './image.js';
 
 const log = logger.child({ scope: 'Content' });
 

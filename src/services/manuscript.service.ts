@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { env } from '../config/env';
-import { logger } from '../lib/logging/logger';
-import { ProgressBar } from '../lib/utils/progress';
-import { downloadImagesToDir, type ImageData } from './product-image.service';
-import type { ProductImagesResponse } from '../types/metadata';
+import { env } from '../config/env.js';
+import { logger } from '../lib/logging/logger.js';
+import { ProgressBar } from '../lib/utils/progress.js';
+import { downloadImagesToDir, type ImageData } from './product-image.service.js';
+import type { ProductImagesResponse } from '../types/metadata.js';
 
-export { getProductData, prepareProductImages, downloadImagesToDir } from './product-image.service';
-export type { PreparedProductData, ImageData, MultiImageData, ExcludeLibraryLinkItem } from './product-image.service';
+export { getProductData, prepareProductImages, downloadImagesToDir } from './product-image.service.js';
+export type { PreparedProductData, ImageData, MultiImageData, ExcludeLibraryLinkItem } from './product-image.service.js';
 
 const JOBS_DIR = path.resolve(process.cwd(), 'data', 'jobs');
 
@@ -254,7 +254,7 @@ export const generateImageUrls = async (
     return urls.map((url) => ({ url }));
   }
   if (imageSource === 'product') {
-    const { getProductData } = await import('./product-image.service');
+    const { getProductData } = await import('./product-image.service.js');
     const data = await getProductData(keyword);
     return data.bodyImages;
   }

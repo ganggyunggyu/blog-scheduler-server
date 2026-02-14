@@ -1,8 +1,8 @@
 import path from 'path';
 import type { Frame, Page } from 'playwright';
-import { logger } from '../logging/logger';
-import { uploadExcludedImage } from './oneLineManuscript';
-import type { ExcludeLibraryLinkItem } from '../../types/metadata';
+import { logger } from '../logging/logger.js';
+import { uploadExcludedImage } from './oneLineManuscript.js';
+import type { ExcludeLibraryLinkItem } from '../../types/metadata.js';
 
 const log = logger.child({ scope: 'ExcludeLibraryLink' });
 

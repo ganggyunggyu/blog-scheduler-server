@@ -1,6 +1,6 @@
 import type { Frame, Page } from 'playwright';
-import { SELECTORS } from '../../constants/selectors';
-import { logger } from '../logging/logger';
+import { SELECTORS } from '../../constants/selectors.js';
+import { logger } from '../logging/logger.js';
 
 const log = logger.child({ scope: 'Editor' });
 

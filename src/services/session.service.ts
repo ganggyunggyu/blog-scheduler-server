@@ -1,5 +1,5 @@
-import { redis } from '../config/redis';
-import { env } from '../config/env';
+import { redis } from '../config/redis.js';
+import { env } from '../config/env.js';
 
 const SESSION_PREFIX = 'session:';
 const RATE_PREFIX = 'rate:login:';

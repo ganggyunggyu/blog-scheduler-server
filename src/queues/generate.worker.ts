@@ -1,11 +1,11 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
-import { prepareJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service';
-import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
-import { getPublishQueue, drainAccountQueues } from './queue-manager';
-import { getValidCookies } from '../services/naver-auth.service';
-import { failAccountSchedules } from '../services/schedule-failure.service';
-import { logger } from '../lib/logging/logger';
+import { prepareJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service.js';
+import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
+import { getPublishQueue, drainAccountQueues } from './queue-manager.js';
+import { getValidCookies } from '../services/naver-auth.service.js';
+import { failAccountSchedules } from '../services/schedule-failure.service.js';
+import { logger } from '../lib/logging/logger.js';
 
 interface GenerateJobData {
   scheduleId: string;

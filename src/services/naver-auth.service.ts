@@ -1,8 +1,8 @@
 import type { Page } from 'playwright';
-import { SELECTORS } from '../constants/selectors';
-import { getBrowser } from '../lib/browser/playwright';
-import { checkRateLimit, getSession, saveSession } from './session.service';
-import { logger } from '../lib/logging/logger';
+import { SELECTORS } from '../constants/selectors.js';
+import { getBrowser } from '../lib/browser/playwright.js';
+import { checkRateLimit, getSession, saveSession } from './session.service.js';
+import { logger } from '../lib/logging/logger.js';
 
 const log = logger.child({ scope: 'Login' });
 

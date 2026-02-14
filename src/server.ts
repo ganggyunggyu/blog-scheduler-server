@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import { buildApp, type AppContext } from './app';
-import { env } from './config/env';
-import { closeAllQueues } from './queues/queue-manager';
-import { closeBrowser } from './lib/browser/playwright';
-import { redis } from './config/redis';
-import { logger } from './lib/logging/logger';
+import { buildApp, type AppContext } from './app.js';
+import { env } from './config/env.js';
+import { closeAllQueues } from './queues/queue-manager.js';
+import { closeBrowser } from './lib/browser/playwright.js';
+import { redis } from './config/redis.js';
+import { logger } from './lib/logging/logger.js';
 
 let context: AppContext | null = null;
 let isShuttingDown = false;

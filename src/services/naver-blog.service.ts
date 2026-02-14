@@ -1,6 +1,6 @@
 import type { Frame, Page } from 'playwright';
-import { logger } from '../lib/logging/logger';
-import { ProgressBar } from '../lib/utils/progress';
+import { logger } from '../lib/logging/logger.js';
+import { ProgressBar } from '../lib/utils/progress.js';
 import {
   createSession,
   closeSession,
@@ -29,8 +29,8 @@ import {
   addSpacing,
   type MultiImageData,
   type WriteResult,
-} from '../lib/naver-editor';
-import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata';
+} from '../lib/naver-editor/index.js';
+import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
 

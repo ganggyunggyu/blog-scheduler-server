@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { writeFile } from 'fs/promises';
 import path from 'path';
-import { env } from '../config/env';
-import { logger } from '../lib/logging/logger';
-import { ProgressBar } from '../lib/utils/progress';
-import type { ProductMetadata, ProductImagesResponse, ExcludeLibraryLinkItem } from '../types/metadata';
-import type { MultiImageData } from '../lib/naver-editor/image';
+import { env } from '../config/env.js';
+import { logger } from '../lib/logging/logger.js';
+import { ProgressBar } from '../lib/utils/progress.js';
+import type { ProductMetadata, ProductImagesResponse, ExcludeLibraryLinkItem } from '../types/metadata.js';
+import type { MultiImageData } from '../lib/naver-editor/image.js';
 
-export type { ExcludeLibraryLinkItem } from '../types/metadata';
-export { type MultiImageData } from '../lib/naver-editor/image';
+export type { ExcludeLibraryLinkItem } from '../types/metadata.js';
+export { type MultiImageData } from '../lib/naver-editor/image.js';
 
 const imageLog = logger.child({ scope: 'Image' });
 

@@ -8,7 +8,7 @@ import {
   cleanCompletedJobs,
   drainAccountQueues,
   drainAllQueues,
-} from '../queues/queue-manager';
+} from '../queues/queue-manager.js';
 
 const jobQuerySchema = z.object({
   type: z.enum(['generate', 'publish']).default('generate'),

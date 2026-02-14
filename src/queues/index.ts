@@ -5,4 +5,4 @@ export {
   getActiveAccounts,
   drainAccountQueues,
   removeJobFromQueue,
-} from './queue-manager';
+} from './queue-manager.js';

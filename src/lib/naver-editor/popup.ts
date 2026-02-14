@@ -1,5 +1,5 @@
 import type { Frame } from 'playwright';
-import { SELECTORS } from '../../constants/selectors';
+import { SELECTORS } from '../../constants/selectors.js';
 
 const POPUP_SELECTORS = [
   SELECTORS.popup.cancel,

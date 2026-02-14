@@ -1,11 +1,11 @@
 import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
-import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto';
-import { createSchedule } from '../services/schedule.service';
-import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager';
-import { getPostList, getPostsByRange } from '../services/naver-blog.service';
-import { getValidCookies } from '../services/naver-auth.service';
-import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto.js';
+import { createSchedule } from '../services/schedule.service.js';
+import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
+import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
+import { getValidCookies } from '../services/naver-auth.service.js';
+import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 
 const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default('ai');
 const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang']).default('default');

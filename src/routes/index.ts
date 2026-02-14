@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
-import { scheduleRoutes } from './schedule.route';
-import { queueRoutes } from './queue.route';
+import { scheduleRoutes } from './schedule.route.js';
+import { queueRoutes } from './queue.route.js';
 
 export const registerRoutes = async (app: FastifyInstance) => {
   await app.register(scheduleRoutes);

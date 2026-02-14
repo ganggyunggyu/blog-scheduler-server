@@ -1,5 +1,5 @@
 import type { Frame, Page } from 'playwright';
-import { logger } from '../logging/logger';
+import { logger } from '../logging/logger.js';
 
 const log = logger.child({ scope: 'Image' });
 

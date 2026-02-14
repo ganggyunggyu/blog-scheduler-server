@@ -1,4 +1,4 @@
-import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 
 interface FailAccountSchedulesResult {
   scheduleIds: string[];

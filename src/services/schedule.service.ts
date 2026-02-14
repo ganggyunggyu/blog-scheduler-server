@@ -1,5 +1,5 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
-import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
+import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 
 export type ScheduleMode = '1' | '2' | '3' | '2121';
 

@@ -1,9 +1,9 @@
 import type { Frame, Page } from 'playwright';
-import { logger } from '../logging/logger';
-import { getMainFrame } from './frame';
-import { dismissPopups } from './popup';
-import { focusEditor } from './editor';
-import { uploadImage } from './image';
+import { logger } from '../logging/logger.js';
+import { getMainFrame } from './frame.js';
+import { dismissPopups } from './popup.js';
+import { focusEditor } from './editor.js';
+import { uploadImage } from './image.js';
 
 const log = logger.child({ scope: 'OneLineManuscript' });
 

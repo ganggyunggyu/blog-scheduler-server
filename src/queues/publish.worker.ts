@@ -1,15 +1,15 @@
 import { Job, UnrecoverableError } from 'bullmq';
-import { NON_RETRYABLE_ERRORS } from './constants';
-import { getSession, invalidateSession } from '../services/session.service';
-import { getValidCookies } from '../services/naver-auth.service';
-import { writePost, updatePost } from '../services/naver-blog.service';
-import { updateJobStatus } from '../services/manuscript.service';
-import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema';
-import { drainAccountQueues } from './queue-manager';
-import { failAccountSchedules } from '../services/schedule-failure.service';
-import { logger } from '../lib/logging/logger';
-import type { ProductMetadata } from '../types/metadata';
-import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscript.service';
+import { NON_RETRYABLE_ERRORS } from './constants.js';
+import { getSession, invalidateSession } from '../services/session.service.js';
+import { getValidCookies } from '../services/naver-auth.service.js';
+import { writePost, updatePost } from '../services/naver-blog.service.js';
+import { updateJobStatus } from '../services/manuscript.service.js';
+import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
+import { drainAccountQueues } from './queue-manager.js';
+import { failAccountSchedules } from '../services/schedule-failure.service.js';
+import { logger } from '../lib/logging/logger.js';
+import type { ProductMetadata } from '../types/metadata.js';
+import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscript.service.js';
 
 interface PublishJobData {
   scheduleId: string;

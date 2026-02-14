@@ -1,10 +1,10 @@
 import { Queue, Worker, type ConnectionOptions } from 'bullmq';
-import { redis } from '../config/redis';
-import { defaultJobOptions } from './constants';
-import { processGenerate } from './generate.worker';
-import { processPublish } from './publish.worker';
-import { logger } from '../lib/logging/logger';
-import { refreshBullBoard } from '../app';
+import { redis } from '../config/redis.js';
+import { defaultJobOptions } from './constants.js';
+import { processGenerate } from './generate.worker.js';
+import { processPublish } from './publish.worker.js';
+import { logger } from '../lib/logging/logger.js';
+import { refreshBullBoard } from '../app.js';
 
 const connection = redis as unknown as ConnectionOptions;
 const log = logger.child({ scope: 'QueueManager' });

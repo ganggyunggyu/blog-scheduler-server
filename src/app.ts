@@ -3,10 +3,10 @@ import cors from '@fastify/cors';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { FastifyAdapter } from '@bull-board/fastify';
-import { registerRoutes } from './routes';
-import { connectMongo } from './config/mongo';
-import { getAllQueues, initializeExistingQueues } from './queues/queue-manager';
-import { logger } from './lib/logging/logger';
+import { registerRoutes } from './routes/index.js';
+import { connectMongo } from './config/mongo.js';
+import { getAllQueues, initializeExistingQueues } from './queues/queue-manager.js';
+import { logger } from './lib/logging/logger.js';
 
 const log = logger.child({ scope: 'App' });
 

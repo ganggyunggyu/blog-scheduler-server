@@ -1,5 +1,5 @@
 import { chromium, type Browser } from 'playwright';
-import { env } from '../../config/env';
+import { env } from '../../config/env.js';
 
 let browser: Browser | null = null;
 
