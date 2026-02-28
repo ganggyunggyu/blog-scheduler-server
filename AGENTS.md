@@ -1,137 +1,127 @@
-# blog-bot (scheduler-server) — Implementation Guide for Codex
+# scheduler-server — Project Knowledge Base
 
-## 0) Goal
-Build a new Node.js service under `scheduler-server/` that:
-- Manages schedules for Naver Blog posting
-- Uses Playwright (Chromium) to **pre-register reservation posts immediately** (v1)
-- Calls the existing Python server (`blog_analyzer`) for manuscript generation (and optionally image generation)
+**Generated:** 2026-02-24 | **Commit:** 651f62c | **Branch:** main
 
-This repo (`blog-bot`) contains only the planning docs right now:
-- `scheduler-server-spec.md` (product/spec)
-- `scheduler-server-prompt.md` (agent prompt / scaffold)
+## OVERVIEW
 
-## 1) Key Decisions (v1)
-### 1.1 Reservation strategy (must-follow)
-- **Do NOT wait until `scheduledAt` to run a job.**
-- When a job runs, Playwright opens Naver’s write page and sets the **reservation UI** to `scheduledAt`, then submits the reservation.
-- The scheduler server is responsible for “schedule management + reservation registration”, not “publishing at exact time”.
+Naver Blog 예약 발행 자동화 서버. Fastify HTTP API → BullMQ 큐(generate/publish) → Playwright(Chromium)로 네이버 블로그 예약 등록. 원고 생성은 외부 Python 서버(`blog_analyzer`) 위임.
 
-### 1.2 Timezone and datetime format
-- Treat all schedule times as **KST (Asia/Seoul)**.
-- Set process timezone: `TZ=Asia/Seoul`.
-- When storing/transporting times use an ISO string **with offset** (e.g. `2025-01-07T10:00:00+09:00`).
-- Avoid `toISOString()` for business times (it converts to UTC and causes drift).
+## STRUCTURE
 
-### 1.3 Queue design
-Use BullMQ + Redis with two queues:
-- `generate`: call Python manuscript server, parse `title/content`, prepare images (download to local files if needed)
-- `reserve`: login (cookie reuse) + Playwright reservation registration
+```
+scheduler-server/
+├── src/
+│   ├── server.ts              # Entry point, graceful shutdown
+│   ├── app.ts                 # Fastify factory, BullBoard, route registration
+│   ├── config/                # env(Zod), mongo, redis connections
+│   ├── constants/             # CSS selectors, account presets
+│   ├── lib/
+│   │   ├── browser/           # Singleton Playwright browser instance
+│   │   ├── logging/           # Custom structured logger (pino-like)
+│   │   ├── naver-editor/      # ★ 15-module Playwright UI automation library → has AGENTS.md
+│   │   └── utils/             # Progress bar
+│   ├── queues/                # ★ BullMQ queue manager + workers → has AGENTS.md
+│   ├── routes/                # Fastify route handlers (schedule, queue)
+│   ├── schemas/               # Mongoose models + Zod DTOs
+│   ├── services/              # ★ Business logic (schedule, manuscript, auth, blog) → has AGENTS.md
+│   └── types/                 # ProductMetadata interfaces
+├── test/
+│   ├── unit/                  # node:test — schedule calculation
+│   ├── integration/           # auth, manuscript, product-image, category
+│   └── e2e/                   # editor write, publish pipeline, multi-upload
+├── data/jobs/                 # Runtime: downloaded images per job (gitignored)
+├── scripts/                   # One-off utilities (DOM explorer, category upload)
+├── Dockerfile                 # Node 20 Alpine, multi-stage
+└── docker-compose.yml         # scheduler + Redis 7 + MongoDB 7
+```
 
-Important:
-- BullMQ `delay` may be used **only for throttling** (e.g., spacing reservations), not to align with `scheduledAt`.
-- Keep Playwright concurrency low (start with `concurrency=1` for `reserve` worker).
+## WHERE TO LOOK
 
-## 2) Scope Split (Python vs Node)
-### 2.1 Python server (blog_analyzer)
-The scheduler server must treat the Python server as an external dependency.
+| Task | Location | Notes |
+|------|----------|-------|
+| API endpoints 추가/수정 | `src/routes/` | Fastify plugin pattern, Zod validation in `schemas/dto.ts` |
+| 큐/워커 수정 | `src/queues/` | Per-account 큐 격리, see queues/AGENTS.md |
+| 네이버 에디터 자동화 | `src/lib/naver-editor/` | 15 modules, see naver-editor/AGENTS.md |
+| 스케줄 계산 로직 | `src/services/schedule.service.ts` | KST date math with date-fns |
+| 원고 생성 연동 | `src/services/manuscript.service.ts` | Python API contract |
+| 로그인/세션 | `src/services/naver-auth.service.ts` + `session.service.ts` | Redis cookie cache, rate limiting |
+| CSS 셀렉터 변경 | `src/constants/selectors.ts` | 네이버 UI 변경 시 여기만 수정 |
+| 환경변수 추가 | `src/config/env.ts` | Zod schema, startup 시 validation |
+| Mongoose 모델 변경 | `src/schemas/schedule.schema.ts` | Schedule + ScheduleJob |
+| 테스트 추가 | `test/{unit,integration,e2e}/` | `node:test` + `tsx`, no Jest |
 
-Use it for:
-- Manuscript generation (example): `POST {MANUSCRIPT_API_URL}/generate/grok` with `{ service, keyword, ref }`
-  - Contract: response contains `content` (assume “first line = title, rest = body”)
-- (Optional) Image generation: `POST {MANUSCRIPT_API_URL}/generate/image` with `{ keyword }` (and optional `category`)
-  - Response: image URLs (permanent); scheduler server downloads them to local temp files for Playwright upload (download can be deferred until reservation execution)
+## DATA FLOW
 
-Do NOT implement LLM generation logic inside the Node scheduler.
+```
+POST /schedules
+  → schedule.service.calculateSchedule() → MongoDB(Schedule + ScheduleJob[])
+  → enqueue generate jobs (per keyword, per account)
 
-### 2.2 Node scheduler-server
-Owns:
-- Schedule calculation and persistence
-- Queueing and retries
-- Session/cookie caching
-- Naver UI automation via Playwright
+generate worker (concurrency=1 per account):
+  → naverLogin() precheck (cookie cache or fresh login)
+  → manuscript.service.callManuscriptAPI() → Python server
+  → product-image.service (download images to data/jobs/)
+  → enqueue publish job
 
-## 3) Public API (scheduler-server)
-Implement these endpoints (Fastify):
-- `POST /schedules`
-  - Creates schedules for one or more accounts and enqueues jobs immediately.
-  - Request body (v1):
-    - `service` (string, default `"default"`)
-    - `ref` (string, default `""`)
-    - `queues`: `{ account: { id, password }, keywords: string[] }[]`
-    - `startDate` (`YYYY-MM-DD`), `startHour`, `postsPerDay`, `intervalHours`
-    - `generateImages` (boolean), `imageCount` (number)
-    - `delayBetweenPostsSeconds` (number, throttle only)
-- `GET /schedules/:id` (load schedule status and items)
-- `DELETE /schedules/:id`
-  - v1 behavior:
-    - If not yet reserved: remove pending jobs + mark schedule/items as `canceled`
-    - If already reserved on Naver: mark as `canceled` only (true remote cancellation is a later feature)
-- `POST /schedules/:id/execute` (optional; manually triggers immediate reservation registration for pending items)
-- `GET /queues/stats` (BullMQ job counts per queue)
-- `GET /health`
+publish worker (concurrency=1 per account):
+  → getValidCookies() → Playwright browser context
+  → naver-blog.service.writePost() → lib/naver-editor/*
+  → set reservation time via datepicker → confirm publish
+  → update ScheduleJob(status=published, postUrl)
+```
 
-## 4) Data Model (MongoDB)
-Persist schedules and per-item execution results.
+## CONVENTIONS
 
-Minimum fields:
-- Schedule:
-  - `status`: `pending | processing | completed | partial | failed | canceled`
-  - `service`, `ref`, schedule settings, account id (masked), created/updated timestamps
-- ScheduleItem:
-  - `keyword`, `scheduledAt` (KST string), `day`, `slot`
-  - `status`: `pending | generating | generated | reserving | reserved | failed | canceled`
-  - BullMQ `generateJobId` / `reserveJobId`
-  - result fields: `postUrl` (if available), error message, timestamps
+- **ESM only** — `"type": "module"` in package.json, all imports use `.js` extension
+- **Arrow functions** — No `function` keyword. `const fn = () => {}`
+- **Functional services** — No classes, no DI container. Pure functions with side effects
+- **Logger pattern** — `const log = logger.child({ scope: 'ModuleName' })` at module top
+- **Barrel exports** — Only in `routes/index.ts`, `queues/index.ts`, `lib/naver-editor/index.ts`
+- **ID format** — `sch_<uuid>` for schedules, `job_<uuid>` for jobs
+- **Testing** — `node:test` (built-in), run with `tsx --test`. No Jest/Vitest
 
-Security rule:
-- Do not persist raw passwords in MongoDB.
-- If passwords must be used, keep them only in BullMQ job data (Redis) and never log them.
+## ANTI-PATTERNS (THIS PROJECT)
 
-## 5) Playwright Automation Requirements
-Port behavior from `blog_analyzer` (baseline references):
-- Login: `blog_analyzer/routers/auth/naver.py`
-- Write/reservation: `blog_analyzer/routers/auth/blog_write.py`
+- **NEVER** `toISOString()` for business times — converts to UTC, causes KST drift. Use ISO with offset: `2025-01-07T10:00:00+09:00`
+- **NEVER** persist passwords in MongoDB — passwords only in BullMQ job data (Redis), never logged
+- **NEVER** use BullMQ `delay` for time alignment — only for throttling between posts
+- **NEVER** implement LLM/generation logic here — call Python `blog_analyzer` server
+- **NEVER** wait for `scheduledAt` to run job — jobs run immediately, set reservation UI to `scheduledAt`
+- **NEVER** `as any`, `@ts-ignore`, `@ts-expect-error`
 
-Implementation requirements:
-- Use `https://blog.naver.com/GoBlogWrite.naver` and `mainFrame`.
-- Handle popups before typing.
-- Reservation flow:
-  - Open publish overlay
-  - Set visibility
-  - Activate reservation mode (schedule radio)
-  - Set date via datepicker if target date != today
-  - Set time via hour/minute selects (minute rounded down to 10)
-  - Confirm reservation
-- Images:
-  - Download URLs to local files
-  - Upload via Playwright file chooser
-  - v1 can keep it simple (upload sequentially), but if matching current behavior is required, port:
-    - subheading detection
-    - image-to-subheading mapping and insertion
+## UNIQUE STYLES
 
-Operational constraints:
-- Close contexts/pages deterministically.
-- Prefer a singleton `Browser` with per-job `BrowserContext`.
-- Start with low concurrency and add rate limiting (per account and/or per IP) if needed.
+- **Per-account queue isolation** — Dynamic queue names: `generate_{safeAccountId}`, `publish_{safeAccountId}`
+- **Non-retryable error detection** — `계정 잠금`, `비밀번호 오류`, `캡차 필요`, `존재하지 않는 계정` → job fails immediately, no retry
+- **Singleton browser + per-job context** — One Chromium instance, each job gets fresh `BrowserContext`
+- **Account presets** — `constants/account-presets.ts` maps account IDs to category/blogId/mvpn metadata
+- **Keyword parsing** — `keyword[category]` syntax supported (e.g. `스마일라식[건강]`)
 
-## 6) Implementation Checklist (preferred order)
-1. Scaffold `scheduler-server/` with TypeScript + Fastify + Zod env validation.
-2. Add Redis + BullMQ queues (`generate`, `reserve`) and worker bootstrap.
-3. Add MongoDB connection + Mongoose models for schedules.
-4. Implement `schedule.service` to calculate and persist schedule items (KST-safe).
-5. Implement `manuscript.service`:
-   - call Python generate endpoint
-   - parse `title/content`
-   - call image endpoint and store image URLs (download to temp files only when running Playwright)
-6. Implement `naver-auth.service` + Redis cookie cache (TTL).
-7. Implement `naver-blog.service` reservation writer (ported UI logic).
-8. Implement routes (`/schedules`, `/queues/stats`, `/health`) with consistent error handling.
-9. Add minimal unit tests only for schedule calculation (no Playwright E2E unless explicitly requested).
+## COMMANDS
 
-Recommended execution timing (v1):
-- Prefer generating manuscripts **right before the reservation registration job runs** (freshness + less waste), but ensure the job runs with enough buffer for retries (e.g. schedule a `reserveAt = scheduledAt - LEAD_TIME` in later versions).
-- If a job is retried after generation succeeded, reuse the stored result (persist `manuscriptId/title/content/imageUrls` on the schedule item) to avoid regenerating.
+```bash
+pnpm dev              # tsx watch src/server.ts (hot reload)
+pnpm build            # tsc -p tsconfig.build.json → dist/
+pnpm start            # node dist/server.js
+pnpm test             # tsx --test test/unit/**/*.test.ts
+pnpm typecheck        # tsc (no emit, type validation only)
+```
 
-## 7) Local execution rules
-- Do not start servers, previews, or browsers unless the user explicitly asks.
-- Network operations (package installs, downloads) may require approval depending on the environment.
+## EXTERNAL DEPENDENCIES
+
+| Service | URL (env var) | Purpose |
+|---------|---------------|---------|
+| Python manuscript server | `MANUSCRIPT_API_URL` (default: localhost:8000) | `POST /generate/{type}` — 원고 생성 |
+| Image API | `IMAGE_API_URL` (default: localhost:3001) | `POST /api/image/*` — 이미지 생성/검색 |
+| MongoDB | `MONGO_URI` (required, no default) | Schedule + ScheduleJob persistence |
+| Redis | `REDIS_HOST:REDIS_PORT` (default: localhost:6379) | BullMQ queues + session cache |
+
+## NOTES
+
+- `TZ=Asia/Seoul` is set at process level in `config/env.ts` — all Date operations assume KST
+- BullBoard admin UI at `/admin/queues` — visual queue monitoring
+- Graceful shutdown order: HTTP → Queues → Browser → Redis → MongoDB
+- `data/jobs/` contains downloaded images per job run — large, gitignored
+- Docker build: `docker-compose up` starts scheduler + Redis + MongoDB
+- Playwright `PLAYWRIGHT_HEADLESS=false` by default in dev (for debugging)
+- Session TTL: 2 hours. Rate limit: 3 logins per 60s per account
