@@ -21,7 +21,7 @@ interface GenerateJobData {
   manuscriptType?: ManuscriptType;
   delayBetweenPostsSeconds: number;
   scheduledAt: string;
-  mode?: 'create' | 'update';
+  mode?: 'create' | 'update' | 'image-replace';
   logNo?: string;
   keywordCategory?: string;
 }
@@ -79,6 +79,41 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new LoginPrecheckError(message);
+    }
+
+    if (mode === 'image-replace') {
+      const os = await import('os');
+      const fs = await import('fs/promises');
+      const imagesDir = path.join(os.default.tmpdir(), `image_replace_${Date.now()}`);
+      await fs.mkdir(imagesDir, { recursive: true });
+
+      const blogId = account.blogId || account.id;
+      const keywordCategory = providedCategory || await getCategory(keyword);
+      const productData = await prepareProductImages(keyword, imagesDir, blogId, providedCategory);
+      let bodyImages = productData.bodyImages;
+
+      if (bodyImages.length === 0) {
+        bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+      }
+
+      log.info('image-replace.prepared', { keyword, images: bodyImages.length });
+
+      const accountPublishQueue = getPublishQueue(account.id);
+      const publishJob = await accountPublishQueue.add('publish', {
+        scheduleId,
+        scheduleJobId,
+        account,
+        jobDir: imagesDir,
+        manuscript: { title: '', content: '', images: bodyImages },
+        keywordCategory,
+        throttleSeconds: delayBetweenPostsSeconds,
+        scheduledAt,
+        mode,
+        logNo,
+      });
+
+      log.info('publish.queued', { jobId: job.id, publishJobId: publishJob.id, mode });
+      return { scheduleJobId, publishJobId: publishJob.id };
     }
 
     const prepared = await prepareJob(keyword, service, ref, imageSource === 'product' ? false : generateImages, imageCount, imageSource, manuscriptType, category);

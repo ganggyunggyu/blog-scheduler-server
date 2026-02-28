@@ -5,7 +5,7 @@ import { logger } from '../logging/logger.js';
 const log = logger.child({ scope: 'Publish' });
 
 export const openPublishDialog = async (page: Page, frame: Frame): Promise<void> => {
-  await frame.click(SELECTORS.publish.btn);
+  await frame.click(SELECTORS.publish.btn, { force: true });
   await page.waitForTimeout(2000);
   log.info('dialog.opened');
 };

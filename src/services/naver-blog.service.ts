@@ -27,6 +27,9 @@ import {
   insertPhone,
   uploadFromMultiImageData,
   addSpacing,
+  uploadImage,
+  removeImage,
+  dismissTransferErrorPopup,
   type MultiImageData,
   type WriteResult,
 } from '../lib/naver-editor/index.js';
@@ -374,6 +377,88 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
 };
 
 // ============================================================
+// Update Post Images Only
+// ============================================================
+
+interface UpdatePostImagesParams {
+  cookies: unknown[];
+  blogId: string;
+  logNo: string;
+  images: string[];
+  category?: string;
+}
+
+export const updatePostImages = async (params: UpdatePostImagesParams): Promise<WriteResult> => {
+  const { cookies, blogId, logNo, images, category } = params;
+  const progress = new ProgressBar({ label: 'image-replace', total: 5, width: 14 });
+
+  const session = await createSession(cookies);
+  const { page } = session;
+
+  try {
+    const url = `https://blog.naver.com/${blogId}?Redirect=Update&logNo=${logNo}`;
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3000);
+    log.info(progress.step('page.open'), { url, logNo });
+
+    const loginStatus = checkLoginStatus(page);
+    if (!loginStatus.loggedIn) {
+      log.warn('session.expired', { logNo });
+      return { success: false, message: '세션이 만료되었습니다. 재로그인이 필요합니다.' };
+    }
+
+    const frame = await getMainFrame(page);
+    await page.waitForTimeout(2000);
+    await dismissPopups(frame);
+    log.info(progress.step('editor.ready'));
+
+    const existingCount = (await frame.$$('.se-component.se-image')).length;
+    const replaceCount = Math.min(existingCount, images.length);
+    log.info('image-replace.plan', { existingCount, newCount: images.length, replaceCount });
+
+    for (let i = 0; i < replaceCount; i++) {
+      const removed = await removeImage(page, frame, i);
+      if (!removed) {
+        throw new Error(`기존 이미지 삭제 실패 (index=${i + 1})`);
+      }
+
+      const uploaded = await uploadImage(page, frame, images[i]);
+      if (!uploaded) {
+        const transferError = await dismissTransferErrorPopup(page, frame);
+        const fileName = images[i]?.split('/').pop() ?? `index=${i + 1}`;
+        if (transferError) {
+          throw new Error(`이미지 전송 오류 (${fileName}): ${transferError}`);
+        }
+        throw new Error(`이미지 업로드 실패 (${fileName})`);
+      }
+
+      await page.waitForTimeout(1000);
+      log.info('image-replace.step', { index: i + 1, total: replaceCount });
+    }
+
+    log.info(progress.step('images.replaced'), { count: replaceCount });
+
+    await setAlignCenter(page, frame);
+    await page.waitForTimeout(500);
+
+    await dismissPopups(frame);
+    await dismissTransferErrorPopup(page, frame);
+
+    log.info(progress.step('publish.dialog'));
+    const postUrl = await handlePublishDialog(page, frame, { category });
+    log.info(progress.done('image-replace.done'), { postUrl, logNo });
+
+    return { success: true, postUrl, message: 'Image replace success' };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Image replace failed';
+    log.error('image-replace.failed', { message, logNo });
+    return { success: false, message };
+  } finally {
+    await closeSession(session);
+  }
+};
+
+// ============================================================
 // Post List Helpers
 // ============================================================
 
@@ -516,6 +601,13 @@ export const indexAllPosts = async (
 
     const frame = await waitForFrame(page, 'mainFrame');
     await page.waitForTimeout(1000);
+
+    const removed = await page.evaluate(() => {
+      const layer = document.getElementById('personalNoticeLayer');
+      if (layer) { layer.remove(); return true; }
+      return false;
+    });
+    if (removed) log.info('indexAllPosts.noticeLayer.removed');
 
     const openListBtn = await frame.$('a._toggleTopList');
     if (openListBtn && (await openListBtn.isVisible())) {

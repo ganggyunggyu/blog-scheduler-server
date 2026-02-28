@@ -45,7 +45,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal';
 
 interface ManuscriptEndpoint {
   path: string;
@@ -61,6 +61,7 @@ const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   keigo: { path: '/generate/keigo', engine: 'keigo' },
   hanryeodamwon: { path: '/generate/hanryeo', engine: 'hanryeodamwon' },
   nyangnyang: { path: '/generate/nyangnyang', engine: 'nyangnyang' },
+  kimdongpal: { path: '/generate/kimdongpal', engine: 'kimdongpal' },
 };
 
 export const callManuscriptAPI = async (

@@ -24,7 +24,7 @@ const envSchema = z.object({
       if (normalized === 'false') return false;
     }
     return value;
-  }, z.boolean()).default(false),
+  }, z.boolean()).default(true),
   PLAYWRIGHT_SLOW_MO: z.coerce.number().default(100),
 
   LEAD_TIME_MINUTES: z.coerce.number().default(30),

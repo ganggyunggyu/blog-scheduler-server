@@ -6,9 +6,10 @@ import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
 import { getValidCookies } from '../services/naver-auth.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
+import { findAccountById } from '../constants/account-presets.js';
 
 const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang']).default('default');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
 
@@ -361,6 +362,192 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         account: maskAccountId(queue.account.id),
         totalJobs: jobsToCreate.length,
         posts: jobsToCreate,
+      });
+    }
+
+    return { success: true, totalJobs, updates: results };
+  });
+
+  const parseBlogUrl = (url: string): { blogId: string; logNo: string } => {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    return { blogId: parts[0], logNo: parts[1] };
+  };
+
+  const linkUpdateSchema = z.object({
+    keywords: z.array(z.string().min(1)),
+    links: z.array(z.string().url()),
+    service: z.string().default('default'),
+    ref: z.string().default(''),
+    generate_images: z.boolean().default(true),
+    image_count: z.number().default(5),
+    image_source: imageSourceSchema,
+    manuscript_type: manuscriptTypeSchema,
+    delay_between_posts: z.number().default(10),
+    keyword_category: z.string().optional(),
+  });
+
+  app.post('/bot/link-update', async (req: { body: unknown }, reply: FastifyReply) => {
+    const body = linkUpdateSchema.parse(req.body);
+    const { keywords, links } = body;
+
+    if (keywords.length !== links.length) {
+      return reply.status(400).send({
+        message: `keywords(${keywords.length})와 links(${links.length}) 개수가 일치하지 않음`,
+      });
+    }
+
+    const pairs = keywords.map((keyword, i) => {
+      const { blogId, logNo } = parseBlogUrl(links[i]);
+      const preset = findAccountById(blogId);
+      return { keyword, blogId, logNo, preset };
+    });
+
+    const missingAccounts = [...new Set(
+      pairs.filter((p) => !p.preset).map((p) => p.blogId)
+    )];
+
+    if (missingAccounts.length > 0) {
+      return reply.status(400).send({
+        message: `프리셋에 없는 계정: ${missingAccounts.join(', ')}`,
+      });
+    }
+
+    const grouped = new Map<string, typeof pairs>();
+    for (const pair of pairs) {
+      const existing = grouped.get(pair.blogId) ?? [];
+      existing.push(pair);
+      grouped.set(pair.blogId, existing);
+    }
+
+    const results: Array<{
+      account: string;
+      totalJobs: number;
+      jobs: Array<{ keyword: string; logNo: string }>;
+    }> = [];
+
+    let totalJobs = 0;
+
+    for (const [blogId, accountPairs] of grouped) {
+      const { preset } = accountPairs[0];
+      const account = { id: preset!.id, password: preset!.password, blogId };
+      const accountGenerateQueue = getGenerateQueue(account.id);
+
+      const jobsList: Array<{ keyword: string; logNo: string }> = [];
+
+      for (let i = 0; i < accountPairs.length; i++) {
+        const { keyword, logNo } = accountPairs[i];
+
+        await accountGenerateQueue.add('generate', {
+          scheduleId: `link_update_${Date.now()}_${totalJobs}`,
+          scheduleJobId: `link_update_job_${Date.now()}_${totalJobs}`,
+          keyword,
+          account,
+          service: body.service,
+          ref: body.ref,
+          generateImages: body.generate_images,
+          imageCount: body.image_count,
+          imageSource: body.image_source,
+          manuscriptType: body.manuscript_type,
+          delayBetweenPostsSeconds: body.delay_between_posts,
+          scheduledAt: new Date().toISOString(),
+          mode: 'update' as const,
+          logNo,
+          keywordCategory: body.keyword_category,
+        });
+
+        jobsList.push({ keyword, logNo });
+        totalJobs++;
+      }
+
+      results.push({
+        account: maskAccountId(blogId),
+        totalJobs: jobsList.length,
+        jobs: jobsList,
+      });
+    }
+
+    return { success: true, totalJobs, updates: results };
+  });
+
+  const imageReplaceSchema = z.object({
+    links: z.array(z.string().url()),
+    image_source: imageSourceSchema.default('product'),
+    image_count: z.number().default(5),
+    delay_between_posts: z.number().default(10),
+    keyword_category: z.string().default('한려담원'),
+  });
+
+  app.post('/bot/image-replace', async (req: { body: unknown }, reply: FastifyReply) => {
+    const body = imageReplaceSchema.parse(req.body);
+    const { links } = body;
+
+    const pairs = links.map((link) => {
+      const { blogId, logNo } = parseBlogUrl(link);
+      const preset = findAccountById(blogId);
+      return { blogId, logNo, preset };
+    });
+
+    const missingAccounts = [...new Set(
+      pairs.filter((p) => !p.preset).map((p) => p.blogId)
+    )];
+
+    if (missingAccounts.length > 0) {
+      return reply.status(400).send({
+        message: `프리셋에 없는 계정: ${missingAccounts.join(', ')}`,
+      });
+    }
+
+    const grouped = new Map<string, typeof pairs>();
+    for (const pair of pairs) {
+      const existing = grouped.get(pair.blogId) ?? [];
+      existing.push(pair);
+      grouped.set(pair.blogId, existing);
+    }
+
+    const results: Array<{
+      account: string;
+      totalJobs: number;
+      jobs: Array<{ logNo: string }>;
+    }> = [];
+
+    let totalJobs = 0;
+
+    for (const [blogId, accountPairs] of grouped) {
+      const { preset } = accountPairs[0];
+      const account = { id: preset!.id, password: preset!.password, blogId };
+      const accountGenerateQueue = getGenerateQueue(account.id);
+
+      const jobsList: Array<{ logNo: string }> = [];
+
+      for (let i = 0; i < accountPairs.length; i++) {
+        const { logNo } = accountPairs[i];
+
+        await accountGenerateQueue.add('generate', {
+          scheduleId: `image_replace_${Date.now()}_${totalJobs}`,
+          scheduleJobId: `image_replace_job_${Date.now()}_${totalJobs}`,
+          keyword: body.keyword_category,
+          account,
+          service: 'default',
+          ref: '',
+          generateImages: true,
+          imageCount: body.image_count,
+          imageSource: body.image_source,
+          delayBetweenPostsSeconds: body.delay_between_posts,
+          scheduledAt: new Date().toISOString(),
+          mode: 'image-replace' as const,
+          logNo,
+          keywordCategory: body.keyword_category,
+        });
+
+        jobsList.push({ logNo });
+        totalJobs++;
+      }
+
+      results.push({
+        account: maskAccountId(blogId),
+        totalJobs: jobsList.length,
+        jobs: jobsList,
       });
     }
 

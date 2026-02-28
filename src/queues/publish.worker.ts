@@ -2,7 +2,7 @@ import { Job, UnrecoverableError } from 'bullmq';
 import { NON_RETRYABLE_ERRORS } from './constants.js';
 import { getSession, invalidateSession } from '../services/session.service.js';
 import { getValidCookies } from '../services/naver-auth.service.js';
-import { writePost, updatePost } from '../services/naver-blog.service.js';
+import { writePost, updatePost, updatePostImages } from '../services/naver-blog.service.js';
 import { updateJobStatus } from '../services/manuscript.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { drainAccountQueues } from './queue-manager.js';
@@ -23,7 +23,7 @@ interface PublishJobData {
   category?: string;
   throttleSeconds?: number;
   scheduledAt: string;
-  mode?: 'create' | 'update';
+  mode?: 'create' | 'update' | 'image-replace';
   logNo?: string;
   metadata?: ProductMetadata;
   keywordCategory?: string;
@@ -46,6 +46,21 @@ const isSessionError = (message: string): boolean => {
 const isLoginFailure = (message: string): boolean =>
   isSessionError(message) || NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern));
 
+const NON_RETRYABLE_PUBLISH_ERROR_PATTERNS = [
+  '이미지 업로드 실패',
+  '이미지 전송 오류',
+  'image transfer error',
+  '용량 초과 오류',
+];
+
+const isNonRetryablePublishError = (message: string): boolean => {
+  if (NON_RETRYABLE_PUBLISH_ERROR_PATTERNS.some((pattern) => message.includes(pattern))) {
+    return true;
+  }
+
+  return message.includes('elementHandle.click') && message.includes('se-popup-transfer-error');
+};
+
 const markScheduleProcessing = async (scheduleId: string): Promise<void> => {
   await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
 };
@@ -67,7 +82,7 @@ const updateScheduleCompletion = async (scheduleId: string, failed: boolean): Pr
 };
 
 const executePost = async (
-  mode: 'create' | 'update',
+  mode: 'create' | 'update' | 'image-replace',
   cookies: unknown[],
   manuscript: { title: string; content: string; images?: string[] },
   category?: string,
@@ -80,6 +95,15 @@ const executePost = async (
   excludeLibraryLink?: ExcludeLibraryLinkItem[],
   keywordCategory?: string
 ) => {
+  if (mode === 'image-replace' && blogId && logNo) {
+    return updatePostImages({
+      cookies,
+      blogId,
+      logNo,
+      images: manuscript.images || [],
+      category,
+    });
+  }
   if (mode === 'update' && blogId && logNo) {
     return updatePost({
       cookies,
@@ -209,6 +233,11 @@ export const processPublish = async (job: Job<PublishJobData>) => {
 
     if (NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern))) {
       log.error('failed.non_retryable', { jobId: job.id, message });
+      throw new UnrecoverableError(message);
+    }
+
+    if (isNonRetryablePublishError(message)) {
+      log.error('failed.non_retryable.publish', { jobId: job.id, message });
       throw new UnrecoverableError(message);
     }
 
