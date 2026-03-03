@@ -407,14 +407,10 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       pairs.filter((p) => !p.preset).map((p) => p.blogId)
     )];
 
-    if (missingAccounts.length > 0) {
-      return reply.status(400).send({
-        message: `프리셋에 없는 계정: ${missingAccounts.join(', ')}`,
-      });
-    }
+    const validPairs = pairs.filter((p) => p.preset);
 
-    const grouped = new Map<string, typeof pairs>();
-    for (const pair of pairs) {
+    const grouped = new Map<string, typeof validPairs>();
+    for (const pair of validPairs) {
       const existing = grouped.get(pair.blogId) ?? [];
       existing.push(pair);
       grouped.set(pair.blogId, existing);
