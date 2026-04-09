@@ -1,4 +1,5 @@
 import type { Frame, Page } from 'playwright';
+import { env } from '../../config/env.js';
 import { logger } from '../logging/logger.js';
 
 const log = logger.child({ scope: 'Image' });
@@ -52,6 +53,8 @@ const selectImageType = async (frame: Frame, imageType: ImageType): Promise<bool
 };
 
 const MAX_FILECHOOSER_RETRIES = 3;
+const FILECHOOSER_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
+const IMAGE_CLICK_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
 const TRANSFER_ERROR_POPUP_SELECTOR =
   'div[data-group="popupLayer"][data-name="se-popup-transfer-error"]';
 const TRANSFER_ERROR_DISMISS_RETRIES = 3;
@@ -186,12 +189,12 @@ const clickAndWaitForFileChooser = async (
     if (!imageBtn) throw new Error('image button not found');
 
     await imageBtn.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
     try {
       const [fileChooser] = await Promise.all([
-        page.waitForEvent('filechooser', { timeout: 5000 }),
-        imageBtn.click({ force: true, timeout: 3000 }),
+        page.waitForEvent('filechooser', { timeout: FILECHOOSER_TIMEOUT_MS }),
+        imageBtn.click({ force: true, timeout: IMAGE_CLICK_TIMEOUT_MS }),
       ]);
       if (attempt > 1) log.info('filechooser.retry.ok', { attempt });
       return fileChooser;
@@ -203,7 +206,7 @@ const clickAndWaitForFileChooser = async (
       const message = error instanceof Error ? error.message : String(error);
       log.warn('filechooser.retry', { attempt, maxRetries: MAX_FILECHOOSER_RETRIES, message });
       if (attempt === MAX_FILECHOOSER_RETRIES) throw new Error(`filechooser failed after ${MAX_FILECHOOSER_RETRIES} retries`);
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(2500);
     }
   }
 
@@ -231,7 +234,7 @@ export const uploadImage = async (
 
     log.info('filechooser.ready');
     await fileChooser.setFiles(imagePath);
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(8000);
 
     const transferError = await dismissTransferErrorPopup(page, frame);
     if (transferError) {
@@ -265,7 +268,7 @@ export const removeImage = async (
   }
 
   try {
-    await target.click({ timeout: 3000 });
+    await target.click({ timeout: IMAGE_CLICK_TIMEOUT_MS });
     await page.waitForTimeout(500);
     await page.keyboard.press('Backspace');
     await page.waitForTimeout(500);
@@ -318,15 +321,15 @@ export const uploadMultipleImages = async (
     const fileChooser = await clickAndWaitForFileChooser(page, frame);
 
     await fileChooser.setFiles(validPaths);
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(3000);
 
     if (validPaths.length >= 2) {
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
       await selectImageType(frame, imageType);
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(1000);
     }
 
-    const waitTime = Math.min(validPaths.length * 3000, 30000);
+    const waitTime = Math.min(validPaths.length * 5000, 45000);
     await page.waitForTimeout(waitTime);
 
     log.info('multiUpload.done', { count: validPaths.length, type: imageType });

@@ -34,6 +34,9 @@ const hashPayload = (payload: unknown): string =>
 const normalizeKeywords = (keywords: string[]): string[] =>
   keywords.map((keyword) => keyword.trim());
 
+const buildBullJobId = (...parts: string[]): string =>
+  parts.map((part) => part.trim()).filter(Boolean).join('_');
+
 export const buildScheduleRequestFingerprint = (
   input: ScheduleRequestFingerprintInput,
 ): string => {
@@ -56,10 +59,10 @@ export const buildScheduleRequestFingerprint = (
 };
 
 export const buildScheduleGenerateJobId = (scheduleJobId: string): string =>
-  `generate:${scheduleJobId}`;
+  buildBullJobId('generate', scheduleJobId);
 
 export const buildSchedulePublishJobId = (scheduleJobId: string): string =>
-  `publish:${scheduleJobId}`;
+  buildBullJobId('publish', scheduleJobId);
 
 export const buildAdhocGenerateIdentity = (
   input: AdhocGenerateIdentityInput,
@@ -82,6 +85,6 @@ export const buildAdhocGenerateIdentity = (
   return {
     scheduleId: `adhoc_${input.mode}_${digest}`,
     scheduleJobId: `adhoc_job_${input.mode}_${digest}`,
-    jobId: `generate:adhoc:${input.mode}:${digest}`,
+    jobId: buildBullJobId('generate', 'adhoc', input.mode, digest),
   };
 };

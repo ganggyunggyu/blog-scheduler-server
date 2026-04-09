@@ -1,8 +1,10 @@
 import type { Frame, Page } from 'playwright';
+import { env } from '../../config/env.js';
 import { SELECTORS } from '../../constants/selectors.js';
 import { logger } from '../logging/logger.js';
 
 const log = logger.child({ scope: 'Schedule' });
+const ACTION_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
 
 const SCHEDULE_RADIO_SELECTORS = [
   'label[for="radio_time2"]',
@@ -22,7 +24,7 @@ const clickScheduleRadio = async (page: Page, frame: Frame): Promise<boolean> =>
     try {
       const el = await frame.$(selector);
       if (el && (await el.isVisible())) {
-        await el.click();
+        await el.click({ timeout: ACTION_TIMEOUT_MS });
         await page.waitForTimeout(1000);
         log.info('radio.clicked', { selector, ctx: 'frame' });
         return true;
@@ -36,7 +38,7 @@ const clickScheduleRadio = async (page: Page, frame: Frame): Promise<boolean> =>
     try {
       const el = await page.$(selector);
       if (el && (await el.isVisible())) {
-        await el.click();
+        await el.click({ timeout: ACTION_TIMEOUT_MS });
         await page.waitForTimeout(1000);
         log.info('radio.clicked', { selector, ctx: 'page' });
         return true;
@@ -47,13 +49,17 @@ const clickScheduleRadio = async (page: Page, frame: Frame): Promise<boolean> =>
   }
 
   try {
-    await frame.getByText('예약', { exact: true }).click();
+    await frame.getByText('예약', { exact: true }).click({
+      timeout: ACTION_TIMEOUT_MS,
+    });
     await page.waitForTimeout(1000);
     log.info('radio.clicked', { method: 'getByText', ctx: 'frame' });
     return true;
   } catch {
     try {
-      await page.getByText('예약', { exact: true }).click();
+      await page.getByText('예약', { exact: true }).click({
+        timeout: ACTION_TIMEOUT_MS,
+      });
       await page.waitForTimeout(1000);
       log.info('radio.clicked', { method: 'getByText', ctx: 'page' });
       return true;
@@ -67,12 +73,12 @@ const clickScheduleRadio = async (page: Page, frame: Frame): Promise<boolean> =>
 
 const waitForTimeSetting = async (page: Page, frame: Frame): Promise<boolean> => {
   try {
-    await frame.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 3000 });
+    await frame.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 5000 });
     log.info('timeSetting.visible', { ctx: 'frame' });
     return true;
   } catch {
     try {
-      await page.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 3000 });
+      await page.waitForSelector(SELECTORS.publish.timeSetting, { timeout: 5000 });
       log.info('timeSetting.visible', { ctx: 'page' });
       return true;
     } catch {
@@ -88,7 +94,7 @@ const findHourSelectContext = async (
 ): Promise<{ found: boolean; ctx: typeof frame | typeof page }> => {
   for (const selector of HOUR_SELECTORS) {
     try {
-      const el = await frame.waitForSelector(selector, { timeout: 1500 });
+      const el = await frame.waitForSelector(selector, { timeout: 3000 });
       if (el) {
         log.info('hourSelect.found', { selector, ctx: 'frame' });
         return { found: true, ctx: frame };
@@ -100,7 +106,7 @@ const findHourSelectContext = async (
 
   for (const selector of HOUR_SELECTORS) {
     try {
-      const el = await page.waitForSelector(selector, { timeout: 1500 });
+      const el = await page.waitForSelector(selector, { timeout: 3000 });
       if (el) {
         log.info('hourSelect.found', { selector, ctx: 'page' });
         return { found: true, ctx: page };
@@ -199,9 +205,15 @@ export const setScheduleTime = async (
   if (!timeSettingVisible) {
     log.warn('timeSetting.retry');
     try {
-      await frame.getByText('예약', { exact: true }).click({ force: true });
+      await frame.getByText('예약', { exact: true }).click({
+        force: true,
+        timeout: ACTION_TIMEOUT_MS,
+      });
     } catch {
-      await page.getByText('예약', { exact: true }).click({ force: true });
+      await page.getByText('예약', { exact: true }).click({
+        force: true,
+        timeout: ACTION_TIMEOUT_MS,
+      });
     }
     await page.waitForTimeout(1000);
   }

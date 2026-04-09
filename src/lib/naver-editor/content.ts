@@ -1,10 +1,37 @@
 import type { Frame, Page } from 'playwright';
-import { SELECTORS } from '../../constants/selectors.js';
 import { logger } from '../logging/logger.js';
 import { ProgressBar } from '../utils/progress.js';
 import { uploadImage } from './image.js';
+import { focusLastParagraphEnd, forceResetTypingStyleToDefault } from './editor.js';
 
 const log = logger.child({ scope: 'Content' });
+
+interface ContentTypingOptions {
+  keywordCategory?: string;
+}
+
+const resetPetContentTypingStyle = async (
+  page: Page,
+  frame: Frame
+): Promise<void> => {
+  try {
+    await page.keyboard.press('Escape').catch(() => undefined);
+    await page.waitForTimeout(200);
+
+    const focused = await focusLastParagraphEnd(frame);
+    if (!focused) {
+      log.warn('content.typingStyle.focus.failed');
+      return;
+    }
+
+    await page.waitForTimeout(200);
+    await forceResetTypingStyleToDefault(page, frame);
+    log.info('content.typingStyle.reset');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    log.warn('content.typingStyle.reset.failed', { message });
+  }
+};
 
 export const isSubheading = (line: string): boolean => {
   const patterns = [/^\d+\.(?:\s|[가-힣a-zA-Z])/, /^【\d+】/, /^\[\d+\]/, /^▶\s*\d+/];
@@ -28,7 +55,7 @@ export const typeLineAvoidingAutoList = async (page: Page, line: string): Promis
     await page.waitForTimeout(30);
     await page.keyboard.press('Backspace');
     await page.waitForTimeout(50);
-    await page.keyboard.type(text, { delay: 10 });
+    await page.keyboard.type(text, { delay: 30 });
     return;
   }
 
@@ -47,11 +74,11 @@ export const typeLineAvoidingAutoList = async (page: Page, line: string): Promis
     await page.waitForTimeout(30);
     await page.keyboard.press('Backspace');
     await page.waitForTimeout(50);
-    await page.keyboard.type(text, { delay: 10 });
+    await page.keyboard.type(text, { delay: 30 });
     return;
   }
 
-  await page.keyboard.type(line, { delay: 10 });
+  await page.keyboard.type(line, { delay: 30 });
 };
 
 const matchImagesToSubheadings = (paragraphs: string[], images: string[]): Map<number, string> => {
@@ -73,8 +100,10 @@ export const typeContentWithImages = async (
   page: Page,
   frame: Frame,
   content: string,
-  images?: string[]
+  images?: string[],
+  options: ContentTypingOptions = {}
 ): Promise<void> => {
+  const { keywordCategory } = options;
   const paragraphs = content.split('\n');
   const imageMap = images?.length ? matchImagesToSubheadings(paragraphs, images) : new Map();
   const uploadTotal = imageMap.size;
@@ -88,6 +117,10 @@ export const typeContentWithImages = async (
     log.info(uploadProgress.start());
   }
 
+  if (keywordCategory === '애견') {
+    await resetPetContentTypingStyle(page, frame);
+  }
+
   for (let i = 0; i < paragraphs.length; i += 1) {
     const line = paragraphs[i].trim();
 
@@ -98,22 +131,6 @@ export const typeContentWithImages = async (
     if (i < paragraphs.length - 1) {
       await page.keyboard.press('Enter');
       await page.waitForTimeout(100);
-
-      if (i === 0) {
-        try {
-          const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
-          if (alignBtn && (await alignBtn.isVisible())) {
-            await alignBtn.click();
-            await page.waitForTimeout(500);
-            await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 2000 });
-            await frame.click(SELECTORS.editor.alignCenter);
-            await page.waitForTimeout(300);
-            log.info('align.center.body');
-          }
-        } catch {
-          // ignore
-        }
-      }
     }
 
     const imagePath = imageMap.get(i);

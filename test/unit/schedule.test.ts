@@ -1,8 +1,37 @@
-import { test } from 'node:test';
+import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateSchedule, parseKeywordWithCategory, type ScheduleMode } from '../../src/services/schedule.service';
 
 process.env.TZ = 'Asia/Seoul';
+
+const withFrozenScheduleTime = (
+  t: TestContext,
+  now: string,
+  leadTimeMinutes: string | undefined,
+  run: () => void,
+): void => {
+  const previousLeadTimeMinutes = process.env.LEAD_TIME_MINUTES;
+
+  if (leadTimeMinutes === undefined) {
+    delete process.env.LEAD_TIME_MINUTES;
+  } else {
+    process.env.LEAD_TIME_MINUTES = leadTimeMinutes;
+  }
+  t.mock.timers.enable({ apis: ['Date'], now: new Date(now) });
+
+  t.after(() => {
+    t.mock.timers.reset();
+
+    if (previousLeadTimeMinutes === undefined) {
+      delete process.env.LEAD_TIME_MINUTES;
+      return;
+    }
+
+    process.env.LEAD_TIME_MINUTES = previousLeadTimeMinutes;
+  });
+
+  run();
+};
 
 test('calculateSchedule mode 2: 하루 2개씩 배치', () => {
   const items = calculateSchedule(
@@ -57,6 +86,56 @@ test('calculateSchedule mode 2121: 2-1-2-1 패턴', () => {
   assert.equal(day2Items.length, 1, '2일차 1개 (홀수 오프셋 1)');
   assert.equal(day3Items.length, 2, '3일차 2개 (짝수 오프셋 2)');
   assert.equal(day4Items.length, 1, '4일차 1개 (홀수 오프셋 3)');
+});
+
+test('calculateSchedule today: LEAD_TIME_MINUTES 기본값은 현재 기준 60분 이후', (t) => {
+  withFrozenScheduleTime(t, '2026-03-16T12:33:00+09:00', undefined, () => {
+    const [item] = calculateSchedule(['keyword1'], '2026-03-16', '2');
+
+    assert.ok(item);
+    assert.equal(item.scheduledAt.toISOString(), '2026-03-16T04:33:00.000Z');
+  });
+});
+
+test('calculateSchedule today: 정각이면 다음 정시에 맞춰 예약 시간 결정', (t) => {
+  withFrozenScheduleTime(t, '2026-03-16T12:00:00+09:00', '60', () => {
+    const [item] = calculateSchedule(['keyword1'], '2026-03-16', '2');
+
+    assert.ok(item);
+    assert.equal(item.scheduledAt.toISOString(), '2026-03-16T04:00:00.000Z');
+  });
+});
+
+test('calculateSchedule today: 비정각이면 현재 기준 60분 뒤 시각으로 예약 시간 결정', (t) => {
+  withFrozenScheduleTime(t, '2026-03-16T12:33:00+09:00', '60', () => {
+    const [item] = calculateSchedule(['keyword1'], '2026-03-16', '2');
+
+    assert.ok(item);
+    assert.equal(item.scheduledAt.toISOString(), '2026-03-16T04:33:00.000Z');
+  });
+});
+
+test('calculateSchedule today: 같은 날 후속 슬롯은 60분 간격으로 배치', (t) => {
+  withFrozenScheduleTime(t, '2026-03-16T12:33:00+09:00', '60', () => {
+    const items = calculateSchedule(['keyword1', 'keyword2'], '2026-03-16', '2');
+
+    assert.equal(items.length, 2);
+    assert.equal(items[0]?.scheduledAt.toISOString(), '2026-03-16T04:33:00.000Z');
+    assert.equal(items[1]?.scheduledAt.toISOString(), '2026-03-16T05:33:00.000Z');
+  });
+});
+
+test('calculateSchedule future date: 미래 날짜는 랜덤 시작 시각 규칙을 유지', (t) => {
+  const randomMock = t.mock.method(Math, 'random', () => 0);
+
+  withFrozenScheduleTime(t, '2026-03-16T12:33:00+09:00', '60', () => {
+    const [item] = calculateSchedule(['keyword1'], '2026-03-18', '2');
+
+    assert.ok(item);
+    assert.equal(item.scheduledAt.toISOString(), '2026-03-17T21:00:00.000Z');
+  });
+
+  assert.equal(randomMock.mock.callCount(), 2);
 });
 
 test('parseKeywordWithCategory: 카테고리 파싱', () => {

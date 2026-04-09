@@ -168,10 +168,6 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       imageSource,
       manuscriptType,
       category,
-      {
-        accountId: account.id,
-        blogName,
-      },
     );
     log.info('job.prepared', {
       jobDir: prepared.jobDir,

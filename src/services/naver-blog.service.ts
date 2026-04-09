@@ -34,6 +34,7 @@ import {
   type WriteResult,
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
+import { getContentPipeline, type ContentBlock } from './naver-blog-pipeline.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
 
@@ -81,7 +82,6 @@ interface WritePostParams extends BasePostParams {
 const prepareEditorForWriting = async (page: Page, frame: Frame): Promise<void> => {
   await dismissPopups(frame);
   await focusEditor(page, frame);
-  await setAlignCenter(page, frame);
 };
 
 interface ClassifiedImages {
@@ -139,8 +139,13 @@ const handlePublishDialog = async (
 
   if (options.scheduleTime) {
     const scheduleDate = new Date(options.scheduleTime);
-    log.info('schedule.time', { scheduleTime: options.scheduleTime, parsed: scheduleDate.toISOString() });
-    await setScheduleTime(page, frame, scheduleDate);
+    const now = new Date();
+    if (scheduleDate <= now) {
+      log.info('schedule.skip.past', { scheduleTime: options.scheduleTime, now: now.toISOString() });
+    } else {
+      log.info('schedule.time', { scheduleTime: options.scheduleTime, parsed: scheduleDate.toISOString() });
+      await setScheduleTime(page, frame, scheduleDate);
+    }
   }
 
   return confirmPublish(page, frame);
@@ -150,30 +155,11 @@ const handlePublishDialog = async (
 // Content Pipeline
 // ============================================================
 
-type ContentBlock = 'excluded1' | 'excluded2' | 'excluded3' | 'allExcluded' | 'maps' | 'phone' | 'content' | 'excludeLibraryLinks' | 'spacing' | 'link' | 'multiImages';
-
-const DEFAULT_PIPELINE: ContentBlock[] = [
-  'excluded1', 'maps', 'phone', 'excluded2', 'content', 'excluded3', 'link', 'multiImages',
-];
-
-const CONTENT_PIPELINES: Record<string, ContentBlock[]> = {
-  default: DEFAULT_PIPELINE,
-  '애견': ['excluded1', 'maps', 'phone', 'excluded2', 'excluded3', 'link', 'spacing', 'content'],
-  '안과': ['allExcluded', 'excludeLibraryLinks', 'maps', 'spacing', 'content', 'multiImages'],
-  '한려담원': ['content', 'link'],
-};
-
-const getPipeline = (keywordCategory?: string): ContentBlock[] => {
-  if (keywordCategory && CONTENT_PIPELINES[keywordCategory]) {
-    return CONTENT_PIPELINES[keywordCategory];
-  }
-  return CONTENT_PIPELINES.default;
-};
-
 interface ContentBlockContext {
   page: Page;
   frame: Frame;
   content: string;
+  keywordCategory?: string;
   normalImages: string[];
   excluded1?: string;
   excluded2?: string;
@@ -207,8 +193,8 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.2.uploaded');
   },
-  content: async ({ page, frame, content, normalImages }) => {
-    await typeContentWithImages(page, frame, content, normalImages);
+  content: async ({ page, frame, content, normalImages, keywordCategory }) => {
+    await typeContentWithImages(page, frame, content, normalImages, { keywordCategory });
     log.info('content.entered');
   },
   excluded3: async ({ page, excluded3 }) => {
@@ -246,7 +232,7 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
 };
 
 const executeContentPipeline = async (ctx: ContentBlockContext, keywordCategory?: string): Promise<void> => {
-  const pipeline = getPipeline(keywordCategory);
+  const pipeline = getContentPipeline(keywordCategory);
   log.info('pipeline.start', { category: keywordCategory ?? 'default', blocks: pipeline });
   for (const block of pipeline) {
     await BLOCK_EXECUTORS[block](ctx);
@@ -267,7 +253,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
   try {
     const url = 'https://blog.naver.com/GoBlogWrite.naver';
     await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
     log.info(progress.step('page.open'), { url });
 
     const loginStatus = checkLoginStatus(page);
@@ -277,7 +263,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
     }
 
     const frame = await getMainFrame(page);
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
 
     await prepareEditorForWriting(page, frame);
     log.info(progress.step('editor.ready'));
@@ -288,14 +274,29 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
     await enterTitle(page, frame, title);
 
     await executeContentPipeline(
-      { page, frame, content, normalImages, excluded1, excluded2, excluded3, metadata, multiImages, excludeLibrary, excludeLibraryLink },
+      {
+        page,
+        frame,
+        content,
+        keywordCategory,
+        normalImages,
+        excluded1,
+        excluded2,
+        excluded3,
+        metadata,
+        multiImages,
+        excludeLibrary,
+        excludeLibraryLink,
+      },
       keywordCategory
     );
     log.info(progress.step('content.entered'));
 
+    await dismissPopups(frame);
     await setAlignCenter(page, frame);
     await page.waitForTimeout(500);
 
+    await dismissPopups(frame);
     log.info(progress.step('publish.dialog'));
     const postUrl = await handlePublishDialog(page, frame, { category, scheduleTime });
     log.info(progress.done('publish.done'), { postUrl });
@@ -354,14 +355,29 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
     await enterTitle(page, frame, title);
 
     await executeContentPipeline(
-      { page, frame, content, normalImages, excluded1, excluded2, excluded3, metadata, multiImages, excludeLibrary, excludeLibraryLink },
+      {
+        page,
+        frame,
+        content,
+        keywordCategory,
+        normalImages,
+        excluded1,
+        excluded2,
+        excluded3,
+        metadata,
+        multiImages,
+        excludeLibrary,
+        excludeLibraryLink,
+      },
       keywordCategory
     );
     log.info(progress.step('content.entered'));
 
+    await dismissPopups(frame);
     await setAlignCenter(page, frame);
     await page.waitForTimeout(500);
 
+    await dismissPopups(frame);
     log.info(progress.step('publish.dialog'));
     const postUrl = await handlePublishDialog(page, frame, { category });
     log.info(progress.done('update.done'), { postUrl, logNo });

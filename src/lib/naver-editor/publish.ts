@@ -1,12 +1,17 @@
 import type { Frame, Page } from 'playwright';
+import { env } from '../../config/env.js';
 import { SELECTORS } from '../../constants/selectors.js';
 import { logger } from '../logging/logger.js';
 
 const log = logger.child({ scope: 'Publish' });
+const ACTION_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
 
 export const openPublishDialog = async (page: Page, frame: Frame): Promise<void> => {
-  await frame.click(SELECTORS.publish.btn, { force: true });
-  await page.waitForTimeout(2000);
+  await frame.click(SELECTORS.publish.btn, {
+    force: true,
+    timeout: ACTION_TIMEOUT_MS,
+  });
+  await page.waitForTimeout(3000);
   log.info('dialog.opened');
 };
 
@@ -23,7 +28,7 @@ export const selectCategory = async (
     }
 
     await categoryBtn.click();
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     const categoryItems = await frame.$$(SELECTORS.publish.categoryItem);
 
@@ -31,7 +36,7 @@ export const selectCategory = async (
       const text = await item.textContent();
       if (text && text.includes(category)) {
         await item.click();
-        await page.waitForTimeout(300);
+        await page.waitForTimeout(500);
         log.info('category.selected', { category });
         return true;
       }
@@ -39,20 +44,20 @@ export const selectCategory = async (
 
     if (categoryItems.length > 0) {
       await categoryItems[0].click();
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
       const firstCategoryText = await categoryItems[0].textContent();
       log.warn('category.fallback', { requested: category, selected: firstCategoryText?.trim() });
       return true;
     }
 
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
     log.warn('category.skip', { category });
     return false;
   } catch (err) {
     log.warn('category.failed', { category, message: err instanceof Error ? err.message : String(err) });
     await page.keyboard.press('Escape').catch(() => {});
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
     return false;
   }
 };
@@ -63,8 +68,10 @@ export const setPublicVisibility = async (page: Page, frame: Frame): Promise<voi
     if (privateRadio) {
       const isPrivate = await privateRadio.isChecked();
       if (isPrivate) {
-        await frame.click(SELECTORS.publish.publicRadio);
-        await page.waitForTimeout(300);
+        await frame.click(SELECTORS.publish.publicRadio, {
+          timeout: ACTION_TIMEOUT_MS,
+        });
+        await page.waitForTimeout(500);
         log.info('visibility.changed', { from: 'private', to: 'public' });
         return;
       }
@@ -76,22 +83,31 @@ export const setPublicVisibility = async (page: Page, frame: Frame): Promise<voi
   }
 
   try {
-    await frame.click(SELECTORS.publish.publicRadio);
-    await page.waitForTimeout(300);
+    await frame.click(SELECTORS.publish.publicRadio, {
+      timeout: ACTION_TIMEOUT_MS,
+    });
+    await page.waitForTimeout(500);
   } catch {
-    await page.click(SELECTORS.publish.publicRadio);
-    await page.waitForTimeout(300);
+    await page.click(SELECTORS.publish.publicRadio, {
+      timeout: ACTION_TIMEOUT_MS,
+    });
+    await page.waitForTimeout(500);
   }
 };
 
 export const confirmPublish = async (page: Page, frame: Frame): Promise<string> => {
   const urlBefore = page.url();
 
-  await frame.click(SELECTORS.publish.confirm);
+  await frame.click(SELECTORS.publish.confirm, {
+    timeout: ACTION_TIMEOUT_MS,
+  });
   log.info('confirm.clicked');
 
   try {
-    await page.waitForURL((url) => url.href !== urlBefore, { timeout: 15000 });
+    await page.waitForURL(
+      (url) => url.href !== urlBefore,
+      { timeout: env.PLAYWRIGHT_NAVIGATION_TIMEOUT_MS }
+    );
     log.info('publish.navigated');
   } catch {
     log.warn('publish.url.unchanged', { url: urlBefore });

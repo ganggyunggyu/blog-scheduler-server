@@ -12,6 +12,20 @@ export const SELECTORS = {
     alignDropdown: 'button[data-name="align-drop-down-with-justify"], button.se-align-left-toolbar-button',
     alignCenter: 'button.se-toolbar-option-align-center-button[data-value="center"]',
     alignLeft: 'button.se-toolbar-option-align-left-button[data-value="left"]',
+    bold: 'button[data-group="propertyToolbar"][data-name="bold"], button[data-group="contentsToolbar"][data-name="bold"]',
+    fontSizeDropdown:
+      'button[data-group="propertyToolbar"][data-name="font-size"], button[data-group="contentsToolbar"][data-name="font-size"]',
+    fontSize24:
+      'button[data-group="propertyToolbar"][data-name="font-size"][data-role="option"][data-value="fs24"], button[data-group="contentsToolbar"][data-name="font-size"][data-role="option"][data-value="fs24"]',
+    fontSize15:
+      'button[data-group="propertyToolbar"][data-name="font-size"][data-role="option"][data-value="fs15"], button[data-group="contentsToolbar"][data-name="font-size"][data-role="option"][data-value="fs15"]',
+    textLinkBtn:
+      'button[data-group="propertyToolbar"][data-name="text-link"], button[data-group="contentsToolbar"][data-name="text-link"], button[data-name="text-link"]',
+    linkInput: 'input.se-custom-layer-link-input',
+    linkApplyBtn: 'button.se-custom-layer-link-apply-button',
+    fontColor:
+      'button[data-name="font-color"][data-group="propertyToolbar"], button[data-name="font-color"][data-group="contentsToolbar"]',
+    fontColorWhite: 'button.se-color-palette[title="#ffffff"]',
   },
 
   publish: {

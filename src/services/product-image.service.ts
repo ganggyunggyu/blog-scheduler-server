@@ -27,19 +27,44 @@ export interface PreparedProductData {
 
 const CATEGORY_RANDOM_CATEGORIES = ['한려담원'];
 
-export const getProductData = async (keyword: string, blogId?: string, category?: string) => {
-  const useCategoryRandom = category && CATEGORY_RANDOM_CATEGORIES.includes(category);
-  const url = useCategoryRandom
-    ? `${env.IMAGE_API_URL}/api/image/category-random`
-    : `${env.IMAGE_API_URL}/api/image/product-images`;
-  const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
-  imageLog.info(progress.start('request'), { url, keyword, blogId, category, endpoint: useCategoryRandom ? 'category-random' : 'product-images' });
+export interface ProductDataOptions {
+  keyword: string;
+  blogId?: string;
+  category?: string;
+  dateCode?: string;
+  blogName?: string;
+}
 
+const sanitizeParam = (value: string): string =>
+  value.replace(/[\n\r]/g, '').trim();
+
+export interface ProductImageRequestConfig {
+  url: string;
+  params: Record<string, string>;
+  endpoint: 'product-images' | 'category-random';
+}
+
+export const buildProductImageRequest = ({ keyword, blogId, category, dateCode, blogName }: ProductDataOptions): ProductImageRequestConfig => {
+  const useCategoryRandom = Boolean(category && CATEGORY_RANDOM_CATEGORIES.includes(category));
+  const endpoint: ProductImageRequestConfig['endpoint'] = useCategoryRandom ? 'category-random' : 'product-images';
+  const url = `${env.IMAGE_API_URL}/api/image/${endpoint}`;
+
+  // 애견 같은 keywordCategory는 에디터 분기용 값이라 product-images 쿼리 category에는 싣지 않음.
   const params: Record<string, string> = useCategoryRandom
-    ? { category: category! }
-    : { keyword };
+    ? { category: category!, keyword: sanitizeParam(keyword) }
+    : { keyword: sanitizeParam(keyword) };
+
   if (!useCategoryRandom && blogId) params.blogId = blogId;
-  if (!useCategoryRandom && category) params.category = category;
+  if (dateCode) params.dateCode = sanitizeParam(dateCode);
+  if (blogName) params.blogName = sanitizeParam(blogName);
+
+  return { url, params, endpoint };
+};
+
+export const getProductData = async ({ keyword, blogId, category, dateCode, blogName }: ProductDataOptions) => {
+  const { url, params, endpoint } = buildProductImageRequest({ keyword, blogId, category, dateCode, blogName });
+  const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
+  imageLog.info(progress.start('request'), { url, keyword, blogId, category, dateCode, blogName, endpoint });
 
   const response = await axios.get(url, {
     params,
@@ -156,13 +181,15 @@ export const downloadImagesToDir = async (
   return saved;
 };
 
-export const prepareProductImages = async (
-  keyword: string,
-  imagesDir: string,
-  blogId?: string,
-  category?: string
-): Promise<PreparedProductData> => {
-  const data = await getProductData(keyword, blogId, category);
+export interface PrepareProductImagesOptions extends ProductDataOptions {
+  imagesDir: string;
+}
+
+export const prepareProductImages = async ({
+  imagesDir,
+  ...productDataOptions
+}: PrepareProductImagesOptions): Promise<PreparedProductData> => {
+  const data = await getProductData(productDataOptions);
 
   const bodyImages = await downloadImagesToDir(data.bodyImages, imagesDir);
 

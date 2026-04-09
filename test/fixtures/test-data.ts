@@ -20,6 +20,7 @@ export const KEYWORDS = {
   한려담원: { keyword: '한려담원', category: '한려담원', manuscriptType: 'hanryeodamwon' as ManuscriptType },
   강아지산책: { keyword: '강아지 산책', category: '', manuscriptType: 'default' as ManuscriptType },
   일본어인사: { keyword: '일본어 인사', category: '', manuscriptType: 'keigo' as ManuscriptType },
+  알리바바셀러: { keyword: '알리바바 구매대행', category: '기타', manuscriptType: 'alibaba' as ManuscriptType },
 } as const satisfies Record<string, KeywordFixture>;
 
 /* ── 카테고리 테스트 케이스 ── */
@@ -36,6 +37,7 @@ export const MANUSCRIPT_CASES: { type: ManuscriptType; keyword: string; category
   { type: 'grok', keyword: KEYWORDS.스마일라식.keyword, category: KEYWORDS.스마일라식.category },
   { type: 'keigo', keyword: KEYWORDS.일본어인사.keyword },
   { type: 'hanryeodamwon', keyword: KEYWORDS.한려담원.keyword },
+  { type: 'alibaba', keyword: KEYWORDS.알리바바셀러.keyword, category: KEYWORDS.알리바바셀러.category },
 ];
 
 /* ── E2E 파이프라인 설정 ── */

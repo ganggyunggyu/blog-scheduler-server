@@ -4,7 +4,7 @@ import { env } from '../../config/env.js';
 let browser: Browser | null = null;
 
 export const getBrowser = async (): Promise<Browser> => {
-  if (!browser) {
+  if (!browser || !browser.isConnected()) {
     browser = await chromium.launch({
       headless: env.PLAYWRIGHT_HEADLESS,
       slowMo: env.PLAYWRIGHT_SLOW_MO,

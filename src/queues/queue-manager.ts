@@ -97,6 +97,9 @@ const ensureGenerateWorker = (accountId: string): Worker => {
   const worker = new Worker(queueName, processGenerate, {
     connection,
     concurrency: 1,
+    lockDuration: 600000,
+    stalledInterval: 300000,
+    maxStalledCount: 3,
   });
 
   worker.on('completed', (job) => {
@@ -128,6 +131,9 @@ const ensurePublishWorker = (accountId: string): Worker => {
   const worker = new Worker(queueName, processPublish, {
     connection,
     concurrency: 1,
+    lockDuration: 600000,
+    stalledInterval: 300000,
+    maxStalledCount: 3,
   });
 
   worker.on('completed', (job) => {

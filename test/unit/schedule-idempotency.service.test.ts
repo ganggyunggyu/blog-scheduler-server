@@ -76,8 +76,13 @@ test('buildScheduleRequestFingerprint: 공백 차이는 무시하지만 모드 �
 });
 
 test('buildScheduleGenerateJobId/buildSchedulePublishJobId: scheduleJob 기준 고정 job id를 생성함', () => {
-  assert.equal(buildScheduleGenerateJobId('job_123'), 'generate:job_123');
-  assert.equal(buildSchedulePublishJobId('job_123'), 'publish:job_123');
+  const generateJobId = buildScheduleGenerateJobId('job_123');
+  const publishJobId = buildSchedulePublishJobId('job_123');
+
+  assert.equal(generateJobId, 'generate_job_123');
+  assert.equal(publishJobId, 'publish_job_123');
+  assert.equal(generateJobId.includes(':'), false);
+  assert.equal(publishJobId.includes(':'), false);
 });
 
 test('buildAdhocGenerateIdentity: 동일 update 요청은 같은 id를 반환함', () => {
@@ -129,4 +134,17 @@ test('buildAdhocGenerateIdentity: logNo가 다르면 다른 id를 반환함', ()
 
   assert.notEqual(first.jobId, second.jobId);
   assert.notEqual(first.scheduleJobId, second.scheduleJobId);
+});
+
+test('buildAdhocGenerateIdentity: BullMQ 호환을 위해 custom job id에 콜론을 넣지 않음', () => {
+  const identity = buildAdhocGenerateIdentity({
+    mode: 'update',
+    accountId: 'fail5644',
+    blogId: 'fail5644',
+    logNo: '22334455',
+    keyword: '터키시앙고라',
+  });
+
+  assert.equal(identity.jobId.includes(':'), false);
+  assert.match(identity.jobId, /^generate_adhoc_update_/);
 });

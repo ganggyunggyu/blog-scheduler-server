@@ -14,7 +14,7 @@ const envSchema = z.object({
   MONGO_URI: z.string(),
 
   MANUSCRIPT_API_URL: z.string().default('http://localhost:8000'),
-  IMAGE_API_URL: z.string().default('http://localhost:3001'),
+  IMAGE_API_URL: z.string().default('http://localhost:3939'),
 
   PLAYWRIGHT_HEADLESS: z.preprocess((value) => {
     if (typeof value === 'boolean') return value;
@@ -26,13 +26,19 @@ const envSchema = z.object({
     return value;
   }, z.boolean()).default(true),
   PLAYWRIGHT_SLOW_MO: z.coerce.number().default(100),
+  PLAYWRIGHT_ACTION_TIMEOUT_MS: z.coerce.number().default(120000),
+  PLAYWRIGHT_NAVIGATION_TIMEOUT_MS: z.coerce.number().default(120000),
 
-  LEAD_TIME_MINUTES: z.coerce.number().default(30),
+  LEAD_TIME_MINUTES: z.coerce.number().default(60),
   SESSION_TTL_SECONDS: z.coerce.number().default(60 * 60 * 2),
   LOGIN_RATE_LIMIT: z.coerce.number().default(3),
   LOGIN_RATE_WINDOW_SECONDS: z.coerce.number().default(60),
 
   POSTS_PER_DAY: z.coerce.number().default(3),
+
+  GEMINI_API_KEY: z.string().optional(),
+  GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().email().optional(),
+  GOOGLE_PRIVATE_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

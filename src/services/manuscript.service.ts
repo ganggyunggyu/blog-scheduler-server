@@ -45,7 +45,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
 
 interface ManuscriptEndpoint {
   path: string;
@@ -56,12 +56,14 @@ interface ManuscriptEndpoint {
 const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   default: { path: '/generate/blog-filler' },
   'update-restaurant': { path: '/generate/update-restaurant' },
+  restaurant: { path: '/generate/blog-filler-restaurant' },
   pet: { path: '/generate/blog-filler-pet' },
   grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
   keigo: { path: '/generate/keigo', engine: 'keigo' },
   hanryeodamwon: { path: '/generate/hanryeo', engine: 'hanryeodamwon' },
   nyangnyang: { path: '/generate/nyangnyang', engine: 'nyangnyang' },
   kimdongpal: { path: '/generate/kimdongpal', engine: 'kimdongpal' },
+  alibaba: { path: '/generate/alibaba', engine: 'alibaba', sendCategory: true },
 };
 
 export const callManuscriptAPI = async (
@@ -74,7 +76,13 @@ export const callManuscriptAPI = async (
   const endpoint = MANUSCRIPT_ENDPOINTS[type];
   const url = `${env.MANUSCRIPT_API_URL}${endpoint.path}`;
   const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
-  manuscriptLog.info(progress.start('request'), { url, keyword, service, ref, ...(endpoint.engine && { engine: endpoint.engine }) });
+  manuscriptLog.info(progress.start('request'), {
+    url,
+    keyword,
+    service,
+    ref,
+    ...(endpoint.engine && { engine: endpoint.engine }),
+  });
 
   const body: Record<string, string> = { service, keyword, ref };
   if (endpoint.sendCategory && category) body.category = category;
@@ -97,10 +105,21 @@ export const callManuscriptAPI = async (
 };
 
 const parseImageResponse = (data: unknown): string[] => {
-  const res = data as ProductImagesResponse;
-  if (res?.images?.body && Array.isArray(res.images.body)) {
-    return res.images.body.filter(Boolean);
+  const res = data as Record<string, unknown>;
+
+  // product 응답: { images: { body: string[] } }
+  const nested = res?.images as Record<string, unknown> | undefined;
+  if (nested?.body && Array.isArray(nested.body)) {
+    return (nested.body as string[]).filter(Boolean);
   }
+
+  // AI 생성 응답: { images: [{url: string}, ...] }
+  if (Array.isArray(res?.images)) {
+    return (res.images as Array<{ url?: string }>)
+      .map((img) => img?.url)
+      .filter((u): u is string => Boolean(u));
+  }
+
   return [];
 };
 
@@ -112,19 +131,27 @@ export const fetchBodyImagesFromAI = async (
   const url = `${env.IMAGE_API_URL}/api/image/ai-images`;
   imageLog.info('ai-images.request', { url, keyword, count });
 
-  const response = await axios.get(url, {
-    params: { keyword, count, distort: true },
-    timeout: 300000,
-  });
+  try {
+    const response = await axios.get(url, {
+      params: { keyword, count, distort: true },
+      timeout: 300000,
+    });
 
-  const urls = parseImageResponse(response.data);
-  imageLog.info('ai-images.done', { count: urls.length });
+    const urls = parseImageResponse(response.data);
+    imageLog.info('ai-images.done', { count: urls.length });
 
-  const imageData: ImageData[] = urls.map((imgUrl, i) => ({
-    url: imgUrl,
-    filename: `body_${i + 1}.webp`,
-  }));
-  return downloadImagesToDir(imageData, imagesDir);
+    const imageData: ImageData[] = urls.map((imgUrl, i) => ({
+      url: imgUrl,
+      filename: `body_${i + 1}.webp`,
+    }));
+    return downloadImagesToDir(imageData, imagesDir);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      imageLog.info('ai-images.not-ready', { keyword, message: '이미지 소스 부족' });
+      return [];
+    }
+    throw error;
+  }
 };
 
 const generateImageUrlsFromAI = async (
@@ -256,7 +283,7 @@ export const generateImageUrls = async (
   }
   if (imageSource === 'product') {
     const { getProductData } = await import('./product-image.service.js');
-    const data = await getProductData(keyword);
+    const data = await getProductData({ keyword, category });
     return data.bodyImages;
   }
   const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
@@ -279,7 +306,7 @@ export const prepareJob = async (
   imageCount: number,
   imageSource: ImageSource = 'ai',
   manuscriptType: ManuscriptType = 'default',
-  category?: string
+  category?: string,
 ): Promise<PreparedJob> => {
   const { dir, imagesDir } = await createJobDir(keyword);
   manuscriptLog.info('job.dir.created', { dir, manuscriptType });
