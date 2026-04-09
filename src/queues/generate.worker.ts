@@ -1,10 +1,13 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
 import { prepareJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service.js';
+import { lookupBlogUtmUrl } from '../services/google-sheets.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { getPublishQueue, drainAccountQueues } from './queue-manager.js';
 import { getValidCookies } from '../services/naver-auth.service.js';
 import { failAccountSchedules } from '../services/schedule-failure.service.js';
+import { assessLoginFailure } from '../services/login-failure.service.js';
+import { buildSchedulePublishJobId } from '../services/schedule-idempotency.service.js';
 import { logger } from '../lib/logging/logger.js';
 
 interface GenerateJobData {
@@ -24,6 +27,7 @@ interface GenerateJobData {
   mode?: 'create' | 'update' | 'image-replace';
   logNo?: string;
   keywordCategory?: string;
+  blogName?: string;
 }
 
 const log = logger.child({ scope: 'Generate' });
@@ -35,8 +39,40 @@ class LoginPrecheckError extends Error {
   }
 }
 
-const normalizeLoginFailure = (message: string): string =>
-  message.includes('로그인') ? message : `로그인 실패: ${message}`;
+const markGenerateJobRetryPending = async (
+  scheduleJobId: string,
+  reason: string,
+): Promise<void> => {
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    $set: { status: 'pending', error: reason },
+    $unset: { completedAt: 1 },
+  });
+};
+
+const markGenerateJobFailed = async (
+  scheduleId: string,
+  scheduleJobId: string,
+  reason: string,
+): Promise<void> => {
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    status: 'failed',
+    error: reason,
+    completedAt: new Date(),
+  });
+
+  const schedule = await ScheduleModel.findByIdAndUpdate(
+    scheduleId,
+    { $inc: { failedJobs: 1 } },
+    { new: true }
+  );
+
+  if (schedule && schedule.status !== 'cancelled') {
+    const done = schedule.completedJobs + schedule.failedJobs;
+    if (done >= schedule.totalJobs) {
+      await ScheduleModel.findByIdAndUpdate(scheduleId, { status: 'failed' });
+    }
+  }
+};
 
 export const processGenerate = async (job: Job<GenerateJobData>) => {
   const {
@@ -56,6 +92,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     mode = 'create',
     logNo,
     keywordCategory: providedCategory,
+    blogName,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -69,7 +106,10 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
 
   await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
 
-  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'generating' });
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    $set: { status: 'generating' },
+    $unset: { error: 1, completedAt: 1 },
+  });
 
   try {
     log.info('login.precheck.start', { account: maskedAccount });
@@ -89,7 +129,8 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
 
       const blogId = account.blogId || account.id;
       const keywordCategory = providedCategory || await getCategory(keyword);
-      const productData = await prepareProductImages(keyword, imagesDir, blogId, providedCategory);
+      const dateCodeForImages = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
+      const productData = await prepareProductImages({ keyword, imagesDir, blogId, category: providedCategory, dateCode: dateCodeForImages, blogName });
       let bodyImages = productData.bodyImages;
 
       if (bodyImages.length === 0) {
@@ -110,13 +151,28 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         scheduledAt,
         mode,
         logNo,
+      }, {
+        jobId: buildSchedulePublishJobId(scheduleJobId),
       });
 
       log.info('publish.queued', { jobId: job.id, publishJobId: publishJob.id, mode });
       return { scheduleJobId, publishJobId: publishJob.id };
     }
 
-    const prepared = await prepareJob(keyword, service, ref, imageSource === 'product' ? false : generateImages, imageCount, imageSource, manuscriptType, category);
+    const prepared = await prepareJob(
+      keyword,
+      service,
+      ref,
+      imageSource === 'product' ? false : generateImages,
+      imageCount,
+      imageSource,
+      manuscriptType,
+      category,
+      {
+        accountId: account.id,
+        blogName,
+      },
+    );
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),
@@ -128,7 +184,8 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     if (imageSource === 'product') {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const blogId = account.blogId || account.id;
-      productData = await prepareProductImages(keyword, imagesDir, blogId, providedCategory);
+      const dateCodeForProduct = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
+      productData = await prepareProductImages({ keyword, imagesDir, blogId, category: providedCategory, dateCode: dateCodeForProduct, blogName });
       log.info('product.prepared', {
         keyword,
         body: productData.bodyImages.length,
@@ -161,18 +218,39 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     if (bodyImages.length === 0) {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const fallbackImages = await fetchBodyImagesFromAI(keyword, 5, imagesDir);
-      if (productData) {
-        productData.bodyImages = fallbackImages;
+      if (fallbackImages.length === 0) {
+        const aiImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+        if (productData) {
+          productData.bodyImages = aiImages;
+        } else {
+          prepared.images = aiImages;
+        }
+        log.info('fallback.body.ai-gen', { count: aiImages.length });
       } else {
-        prepared.images = fallbackImages;
+        if (productData) {
+          productData.bodyImages = fallbackImages;
+        } else {
+          prepared.images = fallbackImages;
+        }
+        log.info('fallback.body.s3', { count: fallbackImages.length });
       }
-      log.info('fallback.body.ai', { count: fallbackImages.length });
     }
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
       status: 'generated',
       manuscriptId: prepared.manuscriptId,
     });
+
+    let metadata = productData?.metadata;
+
+    if (manuscriptType === 'hanryeodamwon' && blogName) {
+      const dateCode = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
+      const utmUrl = await lookupBlogUtmUrl(dateCode, blogName, keyword);
+      if (utmUrl) {
+        metadata = { ...metadata, url: utmUrl };
+        log.info('utm.applied', { keyword, blogName, dateCode, url: utmUrl.slice(0, 60) });
+      }
+    }
 
     const accountPublishQueue = getPublishQueue(account.id);
     const publishJob = await accountPublishQueue.add('publish', {
@@ -194,7 +272,9 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       scheduledAt,
       mode,
       logNo,
-      metadata: productData?.metadata,
+      metadata,
+    }, {
+      jobId: buildSchedulePublishJobId(scheduleJobId),
     });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
@@ -210,23 +290,44 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     const isFinalAttempt = job.attemptsMade + 1 >= attempts;
 
     if (error instanceof LoginPrecheckError) {
-      const reason = normalizeLoginFailure(message);
+      const assessment = assessLoginFailure(message, { forceLoginContext: true });
+      const reason = assessment.normalizedMessage;
+
       log.error('login.precheck.failed', {
         jobId: job.id,
         account: maskedAccount,
         message: reason,
+        category: assessment.category,
+        retryable: assessment.retryable,
+        scope: assessment.scope,
       });
 
-      await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
-        status: 'failed',
-        error: reason,
-        completedAt: new Date(),
-      });
+      if (assessment.scope === 'account') {
+        await markGenerateJobFailed(scheduleId, scheduleJobId, reason);
+        await failAccountSchedules(account.id, reason);
+        await drainAccountQueues(account.id);
+        throw new UnrecoverableError(reason);
+      }
 
-      await failAccountSchedules(account.id, reason);
-      await drainAccountQueues(account.id);
+      if (!isFinalAttempt && assessment.retryable) {
+        await markGenerateJobRetryPending(scheduleJobId, reason);
+        log.warn('login.precheck.retry', {
+          jobId: job.id,
+          account: maskedAccount,
+          attempt: job.attemptsMade + 1,
+          attempts,
+          message: reason,
+        });
+        throw new Error(reason);
+      }
 
-      throw new UnrecoverableError(reason);
+      await markGenerateJobFailed(scheduleId, scheduleJobId, reason);
+
+      if (!assessment.retryable) {
+        throw new UnrecoverableError(reason);
+      }
+
+      throw new Error(reason);
     }
 
     log.error('failed', {
@@ -236,27 +337,13 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       message,
     });
 
+    if (!isFinalAttempt) {
+      await markGenerateJobRetryPending(scheduleJobId, message);
+    }
+
     if (isFinalAttempt) {
       log.error('failed.permanent', { jobId: job.id, attempts });
-
-      await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
-        status: 'failed',
-        error: message,
-        completedAt: new Date(),
-      });
-
-      const schedule = await ScheduleModel.findByIdAndUpdate(
-        scheduleId,
-        { $inc: { failedJobs: 1 } },
-        { new: true }
-      );
-
-      if (schedule && schedule.status !== 'cancelled') {
-        const done = schedule.completedJobs + schedule.failedJobs;
-        if (done >= schedule.totalJobs) {
-          await ScheduleModel.findByIdAndUpdate(scheduleId, { status: 'failed' });
-        }
-      }
+      await markGenerateJobFailed(scheduleId, scheduleJobId, message);
     }
 
     throw error;

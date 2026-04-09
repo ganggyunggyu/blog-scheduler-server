@@ -1,7 +1,9 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
+import { buildScheduleRequestFingerprint } from './schedule-idempotency.service.js';
 
 export type ScheduleMode = '1' | '2' | '3' | '2121';
+const DEFAULT_LEAD_TIME_MINUTES = 60;
 
 const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
@@ -49,10 +51,14 @@ export interface CreateScheduleInput {
   ref: string;
   scheduleDate?: string;
   scheduleMode?: ScheduleMode;
+  items?: ScheduleItem[];
   generateImages: boolean;
   imageCount: number;
   delayBetweenPostsSeconds: number;
   keywords: string[];
+  imageSource?: 'ai' | 'google' | 'keyword' | 'product';
+  manuscriptType?: string;
+  keywordCategory?: string;
 }
 
 const randomBetween = (min: number, max: number): number =>
@@ -70,6 +76,16 @@ const addMinutesWithCap = (base: Date, minutes: number): Date => {
   }
 
   return result;
+};
+
+const getLeadTimeMinutes = (): number => {
+  const parsed = Number(process.env.LEAD_TIME_MINUTES);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_LEAD_TIME_MINUTES;
+  }
+
+  return parsed;
 };
 
 export const calculateSchedule = (
@@ -111,7 +127,7 @@ export const calculateSchedule = (
 
     let postsThisDay = 0;
 
-    const minScheduleTime = new Date(now.getTime() + 30 * 60 * 1000);
+    const minScheduleTime = new Date(now.getTime() + getLeadTimeMinutes() * 60 * 1000);
     if (currentTime < minScheduleTime) {
       currentTime = new Date(minScheduleTime);
     }
@@ -144,13 +160,46 @@ export const formatKst = (date: Date): string =>
   format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
 export const createSchedule = async (input: CreateScheduleInput) => {
-  const items = calculateSchedule(input.keywords, input.scheduleDate, input.scheduleMode);
+  const items = input.items ?? calculateSchedule(input.keywords, input.scheduleDate, input.scheduleMode);
+  const requestFingerprint = buildScheduleRequestFingerprint({
+    accountId: input.accountId,
+    service: input.service,
+    ref: input.ref,
+    scheduleDate: input.scheduleDate,
+    scheduleMode: input.scheduleMode,
+    generateImages: input.generateImages,
+    imageCount: input.imageCount,
+    delayBetweenPostsSeconds: input.delayBetweenPostsSeconds,
+    keywords: input.keywords,
+    imageSource: input.imageSource,
+    manuscriptType: input.manuscriptType,
+    keywordCategory: input.keywordCategory,
+  });
+
+  const existingSchedule = await ScheduleModel.findOne({
+    accountId: input.accountId,
+    requestFingerprint,
+    status: { $in: ['pending', 'processing'] },
+  }).sort({ createdAt: -1 });
+
+  if (existingSchedule) {
+    const jobs = await ScheduleJobModel.find({ scheduleId: existingSchedule._id }).sort({ slot: 1 });
+    const existingItems = jobs.map((job) => ({
+      keyword: job.keyword,
+      category: job.category,
+      scheduledAt: new Date(job.scheduledAt),
+      slot: job.slot,
+    }));
+
+    return { schedule: existingSchedule, jobs, items: existingItems, reused: true };
+  }
 
   const schedule = await ScheduleModel.create({
     accountId: input.accountId,
     service: input.service,
     ref: input.ref,
     scheduleDate: input.scheduleDate || format(new Date(), 'yyyy-MM-dd'),
+    requestFingerprint,
     generateImages: input.generateImages,
     imageCount: input.imageCount,
     delayBetweenPostsSeconds: input.delayBetweenPostsSeconds,
@@ -169,5 +218,5 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     }))
   );
 
-  return { schedule, jobs, items };
+  return { schedule, jobs, items, reused: false };
 };

@@ -8,6 +8,7 @@ export const scheduleSchema = new Schema(
     service: { type: String, default: 'default' },
     ref: { type: String, default: '' },
     scheduleDate: { type: String, required: true },
+    requestFingerprint: { type: String, index: true },
     generateImages: { type: Boolean, default: false },
     imageCount: { type: Number, default: 0 },
     delayBetweenPostsSeconds: { type: Number, default: 0 },

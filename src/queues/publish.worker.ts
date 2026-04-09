@@ -8,8 +8,10 @@ import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { drainAccountQueues } from './queue-manager.js';
 import { failAccountSchedules } from '../services/schedule-failure.service.js';
 import { logger } from '../lib/logging/logger.js';
+import { summarizeScheduleProgress, type ScheduleJobStatus } from './publish-progress.js';
 import type { ProductMetadata } from '../types/metadata.js';
 import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscript.service.js';
+import { assessLoginFailure } from '../services/login-failure.service.js';
 
 interface PublishJobData {
   scheduleId: string;
@@ -43,9 +45,6 @@ const isSessionError = (message: string): boolean => {
   );
 };
 
-const isLoginFailure = (message: string): boolean =>
-  isSessionError(message) || NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern));
-
 const NON_RETRYABLE_PUBLISH_ERROR_PATTERNS = [
   '이미지 업로드 실패',
   '이미지 전송 오류',
@@ -62,23 +61,55 @@ const isNonRetryablePublishError = (message: string): boolean => {
 };
 
 const markScheduleProcessing = async (scheduleId: string): Promise<void> => {
-  await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
+  await ScheduleModel.findOneAndUpdate(
+    { _id: scheduleId, status: { $ne: 'cancelled' } },
+    { status: 'processing' }
+  );
 };
 
-const updateScheduleCompletion = async (scheduleId: string, failed: boolean): Promise<void> => {
-  const schedule = await ScheduleModel.findByIdAndUpdate(
-    scheduleId,
-    { $inc: failed ? { failedJobs: 1 } : { completedJobs: 1 } },
-    { new: true }
-  );
+const syncScheduleProgress = async (scheduleId: string): Promise<void> => {
+  const [schedule, jobs] = await Promise.all([
+    ScheduleModel.findById(scheduleId, { status: 1, totalJobs: 1 }),
+    ScheduleJobModel.find({ scheduleId }, { status: 1 }),
+  ]);
 
   if (!schedule || schedule.status === 'cancelled') return;
 
-  const done = schedule.completedJobs + schedule.failedJobs;
-  if (done >= schedule.totalJobs) {
-    const status = schedule.failedJobs > 0 ? 'failed' : 'completed';
-    await ScheduleModel.findByIdAndUpdate(scheduleId, { status });
-  }
+  const summary = summarizeScheduleProgress(
+    jobs.map((job) => job.status as ScheduleJobStatus),
+    schedule.totalJobs,
+  );
+
+  await ScheduleModel.findByIdAndUpdate(scheduleId, {
+    status: summary.status,
+    completedJobs: summary.completedJobs,
+    failedJobs: summary.failedJobs,
+  });
+};
+
+const markPublishJobRetryReady = async (
+  scheduleId: string,
+  scheduleJobId: string,
+  reason: string,
+): Promise<void> => {
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    $set: { status: 'generated', error: reason },
+    $unset: { completedAt: 1 },
+  });
+  await syncScheduleProgress(scheduleId);
+};
+
+const markPublishJobFailed = async (
+  scheduleId: string,
+  scheduleJobId: string,
+  reason: string,
+): Promise<void> => {
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    status: 'failed',
+    error: reason,
+    completedAt: new Date(),
+  });
+  await syncScheduleProgress(scheduleId);
 };
 
 const executePost = async (
@@ -139,6 +170,8 @@ export const processPublish = async (job: Job<PublishJobData>) => {
   const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory } = job.data;
   const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
+  const attempts = job.opts.attempts ?? 1;
+  const isFinalAttempt = job.attemptsMade + 1 >= attempts;
 
   log.info('start', {
     jobId: job.id,
@@ -155,7 +188,11 @@ export const processPublish = async (job: Job<PublishJobData>) => {
   }
 
   await markScheduleProcessing(scheduleId);
-  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, { status: 'publishing' });
+  await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
+    $set: { status: 'publishing' },
+    $unset: { error: 1, completedAt: 1 },
+  });
+  await syncScheduleProgress(scheduleId);
 
   if (throttleSeconds && throttleSeconds > 0) {
     log.info('throttle', { seconds: throttleSeconds });
@@ -172,11 +209,14 @@ export const processPublish = async (job: Job<PublishJobData>) => {
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
         await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
-          status: 'published',
-          postUrl: result.postUrl,
-          completedAt: new Date(),
+          $set: {
+            status: 'published',
+            postUrl: result.postUrl,
+            completedAt: new Date(),
+          },
+          $unset: { error: 1 },
         });
-        await updateScheduleCompletion(scheduleId, false);
+        await syncScheduleProgress(scheduleId);
         await updateJobStatus(jobDir, 'success', { postUrl: result.postUrl });
         return result;
       }
@@ -203,42 +243,79 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     log.info('completed', { jobId: job.id, postUrl: publishResult.postUrl });
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
-      status: 'published',
-      postUrl: publishResult.postUrl,
-      completedAt: new Date(),
+      $set: {
+        status: 'published',
+        postUrl: publishResult.postUrl,
+        completedAt: new Date(),
+      },
+      $unset: { error: 1 },
     });
-    await updateScheduleCompletion(scheduleId, false);
+    await syncScheduleProgress(scheduleId);
     await updateJobStatus(jobDir, 'success', { postUrl: publishResult.postUrl });
 
     return publishResult;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    const loginAssessment = assessLoginFailure(message);
     log.error('failed', { jobId: job.id, message });
 
-    await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {
-      status: 'failed',
-      error: message,
-      completedAt: new Date(),
-    });
-    await updateScheduleCompletion(scheduleId, true);
-    await updateJobStatus(jobDir, 'failed', { error: message });
+    if (loginAssessment.isLoginFailure) {
+      const reason = loginAssessment.normalizedMessage;
 
-    if (isLoginFailure(message)) {
-      const reason = message.includes('로그인') ? message : `로그인 실패: ${message}`;
-      await failAccountSchedules(account.id, reason);
-      await drainAccountQueues(account.id);
-      log.warn('login.failure.drain', { account: maskedAccount, message: reason });
-      throw new UnrecoverableError(reason);
+      if (loginAssessment.scope === 'account') {
+        await markPublishJobFailed(scheduleId, scheduleJobId, reason);
+        await updateJobStatus(jobDir, 'failed', { error: reason });
+        await failAccountSchedules(account.id, reason);
+        await drainAccountQueues(account.id);
+        log.warn('login.failure.account', {
+          account: maskedAccount,
+          category: loginAssessment.category,
+          message: reason,
+        });
+        throw new UnrecoverableError(reason);
+      }
+
+      if (loginAssessment.retryable && !isFinalAttempt) {
+        await markPublishJobRetryReady(scheduleId, scheduleJobId, reason);
+        log.warn('login.failure.retry', {
+          account: maskedAccount,
+          category: loginAssessment.category,
+          attempt: job.attemptsMade + 1,
+          attempts,
+          message: reason,
+        });
+        throw new Error(reason);
+      }
+
+      await markPublishJobFailed(scheduleId, scheduleJobId, reason);
+      await updateJobStatus(jobDir, 'failed', { error: reason });
+
+      if (!loginAssessment.retryable) {
+        throw new UnrecoverableError(reason);
+      }
+
+      throw new Error(reason);
     }
 
     if (NON_RETRYABLE_ERRORS.some((pattern) => message.includes(pattern))) {
+      await markPublishJobFailed(scheduleId, scheduleJobId, message);
+      await updateJobStatus(jobDir, 'failed', { error: message });
       log.error('failed.non_retryable', { jobId: job.id, message });
       throw new UnrecoverableError(message);
     }
 
     if (isNonRetryablePublishError(message)) {
+      await markPublishJobFailed(scheduleId, scheduleJobId, message);
+      await updateJobStatus(jobDir, 'failed', { error: message });
       log.error('failed.non_retryable.publish', { jobId: job.id, message });
       throw new UnrecoverableError(message);
+    }
+
+    if (isFinalAttempt) {
+      await markPublishJobFailed(scheduleId, scheduleJobId, message);
+      await updateJobStatus(jobDir, 'failed', { error: message });
+    } else {
+      await markPublishJobRetryReady(scheduleId, scheduleJobId, message);
     }
 
     throw error;

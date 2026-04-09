@@ -9,18 +9,23 @@ export const accountSchema = z.object({
 export const createScheduleSchema = z.object({
   service: z.string().default('default'),
   ref: z.string().default(''),
+  scheduleMode: z.enum(['1', '2', '3', '2121']).default('2'),
   queues: z
     .array(
       z.object({
         account: accountSchema,
         keywords: z.array(z.string().min(1)).min(1),
+        blogName: z.string().optional(),
       })
     )
     .min(1),
   scheduleDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   generateImages: z.boolean().default(true),
   imageCount: z.number().min(1).max(10).default(5),
+  imageSource: z.enum(['ai', 'google', 'keyword', 'product']).default('ai'),
+  manuscriptType: z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default'),
   delayBetweenPostsSeconds: z.number().min(0).max(600).default(10),
+  keywordCategory: z.string().optional(),
 });
 
 export type CreateScheduleDto = z.infer<typeof createScheduleSchema>;
