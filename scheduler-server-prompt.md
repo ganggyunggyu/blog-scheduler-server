@@ -8,13 +8,15 @@
 
 - 모든 작업은 가능하면 테스트 코드 추가/수정부터 시작하고, 구현은 테스트를 통과시키는 방향으로 진행한다.
 - 변경 후에는 반드시 검증 명령을 실행한다.
-- `lint` 스크립트가 존재하면 lint를 먼저 실행한다.
-- `lint` 스크립트가 없으면 그 사실을 명시하고 최소 `pnpm typecheck` 와 변경 범위에 맞는 테스트를 실행한다.
+- 현재 레포는 별도 ESLint 가 없으므로 lint gate 는 `pnpm typecheck` 로 본다.
+- 기본 종료 게이트는 `node scripts/run-quality-gate.mjs` 이고, 내부적으로 `pnpm typecheck` 와 변경 범위에 맞는 테스트를 실행한다.
 - 타입체크만 통과했다고 완료로 간주하지 않는다. 관련 unit/integration/e2e 또는 재현 명령을 통해 원하는 결과가 실제로 나오는지 확인한다.
 - 검증이 불가능하면 외부 의존성, 인증, 환경 부재 등 구체적 차단 사유를 남긴다.
 - 작업 마감 전에는 `git status` 로 변경 범위를 확인하고, 현재 작업만 기준으로 커밋 가능한 상태인지 점검한다.
 - 사용자가 커밋을 금지하지 않았고 변경셋이 독립적이면 작업 단위 커밋까지 진행한다.
 - 최종 보고에는 실행한 검증 명령, 결과, 원하는 동작이 확인된 근거를 반드시 포함한다.
+- 로컬 강제선은 `.githooks/pre-push` 이고, `node scripts/install-git-hooks.mjs` 또는 `git config --local core.hooksPath .githooks` 로 연결한다.
+- 원격 강제선은 `.github/workflows/quality-gate.yml` 이고, push/PR 에서 동일한 quality gate 를 실행한다.
 
 ---
 
