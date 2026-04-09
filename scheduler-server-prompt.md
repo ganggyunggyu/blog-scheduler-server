@@ -8,8 +8,9 @@
 
 - 모든 작업은 가능하면 테스트 코드 추가/수정부터 시작하고, 구현은 테스트를 통과시키는 방향으로 진행한다.
 - 변경 후에는 반드시 검증 명령을 실행한다.
-- 현재 레포는 별도 ESLint 가 없으므로 lint gate 는 `pnpm typecheck` 로 본다.
-- 기본 종료 게이트는 `node scripts/run-quality-gate.mjs` 이고, 내부적으로 `pnpm typecheck` 와 변경 범위에 맞는 테스트를 실행한다.
+- 현재 레포는 별도 ESLint 가 없지만 `node scripts/run-lint-gate.mjs` 로 repo-native lint gate 를 강제한다.
+- lint gate 는 기본적으로 `src/**/*.ts`, `test/unit/**/*.ts` 범위에서 `explicit any`, `@ts-ignore`, `@ts-expect-error`, `var`, named `function` 선언, 로거 외 `console.*` 사용을 막는다.
+- 기본 종료 게이트는 `node scripts/run-quality-gate.mjs` 이고, 내부적으로 `node scripts/run-lint-gate.mjs`, `pnpm typecheck`, `pnpm test` 를 순서대로 실행한다.
 - 타입체크만 통과했다고 완료로 간주하지 않는다. 관련 unit/integration/e2e 또는 재현 명령을 통해 원하는 결과가 실제로 나오는지 확인한다.
 - 검증이 불가능하면 외부 의존성, 인증, 환경 부재 등 구체적 차단 사유를 남긴다.
 - 작업 마감 전에는 `git status` 로 변경 범위를 확인하고, 현재 작업만 기준으로 커밋 가능한 상태인지 점검한다.

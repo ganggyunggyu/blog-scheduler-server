@@ -121,7 +121,7 @@ const normalizeContext = (context: LogContext): LogContext => {
   return normalized;
 };
 
-const normalizeArgs = (args: any[], bindings: LogContext): { message: string; context: LogContext } => {
+const normalizeArgs = (args: unknown[], bindings: LogContext): { message: string; context: LogContext } => {
   let message = '';
   let context: LogContext = { ...bindings };
 
@@ -200,7 +200,7 @@ const createLogger = (bindings: LogContext = {}): Logger => {
   const emit = (level: LogLevel): LogFn => {
     if (level === 'silent') return () => {};
 
-    return (...args: any[]) => {
+    return (...args: unknown[]) => {
       const { message, context } = normalizeArgs(args, bindings);
       const line = formatLine(level, message, context);
 

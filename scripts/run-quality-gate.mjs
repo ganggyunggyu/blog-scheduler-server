@@ -14,5 +14,6 @@ const run = (label, command) => {
   });
 };
 
-run('lint-gate', 'pnpm typecheck');
+run('lint-gate', 'node scripts/run-lint-gate.mjs');
+run('typecheck-gate', 'pnpm typecheck');
 run('test-gate', 'pnpm test');

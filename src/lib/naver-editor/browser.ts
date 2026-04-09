@@ -1,5 +1,6 @@
 import { getBrowser } from '../browser/playwright.js';
 import type { BrowserSession } from './types.js';
+import { normalizeSessionCookies } from './cookies.js';
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -10,7 +11,7 @@ export const createSession = async (cookies: unknown[]): Promise<BrowserSession>
     userAgent: USER_AGENT,
     permissions: ['clipboard-read', 'clipboard-write'],
   });
-  await context.addCookies(cookies as any[]);
+  await context.addCookies(normalizeSessionCookies(cookies));
   const page = await context.newPage();
   return { context, page };
 };
