@@ -23,6 +23,15 @@
 - 로거는 `logger.child({ scope: '...' })` 패턴 사용함.
 - barrel export 는 기존 위치에서만 유지함.
 - 테스트는 `node:test` + `tsx` 사용함. Jest/Vitest 추가하지 않음.
+## Task Gate
+- 코드 변경 작업은 테스트 시나리오나 실패 조건부터 먼저 정의하고, 가능하면 테스트 코드 수정/추가를 선행함.
+- 구현 후에는 완료 보고 전에 정적 검증과 테스트를 반드시 돌림.
+- `lint` 스크립트가 있으면 lint를 먼저 돌리고, 현재처럼 별도 ESLint 가 없으면 lint gate 는 `pnpm typecheck` 로 간주함.
+- 기본 종료 게이트는 `pnpm typecheck` 후 `pnpm test` 순서로 실행함.
+- 요구사항이 단순 unit 통과만으로 끝나지 않으면 라우트 호출, 재현 스크립트, 실제 UI 확인 중 하나로 원하는 결과까지 확인함.
+- 작업 마감 전에는 `git status` 로 변경 범위를 확인하고, 현재 작업 파일만 기준으로 커밋 가능한 상태인지 점검함.
+- 검증이 모두 끝난 뒤에는 사용자가 커밋 금지를 말하지 않은 이상 focused commit 을 기본으로 함.
+- 테스트나 검증을 못 돌린 경우에는 이유, 미검증 범위, 원하는 결과를 아직 확인하지 못한 지점을 명확히 남기고 완료로 단정하지 않음.
 ## Critical Rules
 - 비즈니스 시간 계산에 `toISOString()` 쓰지 않음. KST offset 문자열 유지함.
 - 비밀번호를 MongoDB/log 에 저장하거나 출력하지 않음. BullMQ job payload 에만 둠.
