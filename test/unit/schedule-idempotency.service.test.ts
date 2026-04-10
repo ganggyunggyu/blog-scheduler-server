@@ -75,6 +75,42 @@ test('buildScheduleRequestFingerprint: 공백 차이는 무시하지만 모드 �
   assert.notEqual(trimmed, differentMode);
 });
 
+test('buildScheduleRequestFingerprint: 시간 정책 차이는 fingerprint에 반영함', () => {
+  const defaultTiming = buildScheduleRequestFingerprint({
+    accountId: 'dhtksk1p',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-10',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['흑염소효능', '수족냉증'],
+    imageSource: 'product',
+    manuscriptType: 'hanryeodamwon',
+    keywordCategory: '한려담원',
+    scheduleTimingKey: '',
+  });
+
+  const fixedTiming = buildScheduleRequestFingerprint({
+    accountId: 'dhtksk1p',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-10',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['흑염소효능', '수족냉증'],
+    imageSource: 'product',
+    manuscriptType: 'hanryeodamwon',
+    keywordCategory: '한려담원',
+    scheduleTimingKey: 'fixed_2350',
+  });
+
+  assert.notEqual(defaultTiming, fixedTiming);
+});
+
 test('buildScheduleGenerateJobId/buildSchedulePublishJobId: scheduleJob 기준 고정 job id를 생성함', () => {
   const generateJobId = buildScheduleGenerateJobId('job_123');
   const publishJobId = buildSchedulePublishJobId('job_123');

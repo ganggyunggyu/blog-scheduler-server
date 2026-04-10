@@ -4,6 +4,10 @@ import { buildScheduleRequestFingerprint } from './schedule-idempotency.service.
 
 export type ScheduleMode = '1' | '2' | '3' | '2121';
 const DEFAULT_LEAD_TIME_MINUTES = 60;
+const GOAT_FIXED_PUBLISH_TIME = {
+  hours: 23,
+  minutes: 50,
+} as const;
 
 const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
@@ -25,6 +29,15 @@ export interface ScheduleItem {
   category?: string;
   scheduledAt: Date;
   slot: number;
+}
+
+interface FixedPublishTime {
+  hours: number;
+  minutes: number;
+}
+
+export interface ScheduleTimingOptions {
+  fixedPublishTime?: FixedPublishTime;
 }
 
 export const parseKeywordWithCategory = (
@@ -64,6 +77,38 @@ export interface CreateScheduleInput {
 const randomBetween = (min: number, max: number): number =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
+const applyFixedPublishTime = (
+  base: Date,
+  fixedPublishTime: FixedPublishTime,
+): Date =>
+  setSeconds(
+    setMinutes(
+      setHours(new Date(base), fixedPublishTime.hours),
+      fixedPublishTime.minutes,
+    ),
+    0,
+  );
+
+export const buildScheduleTimingOptions = (
+  input: { manuscriptType?: string },
+): ScheduleTimingOptions => {
+  if (input.manuscriptType === 'hanryeodamwon') {
+    return {
+      fixedPublishTime: GOAT_FIXED_PUBLISH_TIME,
+    };
+  }
+
+  return {};
+};
+
+const buildScheduleTimingKey = (options: ScheduleTimingOptions): string => {
+  if (!options.fixedPublishTime) {
+    return '';
+  }
+
+  return `fixed_${String(options.fixedPublishTime.hours).padStart(2, '0')}${String(options.fixedPublishTime.minutes).padStart(2, '0')}`;
+};
+
 const addMinutesWithCap = (base: Date, minutes: number): Date => {
   const result = new Date(base.getTime() + minutes * 60 * 1000);
 
@@ -91,7 +136,8 @@ const getLeadTimeMinutes = (): number => {
 export const calculateSchedule = (
   keywords: string[],
   scheduleDate?: string,
-  scheduleMode: ScheduleMode = '2'
+  scheduleMode: ScheduleMode = '2',
+  options: ScheduleTimingOptions = {},
 ): ScheduleItem[] => {
   const now = new Date();
   const baseDate = scheduleDate ? new Date(`${scheduleDate}T00:00:00`) : now;
@@ -110,7 +156,10 @@ export const calculateSchedule = (
     let currentTime: Date;
     let intervalMinutes: number;
 
-    if (isToday) {
+    if (options.fixedPublishTime) {
+      currentTime = applyFixedPublishTime(targetDate, options.fixedPublishTime);
+      intervalMinutes = 0;
+    } else if (isToday) {
       const nextHour = new Date(now);
       nextHour.setMinutes(0, 0, 0);
       nextHour.setHours(nextHour.getHours() + 1);
@@ -160,7 +209,15 @@ export const formatKst = (date: Date): string =>
   format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
 export const createSchedule = async (input: CreateScheduleInput) => {
-  const items = input.items ?? calculateSchedule(input.keywords, input.scheduleDate, input.scheduleMode);
+  const timingOptions = buildScheduleTimingOptions({
+    manuscriptType: input.manuscriptType,
+  });
+  const items = input.items ?? calculateSchedule(
+    input.keywords,
+    input.scheduleDate,
+    input.scheduleMode,
+    timingOptions,
+  );
   const requestFingerprint = buildScheduleRequestFingerprint({
     accountId: input.accountId,
     service: input.service,
@@ -174,6 +231,7 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     imageSource: input.imageSource,
     manuscriptType: input.manuscriptType,
     keywordCategory: input.keywordCategory,
+    scheduleTimingKey: buildScheduleTimingKey(timingOptions),
   });
 
   const existingSchedule = await ScheduleModel.findOne({

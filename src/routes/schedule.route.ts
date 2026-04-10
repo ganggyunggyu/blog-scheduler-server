@@ -3,7 +3,7 @@ import type { Queue } from 'bullmq';
 import { z } from 'zod';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto.js';
 import { appendScheduledBlogUtmRows } from '../services/google-sheets.service.js';
-import { calculateSchedule, createSchedule } from '../services/schedule.service.js';
+import { buildScheduleTimingOptions, calculateSchedule, createSchedule } from '../services/schedule.service.js';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
 import { getValidCookies } from '../services/naver-auth.service.js';
@@ -312,6 +312,9 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   // Python 호환 라우트 (/bot/auto-schedule)
   app.post('/bot/auto-schedule', async (req: { body: unknown }) => {
     const body = pythonCompatSchema.parse(req.body);
+    const timingOptions = buildScheduleTimingOptions({
+      manuscriptType: body.manuscript_type,
+    });
 
     const results: Array<{
       scheduleId: string;
@@ -327,7 +330,12 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       return {
         queue,
         blogName: queue.blog_name || matchedAccount?.name,
-        items: calculateSchedule(queue.keywords, body.schedule_date, body.schedule_mode),
+        items: calculateSchedule(
+          queue.keywords,
+          body.schedule_date,
+          body.schedule_mode,
+          timingOptions,
+        ),
       };
     }));
 

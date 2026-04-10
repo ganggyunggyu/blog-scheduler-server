@@ -13,6 +13,7 @@ interface ScheduleRequestFingerprintInput {
   imageSource?: string;
   manuscriptType?: string;
   keywordCategory?: string;
+  scheduleTimingKey?: string;
 }
 
 interface AdhocGenerateIdentityInput {
@@ -53,6 +54,7 @@ export const buildScheduleRequestFingerprint = (
     imageSource: input.imageSource ?? 'ai',
     manuscriptType: input.manuscriptType ?? 'default',
     keywordCategory: input.keywordCategory ?? '',
+    scheduleTimingKey: input.scheduleTimingKey ?? '',
   };
 
   return `schreq_${hashPayload(normalized)}`;

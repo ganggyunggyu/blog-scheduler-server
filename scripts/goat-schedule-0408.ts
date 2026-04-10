@@ -1,4 +1,4 @@
-import { calculateSchedule } from '../src/services/schedule.service.js';
+import { buildScheduleTimingOptions, calculateSchedule } from '../src/services/schedule.service.js';
 import { appendScheduledBlogUtmRows } from '../src/services/google-sheets.service.js';
 
 const accounts = [
@@ -13,9 +13,10 @@ const accounts = [
 ];
 
 const main = async () => {
+  const timingOptions = buildScheduleTimingOptions({ manuscriptType: 'hanryeodamwon' });
   const scheduled = accounts.map(({ name, keywords }) => ({
     name,
-    items: calculateSchedule(keywords, '2026-04-08', '2'),
+    items: calculateSchedule(keywords, '2026-04-08', '2', timingOptions),
   }));
 
   for (const { name, items } of scheduled) {

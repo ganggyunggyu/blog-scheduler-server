@@ -1,6 +1,6 @@
 import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateSchedule, parseKeywordWithCategory, type ScheduleMode } from '../../src/services/schedule.service';
+import { buildScheduleTimingOptions, calculateSchedule, parseKeywordWithCategory, type ScheduleMode } from '../../src/services/schedule.service';
 
 process.env.TZ = 'Asia/Seoul';
 
@@ -136,6 +136,26 @@ test('calculateSchedule future date: 미래 날짜는 랜덤 시작 시각 규�
   });
 
   assert.equal(randomMock.mock.callCount(), 2);
+});
+
+test('calculateSchedule: 흑염소는 모든 슬롯 시간을 23시 50분으로 고정함', () => {
+  const items = calculateSchedule(
+    ['keyword1', 'keyword2', 'keyword3'],
+    '2099-03-18',
+    '2',
+    buildScheduleTimingOptions({ manuscriptType: 'hanryeodamwon' }),
+  );
+
+  assert.equal(items.length, 3);
+  assert.equal(items[0]?.scheduledAt.getDate(), 18);
+  assert.equal(items[1]?.scheduledAt.getDate(), 18);
+  assert.equal(items[2]?.scheduledAt.getDate(), 19);
+  assert.equal(items[0]?.scheduledAt.getHours(), 23);
+  assert.equal(items[0]?.scheduledAt.getMinutes(), 50);
+  assert.equal(items[1]?.scheduledAt.getHours(), 23);
+  assert.equal(items[1]?.scheduledAt.getMinutes(), 50);
+  assert.equal(items[2]?.scheduledAt.getHours(), 23);
+  assert.equal(items[2]?.scheduledAt.getMinutes(), 50);
 });
 
 test('parseKeywordWithCategory: 카테고리 파싱', () => {

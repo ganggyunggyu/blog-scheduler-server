@@ -10,6 +10,10 @@
 | image_source | `product` |
 | keyword_category | `한려담원` |
 
+운영 메모:
+- 흑염소 스케쥴은 **모든 예약 시각을 `23:50`으로 고정**함
+- `schedule_mode` 는 하루 배치 수만 결정하고, 같은 날에 배치된 건들은 모두 `23:50` 기준으로 계산함
+
 ## 실행 흐름
 
 ### 1단계: 사용자에게 입력 요청
@@ -45,22 +49,23 @@
 
 **운영 순서는 기존과 동일하게 `시트 내보내기 -> 스케쥴 생성`을 유지합니다.**
 
-다만 UTM 시트의 **Medium** 값을 `MMDD + 계정이름` 형식으로 맞추기 위해, 시트 내보내기 **직전에만** `calculateSchedule()`로 예약시간을 먼저 계산합니다.
+다만 UTM 시트의 **Medium** 값을 `MMDD + 계정이름` 형식으로 맞추기 위해, 시트 내보내기 **직전에만** `calculateSchedule()`로 예약시간을 먼저 계산합니다. 흑염소는 이때도 **모든 시각을 `23:50`으로 고정**합니다.
 
 - 이 선계산은 **시트 내보내기용 날짜코드(MMDD)를 만들기 위한 내부 준비 단계**입니다.
 - 외부 작업 순서는 바뀌지 않습니다. 여전히 **UTM 시트 append를 먼저** 하고, 그 다음에 실제 `/bot/auto-schedule` 호출을 합니다.
 - 선계산 결과로 나온 각 키워드의 `scheduledAt`에서 `MMDD`를 추출합니다.
 - 예시:
-  - `2026-03-12T07:00:00+09:00` -> `0312`
-  - `2026-04-01T09:00:00+09:00` -> `0401`
+  - `2026-03-12T23:50:00+09:00` -> `0312`
+  - `2026-04-01T23:50:00+09:00` -> `0401`
 
 ```typescript
-import { calculateSchedule } from './src/services/schedule.service.js';
+import { buildScheduleTimingOptions, calculateSchedule } from './src/services/schedule.service.js';
 
 const items = calculateSchedule(
   ['키워드1', '키워드2', '키워드3'],
   '2026-04-01',
   '3',
+  buildScheduleTimingOptions({ manuscriptType: 'hanryeodamwon' }),
 );
 ```
 
@@ -88,12 +93,13 @@ const items = calculateSchedule(
 
 ```typescript
 import { appendScheduledBlogUtmRows } from './src/services/google-sheets.service.js';
-import { calculateSchedule } from './src/services/schedule.service.js';
+import { buildScheduleTimingOptions, calculateSchedule } from './src/services/schedule.service.js';
 
 const items = calculateSchedule(
   ['키워드1', '키워드2', '키워드3'],
   '2026-04-01',
   '3',
+  buildScheduleTimingOptions({ manuscriptType: 'hanryeodamwon' }),
 );
 
 await appendScheduledBlogUtmRows([
