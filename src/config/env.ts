@@ -41,7 +41,8 @@ const envSchema = z.object({
   GOOGLE_PRIVATE_KEY: z.string().optional(),
 });
 
-export const env = envSchema.parse(process.env);
 export type Env = z.infer<typeof envSchema>;
+export const parseEnv = (input: NodeJS.ProcessEnv): Env => envSchema.parse(input);
+export const env = parseEnv(process.env);
 
 process.env.TZ = env.TZ;
