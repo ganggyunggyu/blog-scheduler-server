@@ -4,7 +4,8 @@ import { chromium } from 'playwright';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const TODAY = new Date();
+const TARGET_DATE_ARG = process.argv[2];
+const TODAY = TARGET_DATE_ARG ? new Date(`${TARGET_DATE_ARG}T00:00:00+09:00`) : new Date();
 const TODAY_STR = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
 const TODAY_COMPACT = TODAY_STR.replace(/-/g, '');
 
