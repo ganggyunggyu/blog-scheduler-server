@@ -18,12 +18,19 @@ const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default
 const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
+const scheduleItemSchema = z.object({
+  keyword: z.string(),
+  category: z.string().optional(),
+  scheduledAt: z.string(),
+  slot: z.number().int().min(1),
+});
 
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
       account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
       keywords: z.array(z.string()),
+      items: z.array(scheduleItemSchema).optional(),
       blog_name: z.string().optional(),
     })
   ),
@@ -120,6 +127,46 @@ const enqueueScheduleGenerateJob = async ({
   await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
     generateJobId: String(generateJob.id),
   });
+};
+
+const resolveExecutableJobStatus = async (
+  accountGenerateQueue: Queue,
+  jobItem: {
+    _id: unknown;
+    status: string;
+    generateJobId?: string;
+  },
+): Promise<'pending' | null> => {
+  if (jobItem.status === 'pending') {
+    return 'pending';
+  }
+
+  if (jobItem.status !== 'generating') {
+    return null;
+  }
+
+  const generateJob = jobItem.generateJobId
+    ? await accountGenerateQueue.getJob(jobItem.generateJobId)
+    : null;
+
+  if (!generateJob) {
+    await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
+      $set: { status: 'pending' },
+      $unset: { completedAt: 1 },
+    });
+    return 'pending';
+  }
+
+  const state = await generateJob.getState();
+  if (state === 'failed') {
+    await ScheduleJobModel.findByIdAndUpdate(jobItem._id, {
+      $set: { status: 'pending' },
+      $unset: { completedAt: 1 },
+    });
+    return 'pending';
+  }
+
+  return null;
 };
 
 export const scheduleRoutes = async (app: FastifyInstance) => {
@@ -281,11 +328,37 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       return reply.status(400).send({ message: 'Account mismatch' });
     }
 
-    const jobs = await ScheduleJobModel.find({ scheduleId: id, status: 'pending' });
+    const matchedAccount = body.account.password
+      ? null
+      : await findAccountById(body.account.id);
 
-    const accountGenerateQueue = getGenerateQueue(body.account.id);
+    if (!body.account.password && !matchedAccount) {
+      return reply.status(400).send({ message: 'Account credentials not found' });
+    }
+
+    const account = {
+      id: body.account.id,
+      password: body.account.password ?? matchedAccount!.password,
+      blogId: body.account.blogId ?? matchedAccount?.blogId,
+    };
+
+    const accountGenerateQueue = getGenerateQueue(account.id);
+    const jobs = await ScheduleJobModel.find({
+      scheduleId: id,
+      status: { $in: ['pending', 'generating'] },
+    });
 
     for (const jobItem of jobs) {
+      const executableStatus = await resolveExecutableJobStatus(accountGenerateQueue, {
+        _id: jobItem._id,
+        status: jobItem.status,
+        generateJobId: jobItem.generateJobId ?? undefined,
+      });
+
+      if (executableStatus !== 'pending') {
+        continue;
+      }
+
       await enqueueScheduleGenerateJob({
         accountGenerateQueue,
         scheduleId: String(schedule._id),
@@ -295,9 +368,9 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           category: jobItem.category ?? undefined,
           scheduledAt: jobItem.scheduledAt,
           slot: jobItem.slot,
-          status: jobItem.status,
+          status: executableStatus,
         },
-        account: body.account,
+        account,
         service: schedule.service,
         ref: schedule.ref,
         generateImages: schedule.generateImages,
@@ -326,16 +399,22 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
     const preparedQueues = await Promise.all(body.queues.map(async (queue) => {
       const matchedAccount = await findAccountById(queue.account.id);
+      const items = queue.items?.map((item) => ({
+        keyword: item.keyword,
+        category: item.category,
+        scheduledAt: new Date(item.scheduledAt),
+        slot: item.slot,
+      })) ?? calculateSchedule(
+        queue.keywords,
+        body.schedule_date,
+        body.schedule_mode,
+        timingOptions,
+      );
 
       return {
         queue,
         blogName: queue.blog_name || matchedAccount?.name,
-        items: calculateSchedule(
-          queue.keywords,
-          body.schedule_date,
-          body.schedule_mode,
-          timingOptions,
-        ),
+        items,
       };
     }));
 

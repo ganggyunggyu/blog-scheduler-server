@@ -40,7 +40,11 @@ export const scheduleQuerySchema = z.object({
 export type ScheduleQueryDto = z.infer<typeof scheduleQuerySchema>;
 
 export const executeScheduleSchema = z.object({
-  account: accountSchema,
+  account: z.object({
+    id: z.string().min(1),
+    password: z.string().min(1).optional(),
+    blogId: z.string().optional(),
+  }),
 });
 
 export type ExecuteScheduleDto = z.infer<typeof executeScheduleSchema>;

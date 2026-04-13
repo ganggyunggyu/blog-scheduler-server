@@ -4,10 +4,6 @@ import { buildScheduleRequestFingerprint } from './schedule-idempotency.service.
 
 export type ScheduleMode = '1' | '2' | '3' | '2121';
 const DEFAULT_LEAD_TIME_MINUTES = 60;
-const GOAT_FIXED_PUBLISH_TIME = {
-  hours: 23,
-  minutes: 50,
-} as const;
 
 const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
@@ -90,16 +86,8 @@ const applyFixedPublishTime = (
   );
 
 export const buildScheduleTimingOptions = (
-  input: { manuscriptType?: string },
-): ScheduleTimingOptions => {
-  if (input.manuscriptType === 'hanryeodamwon') {
-    return {
-      fixedPublishTime: GOAT_FIXED_PUBLISH_TIME,
-    };
-  }
-
-  return {};
-};
+  _input: { manuscriptType?: string },
+): ScheduleTimingOptions => ({});
 
 const buildScheduleTimingKey = (options: ScheduleTimingOptions): string => {
   if (!options.fixedPublishTime) {

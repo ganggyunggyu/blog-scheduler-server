@@ -138,7 +138,8 @@ test('calculateSchedule future date: 미래 날짜는 랜덤 시작 시각 규�
   assert.equal(randomMock.mock.callCount(), 2);
 });
 
-test('calculateSchedule: 흑염소는 모든 슬롯 시간을 23시 50분으로 고정함', () => {
+test('calculateSchedule: 흑염소도 기본 배치 시간 계산을 사용함', (t) => {
+  const randomMock = t.mock.method(Math, 'random', () => 0);
   const items = calculateSchedule(
     ['keyword1', 'keyword2', 'keyword3'],
     '2099-03-18',
@@ -147,15 +148,10 @@ test('calculateSchedule: 흑염소는 모든 슬롯 시간을 23시 50분으로 
   );
 
   assert.equal(items.length, 3);
-  assert.equal(items[0]?.scheduledAt.getDate(), 18);
-  assert.equal(items[1]?.scheduledAt.getDate(), 18);
-  assert.equal(items[2]?.scheduledAt.getDate(), 19);
-  assert.equal(items[0]?.scheduledAt.getHours(), 23);
-  assert.equal(items[0]?.scheduledAt.getMinutes(), 50);
-  assert.equal(items[1]?.scheduledAt.getHours(), 23);
-  assert.equal(items[1]?.scheduledAt.getMinutes(), 50);
-  assert.equal(items[2]?.scheduledAt.getHours(), 23);
-  assert.equal(items[2]?.scheduledAt.getMinutes(), 50);
+  assert.equal(items[0]?.scheduledAt.toISOString(), '2099-03-17T21:00:00.000Z');
+  assert.equal(items[1]?.scheduledAt.toISOString(), '2099-03-17T23:00:00.000Z');
+  assert.equal(items[2]?.scheduledAt.toISOString(), '2099-03-18T21:00:00.000Z');
+  assert.equal(randomMock.mock.callCount(), 4);
 });
 
 test('parseKeywordWithCategory: 카테고리 파싱', () => {
