@@ -37,6 +37,7 @@ const runPipelineTest = async ({ keyword, manuscriptType, blogId, keywordCategor
     excludeLibraryLink: productData.excludeLibraryLink,
     metadata: productData.metadata,
     keywordCategory,
+    manuscriptType,
   });
 
   console.log(`  결과: ${result.success ? 'SUCCESS' : 'FAIL'} | ${result.postUrl ?? result.message}`);

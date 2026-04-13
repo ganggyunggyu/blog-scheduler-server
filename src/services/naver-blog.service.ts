@@ -27,6 +27,7 @@ import {
   insertPhone,
   uploadFromMultiImageData,
   addSpacing,
+  setFontColorWhite,
   uploadImage,
   removeImage,
   dismissTransferErrorPopup,
@@ -35,6 +36,7 @@ import {
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
 import { getContentPipeline, type ContentBlock } from './naver-blog-pipeline.js';
+import type { ManuscriptType } from './manuscript.service.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
 
@@ -69,6 +71,7 @@ interface BasePostParams {
   category?: string;
   metadata?: ProductMetadata;
   keywordCategory?: string;
+  manuscriptType?: ManuscriptType;
 }
 
 interface WritePostParams extends BasePostParams {
@@ -160,6 +163,7 @@ interface ContentBlockContext {
   frame: Frame;
   content: string;
   keywordCategory?: string;
+  manuscriptType?: ManuscriptType;
   normalImages: string[];
   excluded1?: string;
   excluded2?: string;
@@ -229,11 +233,22 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     const result = await uploadFromMultiImageData(page, frame, multiImages);
     log.info('multiImages.uploaded', { total: result.total, success: result.success, failed: result.failed });
   },
+  whiteText: async ({ page, frame }) => {
+    const applied = await setFontColorWhite(page, frame);
+    log.info('whiteText.applied', { applied });
+  },
 };
 
-const executeContentPipeline = async (ctx: ContentBlockContext, keywordCategory?: string): Promise<void> => {
-  const pipeline = getContentPipeline(keywordCategory);
-  log.info('pipeline.start', { category: keywordCategory ?? 'default', blocks: pipeline });
+const executeContentPipeline = async (
+  ctx: ContentBlockContext,
+  options: { keywordCategory?: string; manuscriptType?: ManuscriptType }
+): Promise<void> => {
+  const pipeline = getContentPipeline(options);
+  log.info('pipeline.start', {
+    category: options.keywordCategory ?? 'default',
+    manuscriptType: options.manuscriptType ?? 'default',
+    blocks: pipeline,
+  });
   for (const block of pipeline) {
     await BLOCK_EXECUTORS[block](ctx);
   }
@@ -244,7 +259,7 @@ const executeContentPipeline = async (ctx: ContentBlockContext, keywordCategory?
 // ============================================================
 
 export const writePost = async (params: WritePostParams): Promise<WriteResult> => {
-  const { cookies, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory } = params;
+  const { cookies, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory, manuscriptType } = params;
   const progress = new ProgressBar({ label: 'publish', total: 5, width: 14 });
 
   const session = await createSession(cookies);
@@ -279,6 +294,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
         frame,
         content,
         keywordCategory,
+        manuscriptType,
         normalImages,
         excluded1,
         excluded2,
@@ -288,7 +304,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
         excludeLibrary,
         excludeLibraryLink,
       },
-      keywordCategory
+      { keywordCategory, manuscriptType }
     );
     log.info(progress.step('content.entered'));
 
@@ -321,7 +337,7 @@ interface UpdatePostParams extends BasePostParams {
 }
 
 export const updatePost = async (params: UpdatePostParams): Promise<WriteResult> => {
-  const { cookies, blogId, logNo, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, metadata, keywordCategory } = params;
+  const { cookies, blogId, logNo, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, metadata, keywordCategory, manuscriptType } = params;
   const progress = new ProgressBar({ label: 'update', total: 6, width: 14 });
 
   const session = await createSession(cookies);
@@ -360,6 +376,7 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
         frame,
         content,
         keywordCategory,
+        manuscriptType,
         normalImages,
         excluded1,
         excluded2,
@@ -369,7 +386,7 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
         excludeLibrary,
         excludeLibraryLink,
       },
-      keywordCategory
+      { keywordCategory, manuscriptType }
     );
     log.info(progress.step('content.entered'));
 

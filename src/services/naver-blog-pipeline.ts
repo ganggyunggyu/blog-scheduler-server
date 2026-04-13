@@ -1,3 +1,5 @@
+import type { ManuscriptType } from './manuscript.service.js';
+
 export type ContentBlock =
   | 'excluded1'
   | 'excluded2'
@@ -9,7 +11,8 @@ export type ContentBlock =
   | 'excludeLibraryLinks'
   | 'spacing'
   | 'link'
-  | 'multiImages';
+  | 'multiImages'
+  | 'whiteText';
 
 export const DEFAULT_CONTENT_PIPELINE: ContentBlock[] = [
   'excluded1',
@@ -29,7 +32,26 @@ export const CONTENT_PIPELINES: Record<string, ContentBlock[]> = {
   한려담원: ['content', 'link'],
 };
 
-export const getContentPipeline = (keywordCategory?: string): ContentBlock[] => {
+export const ALIBABA_CONTENT_PIPELINE: ContentBlock[] = [
+  'allExcluded',
+  'spacing',
+  'content',
+  'whiteText',
+];
+
+interface ContentPipelineOptions {
+  keywordCategory?: string;
+  manuscriptType?: ManuscriptType;
+}
+
+export const getContentPipeline = ({
+  keywordCategory,
+  manuscriptType,
+}: ContentPipelineOptions = {}): ContentBlock[] => {
+  if (manuscriptType === 'alibaba') {
+    return [...ALIBABA_CONTENT_PIPELINE];
+  }
+
   if (keywordCategory && CONTENT_PIPELINES[keywordCategory]) {
     return [...CONTENT_PIPELINES[keywordCategory]];
   }

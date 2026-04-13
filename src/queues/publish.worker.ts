@@ -12,6 +12,7 @@ import { summarizeScheduleProgress, type ScheduleJobStatus } from './publish-pro
 import type { ProductMetadata } from '../types/metadata.js';
 import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscript.service.js';
 import { assessLoginFailure } from '../services/login-failure.service.js';
+import type { ManuscriptType } from '../services/manuscript.service.js';
 
 interface PublishJobData {
   scheduleId: string;
@@ -29,6 +30,7 @@ interface PublishJobData {
   logNo?: string;
   metadata?: ProductMetadata;
   keywordCategory?: string;
+  manuscriptType?: ManuscriptType;
 }
 
 const log = logger.child({ scope: 'Publish' });
@@ -124,7 +126,8 @@ const executePost = async (
   multiImages?: MultiImageData,
   excludeLibrary?: string[],
   excludeLibraryLink?: ExcludeLibraryLinkItem[],
-  keywordCategory?: string
+  keywordCategory?: string,
+  manuscriptType?: ManuscriptType
 ) => {
   if (mode === 'image-replace' && blogId && logNo) {
     return updatePostImages({
@@ -149,6 +152,7 @@ const executePost = async (
       category,
       metadata,
       keywordCategory,
+      manuscriptType,
     });
   }
   return writePost({
@@ -163,11 +167,12 @@ const executePost = async (
     scheduleTime: scheduledAt,
     metadata,
     keywordCategory,
+    manuscriptType,
   });
 };
 
 export const processPublish = async (job: Job<PublishJobData>) => {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory } = job.data;
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory, manuscriptType } = job.data;
   const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
   const attempts = job.opts.attempts ?? 1;
@@ -204,7 +209,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
 
     if (cookies) {
       log.info('session.cache', { account: maskedAccount, mode });
-      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory);
+      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory, manuscriptType);
 
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
@@ -234,7 +239,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     const auth = await getValidCookies(account.id, account.password);
     log.info('auth.success', { account: maskedAccount, fromCache: auth.fromCache });
 
-    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory);
+    const publishResult = await executePost(mode, auth.cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory, manuscriptType);
 
     if (!publishResult.success) {
       throw new Error(publishResult.message);

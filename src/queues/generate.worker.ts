@@ -264,6 +264,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       excludeLibraryLink: productData?.excludeLibraryLink,
       category,
       keywordCategory,
+      manuscriptType,
       throttleSeconds: delayBetweenPostsSeconds,
       scheduledAt,
       mode,
