@@ -19,8 +19,12 @@ interface PageController {
   waitForTimeout: (ms: number) => Promise<void>;
 }
 
+interface ClickOptions {
+  force?: boolean;
+}
+
 interface ToolbarControl {
-  click?: () => Promise<void>;
+  click?: (options?: ClickOptions) => Promise<void>;
   fill?: (value: string) => Promise<void>;
   isVisible?: () => Promise<boolean>;
 }
@@ -29,7 +33,7 @@ interface FrameController {
   $: (selector: string) => Promise<ToolbarControl | null>;
   dblclick?: (selector: string) => Promise<void>;
   waitForSelector: (selector: string, options?: { timeout?: number }) => Promise<unknown>;
-  evaluate: <T>(pageFunction: () => T | Promise<T>) => Promise<T>;
+  evaluate: <T, Arg = undefined>(pageFunction: (arg: Arg) => T | Promise<T>, arg?: Arg) => Promise<T>;
 }
 
 const buildPhoneTextSelector = (phone: string): string =>

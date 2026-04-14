@@ -35,3 +35,21 @@ test('buildProductImageRequest: 한려담원은 category-random 요청으로 보
     dateCode: '0331',
   });
 });
+
+test('buildProductImageRequest: 알리바바 manuscriptType은 product-images 요청에 함께 실음', () => {
+  const result = buildProductImageRequest({
+    keyword: '1688',
+    blogId: 'weed3122',
+    dateCode: '0413',
+    manuscriptType: 'alibaba',
+  });
+
+  assert.equal(result.endpoint, 'product-images');
+  assert.equal(result.url, 'http://localhost:3939/api/image/product-images');
+  assert.deepEqual(result.params, {
+    keyword: '1688',
+    blogId: 'weed3122',
+    dateCode: '0413',
+    manuscriptType: 'alibaba',
+  });
+});

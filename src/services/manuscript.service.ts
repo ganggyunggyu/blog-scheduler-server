@@ -63,7 +63,34 @@ const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   hanryeodamwon: { path: '/generate/hanryeo', engine: 'hanryeodamwon' },
   nyangnyang: { path: '/generate/nyangnyang', engine: 'nyangnyang' },
   kimdongpal: { path: '/generate/kimdongpal', engine: 'kimdongpal' },
-  alibaba: { path: '/generate/alibaba', engine: 'alibaba', sendCategory: true },
+  alibaba: { path: '/generate/blog-filler' },
+};
+
+export interface ManuscriptRequestConfig {
+  url: string;
+  body: Record<string, string>;
+  engine?: string;
+}
+
+export const buildManuscriptRequest = (
+  type: ManuscriptType,
+  keyword: string,
+  service: string,
+  ref: string = '',
+  category?: string,
+): ManuscriptRequestConfig => {
+  const endpoint = MANUSCRIPT_ENDPOINTS[type];
+  const body: Record<string, string> = { service, keyword, ref };
+
+  if (endpoint.sendCategory && category) {
+    body.category = category;
+  }
+
+  return {
+    url: `${env.MANUSCRIPT_API_URL}${endpoint.path}`,
+    body,
+    engine: endpoint.engine,
+  };
 };
 
 export const callManuscriptAPI = async (
@@ -73,19 +100,15 @@ export const callManuscriptAPI = async (
   ref: string = '',
   category?: string,
 ): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const endpoint = MANUSCRIPT_ENDPOINTS[type];
-  const url = `${env.MANUSCRIPT_API_URL}${endpoint.path}`;
+  const { url, body, engine } = buildManuscriptRequest(type, keyword, service, ref, category);
   const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
   manuscriptLog.info(progress.start('request'), {
     url,
     keyword,
     service,
     ref,
-    ...(endpoint.engine && { engine: endpoint.engine }),
+    ...(engine && { engine }),
   });
-
-  const body: Record<string, string> = { service, keyword, ref };
-  if (endpoint.sendCategory && category) body.category = category;
 
   const response = await axios.post<Manuscript>(url, body, { timeout: 300000 });
 
@@ -98,7 +121,7 @@ export const callManuscriptAPI = async (
     id: raw._id ?? '',
     titlePreview: title.slice(0, 30),
     length: content.length,
-    ...(endpoint.engine && { engine: endpoint.engine }),
+    ...(engine && { engine }),
   });
 
   return { id: raw._id ?? '', title, content, raw };
@@ -298,6 +321,89 @@ export interface PreparedJob {
   manuscriptId: string;
 }
 
+export interface ProvidedManuscript {
+  title: string;
+  content: string;
+}
+
+const writePreparedJobFiles = async (
+  dir: string,
+  manuscript: { id: string; title: string; content: string },
+  meta: Record<string, unknown>,
+): Promise<void> => {
+  const manuscriptPath = path.join(dir, 'manuscript.txt');
+  await writeFile(
+    manuscriptPath,
+    `${manuscript.title}\n\n${manuscript.content}`
+  );
+  await writeFile(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
+};
+
+export const prepareProvidedJob = async (
+  keyword: string,
+  service: string,
+  ref: string,
+  manuscript: ProvidedManuscript,
+  generateImages: boolean,
+  imageCount: number,
+  imageSource: ImageSource = 'ai',
+  manuscriptType: ManuscriptType = 'default',
+): Promise<PreparedJob> => {
+  const { dir, imagesDir } = await createJobDir(keyword);
+  const manuscriptId = `manual_${Date.now()}`;
+  manuscriptLog.info('job.dir.created', { dir, manuscriptType, source: 'manual' });
+
+  await writePreparedJobFiles(
+    dir,
+    {
+      id: manuscriptId,
+      title: manuscript.title,
+      content: manuscript.content,
+    },
+    {
+      keyword,
+      service,
+      ref,
+      manuscriptId,
+      imageSource,
+      manuscriptType,
+      createdAt: new Date().toISOString(),
+      status: 'generated',
+      source: 'manual',
+    },
+  );
+
+  let images: string[] = [];
+  if (generateImages) {
+    const finalImageCount = imageSource === 'product' ? 10 : imageCount;
+    const imageUrls = await generateImageUrls(
+      keyword,
+      finalImageCount,
+      undefined,
+      imageSource
+    );
+    images = await downloadImagesToDir(
+      imageUrls.slice(0, finalImageCount),
+      imagesDir
+    );
+  }
+
+  manuscriptLog.info('job.prepared', {
+    dir,
+    title: manuscript.title.slice(0, 30),
+    images: images.length,
+    source: 'manual',
+  });
+
+  return {
+    jobDir: dir,
+    title: manuscript.title,
+    content: manuscript.content,
+    images,
+    manuscriptId,
+  };
+};
+
 export const prepareJob = async (
   keyword: string,
   service: string,
@@ -312,24 +418,21 @@ export const prepareJob = async (
   manuscriptLog.info('job.dir.created', { dir, manuscriptType });
 
   const manuscript = await callManuscriptAPI(manuscriptType, keyword, service, ref, category);
-
-  const manuscriptPath = path.join(dir, 'manuscript.txt');
-  await writeFile(
-    manuscriptPath,
-    `${manuscript.title}\n\n${manuscript.content}`
+  await writePreparedJobFiles(
+    dir,
+    manuscript,
+    {
+      keyword,
+      service,
+      ref,
+      manuscriptId: manuscript.id,
+      imageSource,
+      manuscriptType,
+      createdAt: new Date().toISOString(),
+      status: 'generated',
+      source: 'api',
+    },
   );
-
-  const meta = {
-    keyword,
-    service,
-    ref,
-    manuscriptId: manuscript.id,
-    imageSource,
-    manuscriptType,
-    createdAt: new Date().toISOString(),
-    status: 'generated',
-  };
-  await writeFile(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
 
   let images: string[] = [];
   if (generateImages) {

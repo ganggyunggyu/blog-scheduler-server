@@ -1,6 +1,6 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
-import { prepareJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData } from '../services/manuscript.service.js';
+import { prepareJob, prepareProvidedJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData, type ProvidedManuscript } from '../services/manuscript.service.js';
 import { lookupBlogUtmUrl } from '../services/google-sheets.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { getPublishQueue, drainAccountQueues } from './queue-manager.js';
@@ -28,6 +28,7 @@ interface GenerateJobData {
   logNo?: string;
   keywordCategory?: string;
   blogName?: string;
+  providedManuscript?: ProvidedManuscript;
 }
 
 const log = logger.child({ scope: 'Generate' });
@@ -93,6 +94,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     logNo,
     keywordCategory: providedCategory,
     blogName,
+    providedManuscript,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -130,7 +132,15 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       const blogId = account.blogId || account.id;
       const keywordCategory = providedCategory || await getCategory(keyword);
       const dateCodeForImages = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
-      const productData = await prepareProductImages({ keyword, imagesDir, blogId, category: providedCategory, dateCode: dateCodeForImages, blogName });
+      const productData = await prepareProductImages({
+        keyword,
+        imagesDir,
+        blogId,
+        category: providedCategory,
+        dateCode: dateCodeForImages,
+        blogName,
+        manuscriptType,
+      });
       let bodyImages = productData.bodyImages;
 
       if (bodyImages.length === 0) {
@@ -159,20 +169,32 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       return { scheduleJobId, publishJobId: publishJob.id };
     }
 
-    const prepared = await prepareJob(
-      keyword,
-      service,
-      ref,
-      imageSource === 'product' ? false : generateImages,
-      imageCount,
-      imageSource,
-      manuscriptType,
-      category,
-    );
+    const prepared = providedManuscript
+      ? await prepareProvidedJob(
+        keyword,
+        service,
+        ref,
+        providedManuscript,
+        imageSource === 'product' ? false : generateImages,
+        imageCount,
+        imageSource,
+        manuscriptType,
+      )
+      : await prepareJob(
+        keyword,
+        service,
+        ref,
+        imageSource === 'product' ? false : generateImages,
+        imageCount,
+        imageSource,
+        manuscriptType,
+        category,
+      );
     log.info('job.prepared', {
       jobDir: prepared.jobDir,
       title: prepared.title.slice(0, 30),
       images: prepared.images.length,
+      source: providedManuscript ? 'manual' : 'api',
     });
 
     // product 이미지: 모든 상품 이미지 다운로드
@@ -181,7 +203,15 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const blogId = account.blogId || account.id;
       const dateCodeForProduct = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
-      productData = await prepareProductImages({ keyword, imagesDir, blogId, category: providedCategory, dateCode: dateCodeForProduct, blogName });
+      productData = await prepareProductImages({
+        keyword,
+        imagesDir,
+        blogId,
+        category: providedCategory,
+        dateCode: dateCodeForProduct,
+        blogName,
+        manuscriptType,
+      });
       log.info('product.prepared', {
         keyword,
         body: productData.bodyImages.length,

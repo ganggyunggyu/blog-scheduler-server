@@ -6,10 +6,17 @@ const log = logger.child({ scope: 'Editor' });
 
 interface PageController {
   waitForTimeout: (ms: number) => Promise<void>;
+  keyboard?: {
+    press: (key: string) => Promise<void>;
+  };
+}
+
+interface ClickOptions {
+  force?: boolean;
 }
 
 interface ToolbarControl {
-  click?: () => Promise<void>;
+  click?: (options?: ClickOptions) => Promise<void>;
   isVisible?: () => Promise<boolean>;
   getAttribute?: (name: string) => Promise<string | null>;
 }
@@ -18,8 +25,167 @@ interface FrameController {
   $: (selector: string) => Promise<ToolbarControl | null>;
   $$?: (selector: string) => Promise<ToolbarControl[]>;
   waitForSelector: (selector: string, options?: { timeout?: number }) => Promise<unknown>;
-  evaluate: <T>(pageFunction: () => T | Promise<T>) => Promise<T>;
+  evaluate: <T, Arg = undefined>(pageFunction: (arg: Arg) => T | Promise<T>, arg?: Arg) => Promise<T>;
 }
+
+interface AlignmentStatus {
+  centered: number;
+  total: number;
+}
+
+const removeEditorOverlays = async (frame: FrameController): Promise<void> => {
+  await frame.evaluate(() => {
+    document.querySelectorAll('.se-help-panel, .se-help-panel-dimmed, .se-popup-dim').forEach((el) => el.remove());
+    document.querySelectorAll('[class*="container__"]').forEach((el) => {
+      if (el.querySelector('h1')?.textContent?.includes('도움말')) {
+        el.remove();
+      }
+    });
+  });
+};
+
+const focusFirstTextParagraph = async (frame: FrameController): Promise<boolean> => {
+  const focused = await frame.evaluate(() => {
+    const comps = document.querySelectorAll('.se-component.se-text:not(.se-documentTitle)');
+    for (const comp of comps) {
+      const paragraph = comp.querySelector('p.se-text-paragraph') as HTMLElement | null;
+      if (paragraph?.textContent?.trim()) {
+        paragraph.scrollIntoView({ behavior: 'instant', block: 'center' });
+        paragraph.click();
+        return true;
+      }
+    }
+
+    const editable = document.querySelector('[contenteditable="true"]') as HTMLElement | null;
+    if (!editable) {
+      return false;
+    }
+
+    editable.scrollIntoView({ behavior: 'instant', block: 'center' });
+    editable.focus();
+    editable.click();
+    return true;
+  });
+
+  if (!focused) {
+    log.warn('align.center.no-focus-target');
+    return false;
+  }
+
+  return true;
+};
+
+const selectAllTextParagraphs = async (frame: FrameController): Promise<boolean> => {
+  const selected = await frame.evaluate(() => {
+    const paragraphs = Array.from(
+      document.querySelectorAll<HTMLParagraphElement>('.se-component.se-text:not(.se-documentTitle) p.se-text-paragraph')
+    ).filter((paragraph) => {
+      const text = paragraph.textContent?.replace(/\s+/g, '') ?? '';
+      return text.length > 0 || paragraph.querySelector('span, br') !== null;
+    });
+
+    const firstParagraph = paragraphs[0];
+    const lastParagraph = paragraphs.at(-1);
+    if (!firstParagraph || !lastParagraph) {
+      return false;
+    }
+
+    firstParagraph.scrollIntoView({ behavior: 'instant', block: 'center' });
+    (
+      firstParagraph.closest<HTMLElement>('[contenteditable="true"]') ??
+      firstParagraph.closest<HTMLElement>('.se-component-content')
+    )?.focus();
+
+    const selection = window.getSelection();
+    if (!selection) {
+      return false;
+    }
+
+    const range = document.createRange();
+    range.setStartBefore(firstParagraph);
+    range.setEndAfter(lastParagraph);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    return true;
+  });
+
+  if (!selected) {
+    log.warn('align.center.select-all.failed');
+    return false;
+  }
+
+  log.info('align.center.select-all.ready');
+  return true;
+};
+
+const getAlignmentStatus = async (frame: FrameController): Promise<AlignmentStatus> => {
+  return frame.evaluate(() => {
+    const textComponents = Array.from(
+      document.querySelectorAll<HTMLElement>('.se-component.se-text:not(.se-documentTitle)')
+    );
+
+    let centered = 0;
+    for (const component of textComponents) {
+      const className = component.className ?? '';
+      const textAlign = window.getComputedStyle(component).textAlign;
+
+      if (className.includes('align_center') || textAlign === 'center') {
+        centered += 1;
+      }
+    }
+
+    return {
+      centered,
+      total: textComponents.length,
+    };
+  });
+};
+
+const forceAlignTextComponentsCenter = async (frame: FrameController): Promise<number> => {
+  return frame.evaluate(() => {
+    const textComponents = Array.from(
+      document.querySelectorAll<HTMLElement>('.se-component.se-text:not(.se-documentTitle)')
+    );
+
+    for (const component of textComponents) {
+      component.classList.remove('align_left', 'align_right', 'align_justify');
+      component.classList.add('align_center');
+      component.style.textAlign = 'center';
+
+      const paragraphs = component.querySelectorAll<HTMLElement>('p.se-text-paragraph');
+      for (const paragraph of paragraphs) {
+        paragraph.style.textAlign = 'center';
+        paragraph.setAttribute('align', 'center');
+      }
+    }
+
+    return textComponents.length;
+  });
+};
+
+const clickToolbarButtonByDom = async (
+  frame: FrameController,
+  selector: string,
+  logKey: string
+): Promise<boolean> => {
+  const clicked = await frame.evaluate((targetSelector) => {
+    const button = document.querySelector(targetSelector) as HTMLElement | null;
+    if (!button) {
+      return false;
+    }
+
+    button.click();
+    return true;
+  }, selector);
+
+  if (!clicked) {
+    log.warn(`${logKey}.dom.notFound`);
+    return false;
+  }
+
+  log.info(`${logKey}.dom.clicked`);
+  return true;
+};
 
 export const focusEditor = async (page: Page, frame: Frame): Promise<void> => {
   const editorSelector = 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph';
@@ -37,45 +203,94 @@ export const focusEditor = async (page: Page, frame: Frame): Promise<void> => {
 
 export const setAlignCenter = async (page: Page, frame: Frame): Promise<boolean> => {
   try {
-    // 텍스트 paragraph 클릭으로 에디터 포커스 확보
-    const focused = await frame.evaluate(() => {
-      const comps = document.querySelectorAll('.se-component.se-text:not(.se-documentTitle)');
-      for (const comp of comps) {
-        const p = comp.querySelector('p.se-text-paragraph') as HTMLElement;
-        if (p?.textContent?.trim()) {
-          p.scrollIntoView({ behavior: 'instant', block: 'center' });
-          p.click();
-          return true;
+    const prepareSelectionStrategies: Array<() => Promise<boolean>> = [
+      async () => {
+        await removeEditorOverlays(frame);
+        await page.waitForTimeout(200);
+        return selectAllTextParagraphs(frame);
+      },
+      async () => {
+        await removeEditorOverlays(frame);
+        await page.waitForTimeout(200);
+
+        const focused = await focusFirstTextParagraph(frame);
+        if (!focused || !page.keyboard) {
+          return false;
         }
+
+        await page.waitForTimeout(300);
+        await page.keyboard.press('Meta+a');
+        await page.waitForTimeout(300);
+        await page.keyboard.press('Meta+a');
+        return true;
+      },
+    ];
+
+    for (let attempt = 0; attempt < prepareSelectionStrategies.length; attempt += 1) {
+      const prepared = await prepareSelectionStrategies[attempt]();
+      if (!prepared) {
+        continue;
       }
-      const editable = document.querySelector('[contenteditable="true"]') as HTMLElement;
-      if (editable) { editable.focus(); editable.click(); return true; }
-      return false;
-    });
 
-    if (!focused) {
-      log.warn('align.center.no-focus-target');
-      return false;
-    }
-    await page.waitForTimeout(500);
-
-    // 전체 선택
-    await page.keyboard.press('Meta+a');
-    await page.waitForTimeout(500);
-
-    const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
-    if (alignBtn && (await alignBtn.isVisible())) {
-      await alignBtn.click();
-      await page.waitForTimeout(500);
-      await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 3000 });
-      await frame.click(SELECTORS.editor.alignCenter);
       await page.waitForTimeout(300);
-      log.info('align.center.set');
-      return true;
+
+      const alignDropdownClicked = await clickToolbarButtonWithFallback(
+        frame,
+        SELECTORS.editor.alignDropdown,
+        'align.center.dropdown'
+      );
+      if (!alignDropdownClicked) {
+        continue;
+      }
+
+      await page.waitForTimeout(500);
+      await frame.waitForSelector(SELECTORS.editor.alignCenter, { timeout: 3000 }).catch(() => undefined);
+
+      const alignCenterClicked = await clickToolbarButtonWithFallback(
+        frame,
+        SELECTORS.editor.alignCenter,
+        'align.center.option'
+      );
+      if (!alignCenterClicked) {
+        continue;
+      }
+
+      await page.waitForTimeout(400);
+
+      const status = await getAlignmentStatus(frame);
+      log.info('align.center.status', {
+        attempt: attempt + 1,
+        centered: status.centered,
+        total: status.total,
+      });
+
+      if (status.total === 0 || status.centered === status.total) {
+        log.info('align.center.set', { attempt: attempt + 1 });
+        return true;
+      }
     }
-  } catch {
-    log.warn('align.center.failed');
+
+    const forcedCount = await forceAlignTextComponentsCenter(frame);
+    if (forcedCount > 0) {
+      await page.waitForTimeout(400);
+
+      const forcedStatus = await getAlignmentStatus(frame);
+      log.info('align.center.dom.status', {
+        centered: forcedStatus.centered,
+        total: forcedStatus.total,
+      });
+
+      if (forcedStatus.centered === forcedStatus.total) {
+        log.info('align.center.set', { attempt: 'dom' });
+        return true;
+      }
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    log.warn('align.center.failed', { message });
   }
+
+  log.warn('align.center.partial');
   return false;
 };
 
@@ -317,7 +532,8 @@ const getVisibleToolbarButton = async (
 const clickVisibleToolbarButton = async (
   frame: FrameController,
   selector: string,
-  logKey: string
+  logKey: string,
+  options: ClickOptions = {}
 ): Promise<boolean> => {
   const button = await getVisibleToolbarButton(frame, selector);
   if (!button) {
@@ -330,8 +546,28 @@ const clickVisibleToolbarButton = async (
     return false;
   }
 
-  await button.click();
+  await button.click(options);
   return true;
+};
+
+const clickToolbarButtonWithFallback = async (
+  frame: FrameController,
+  selector: string,
+  logKey: string
+): Promise<boolean> => {
+  const visibleClicked = await clickVisibleToolbarButton(frame, selector, logKey, { force: true });
+  if (visibleClicked) {
+    return true;
+  }
+
+  const rawButton = await frame.$(selector);
+  if (rawButton?.click) {
+    await rawButton.click({ force: true });
+    log.info(`${logKey}.force.clicked`);
+    return true;
+  }
+
+  return clickToolbarButtonByDom(frame, selector, logKey);
 };
 
 const isVisibleToolbarButtonActive = async (

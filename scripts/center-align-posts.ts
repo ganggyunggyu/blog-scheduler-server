@@ -1,36 +1,98 @@
 import 'dotenv/config';
+import mongoose from 'mongoose';
 import type { Frame, Page } from 'playwright';
 import { naverLogin } from '../src/services/naver-auth.service.js';
 import {
   createSession,
   closeSession,
+  setAlignCenter,
   waitForFrame,
 } from '../src/lib/naver-editor/index.js';
 import { SELECTORS } from '../src/constants/selectors.js';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const ACCOUNT_FILTERS = (process.env.CENTER_ALIGN_ACCOUNT_IDS ?? '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const MAX_POSTS_PER_BUCKET = Number(process.env.CENTER_ALIGN_MAX_POSTS ?? '10');
 
-const ACCOUNTS = [
-  { name: '겨울의 눈꽃', id: 'iealpx8p', pw: '2e8f5eg)' },
-  { name: '라우드', id: 'loand3324', pw: 'akfalwk12!!' },
-  { name: '고구마스틱', id: 'fail5644', pw: 'akfalwk12!' },
-  { name: '룰루랄라', id: 'compare14310', pw: 'akfalwk12!' },
-  { name: '꼬리별', id: '8i2vlbym', pw: '8wn@1i7u1' },
-  { name: '하준리뷰', id: 'heavyzebra240', pw: '*!cje4@@1' },
-  { name: '달달한하루', id: 'njmzdksm', pw: 'i5*wx7v11' },
-  { name: '봄바람', id: 'e6yb5u4k', pw: '#ic3duzb1' },
-  { name: '오늘도 즐겁게', id: 'suc4dce7', pw: '*i93h&6p1' },
-  { name: '스탠드', id: 'xzjmfn3f', pw: 'ir%3(pw*1' },
-  { name: '세월', id: '8ua1womn', pw: 'efe9uwk71' },
-  { name: '오차즈케', id: '0ehz3cb2', pw: '8&ofp4h)1' },
-  { name: '기쁨의꽃', id: 'br5rbg', pw: '49thf9gz' },
-  { name: '뷰티풀', id: 'beautifulelephant274', pw: 'wn#5ze7#1' },
-];
+interface AccountInfo {
+  name: string;
+  id: string;
+  pw: string;
+  blogId: string;
+}
+
+interface AccountRecord {
+  accountId?: string;
+  password?: string;
+  nickname?: string;
+  blogId?: string;
+}
 
 const isLoginPage = (url: string): boolean =>
   url.includes('nidlogin') || url.includes('nid.naver.com');
 
 interface PostInfo { logNo: string; title: string; }
+
+const loadAccounts = async (): Promise<AccountInfo[]> => {
+  await mongoose.connect(process.env.MONGO_URI ?? '');
+
+  try {
+    const docs = await mongoose.connection
+      .useDb('cafe-bot')
+      .collection<AccountRecord>('accounts')
+      .find({
+        $and: [
+          {
+            $or: [
+              { isActive: { $exists: false } },
+              { isActive: true },
+            ],
+          },
+          { accountId: { $exists: true, $ne: '' } },
+          { password: { $exists: true, $ne: '' } },
+          { blogId: { $exists: true, $ne: '' } },
+        ],
+      }, {
+        projection: {
+          _id: 0,
+          accountId: 1,
+          password: 1,
+          nickname: 1,
+          blogId: 1,
+        },
+      })
+      .sort({ nickname: 1, accountId: 1 })
+      .toArray();
+
+    const accounts = docs.flatMap((doc) => {
+      if (!doc.accountId || !doc.password || !doc.blogId) {
+        return [];
+      }
+
+      return [{
+        name: doc.nickname?.trim() || doc.blogId || doc.accountId,
+        id: doc.accountId,
+        pw: doc.password,
+        blogId: doc.blogId,
+      }];
+    });
+
+    if (ACCOUNT_FILTERS.length === 0) {
+      return accounts;
+    }
+
+    return accounts.filter((account) =>
+      ACCOUNT_FILTERS.includes(account.id) ||
+      ACCOUNT_FILTERS.includes(account.blogId) ||
+      ACCOUNT_FILTERS.includes(account.name)
+    );
+  } finally {
+    await mongoose.disconnect();
+  }
+};
 
 const removeOverlays = async (frame: Frame): Promise<void> => {
   await frame.evaluate(() => {
@@ -41,44 +103,18 @@ const removeOverlays = async (frame: Frame): Promise<void> => {
   });
 };
 
-const clickTextParagraph = async (frame: Frame): Promise<boolean> => {
-  return frame.evaluate(() => {
-    const comps = document.querySelectorAll('.se-component.se-text:not(.se-documentTitle)');
-    for (const comp of comps) {
-      const p = comp.querySelector('p.se-text-paragraph') as HTMLElement;
-      if (p?.textContent?.trim()) {
-        p.scrollIntoView({ behavior: 'instant', block: 'center' });
-        p.click();
-        return true;
-      }
-    }
-    const editable = document.querySelector('[contenteditable="true"]') as HTMLElement;
-    if (editable) { editable.scrollIntoView({ behavior: 'instant', block: 'center' }); editable.focus(); editable.click(); return true; }
-    return false;
-  });
-};
+const removePersonalNoticeLayer = async (page: Page, frame?: Frame): Promise<void> => {
+  await page.evaluate(() => {
+    document.getElementById('personalNoticeLayer')?.remove();
+    document.querySelectorAll('#personalNoticeLayer, #personalNoticeLayer .dimmed').forEach((el) => el.remove());
+  }).catch(() => undefined);
 
-const applyCenter = async (page: Page, frame: Frame): Promise<boolean> => {
-  await removeOverlays(frame);
-  await sleep(500);
-
-  const clicked = await clickTextParagraph(frame);
-  if (!clicked) return false;
-  await sleep(500);
-
-  await page.keyboard.press('Meta+a');
-  await sleep(500);
-
-  const alignBtn = await frame.$(SELECTORS.editor.alignDropdown);
-  if (!alignBtn) return false;
-  await alignBtn.click({ force: true });
-  await sleep(1000);
-
-  const centerBtn = await frame.$(SELECTORS.editor.alignCenter);
-  if (!centerBtn) return false;
-  await centerBtn.click({ force: true });
-  await sleep(500);
-  return true;
+  if (frame) {
+    await frame.evaluate(() => {
+      document.getElementById('personalNoticeLayer')?.remove();
+      document.querySelectorAll('#personalNoticeLayer, #personalNoticeLayer .dimmed').forEach((el) => el.remove());
+    }).catch(() => undefined);
+  }
 };
 
 const savePost = async (page: Page, frame: Frame): Promise<boolean> => {
@@ -115,7 +151,7 @@ const alignAndSave = async (cookies: unknown[], blogId: string, logNo: string): 
     await frame.waitForSelector('.se-content, .se-component', { timeout: 30000 });
     await sleep(3000);
 
-    const aligned = await applyCenter(page, frame);
+    const aligned = await setAlignCenter(page, frame);
     if (!aligned) { console.log('      정렬 실패'); return false; }
     console.log('      정렬 적용');
 
@@ -141,17 +177,18 @@ const getRecentPosts = async (cookies: unknown[], blogId: string): Promise<PostI
     if (isLoginPage(page.url())) return [];
 
     const frame = await waitForFrame(page, 'mainFrame', 30000);
-    await page.evaluate(() => { document.getElementById('personalNoticeLayer')?.remove(); });
+    await removePersonalNoticeLayer(page, frame);
+    await removeOverlays(frame);
 
     const openListBtn = await frame.$('a._toggleTopList');
     if (openListBtn && (await openListBtn.isVisible().catch(() => false))) {
-      await openListBtn.click();
+      await openListBtn.click({ force: true });
       await sleep(2000);
     }
 
     const posts: PostInfo[] = [];
     const checkboxes = await frame.$$('input[name="logNo"]');
-    for (let i = 0; i < Math.min(checkboxes.length, 10); i++) {
+    for (let i = 0; i < Math.min(checkboxes.length, MAX_POSTS_PER_BUCKET); i++) {
       const logNo = await checkboxes[i].getAttribute('value');
       if (!logNo) continue;
       const row = await checkboxes[i].evaluateHandle((el) => el.closest('tr'));
@@ -166,7 +203,7 @@ const getRecentPosts = async (cookies: unknown[], blogId: string): Promise<PostI
         return links
           .map((a) => { const m = a.getAttribute('href')?.match(/logNo=(\d+)/); return m ? { logNo: m[1], title: a.textContent?.trim() || '' } : null; })
           .filter((p): p is { logNo: string; title: string } => p !== null && p.title.length > 2 && !seen.has(p.logNo) && (seen.add(p.logNo), true))
-          .slice(0, 10);
+          .slice(0, MAX_POSTS_PER_BUCKET);
       });
       posts.push(...ids);
     }
@@ -221,6 +258,10 @@ const getScheduledPosts = async (cookies: unknown[]): Promise<PostInfo[]> => {
         seen.add(m[1]);
         const title = (await link.textContent())?.trim() || '';
         posts.push({ logNo: m[1], title });
+
+        if (posts.length >= MAX_POSTS_PER_BUCKET) {
+          break;
+        }
       }
     }
     return posts;
@@ -232,7 +273,7 @@ const getScheduledPosts = async (cookies: unknown[]): Promise<PostInfo[]> => {
   }
 };
 
-const processAccount = async (account: typeof ACCOUNTS[0]): Promise<string> => {
+const processAccount = async (account: AccountInfo): Promise<string> => {
   console.log(`\n${'='.repeat(50)}`);
   console.log(`[${account.name}] ${account.id}`);
   console.log('='.repeat(50));
@@ -242,7 +283,7 @@ const processAccount = async (account: typeof ACCOUNTS[0]): Promise<string> => {
   console.log(`  로그인 OK`);
 
   // blogId 확인
-  let blogId = account.id;
+  let blogId = account.blogId || account.id;
   const idSession = await createSession(login.cookies);
   try {
     await idSession.page.goto('https://blog.naver.com/MyBlog.naver', { waitUntil: 'load', timeout: 60000 });
@@ -283,11 +324,12 @@ const processAccount = async (account: typeof ACCOUNTS[0]): Promise<string> => {
 };
 
 const main = async () => {
+  const accounts = await loadAccounts();
   console.log('=== 가운데정렬 자동화 ===');
-  console.log(`${ACCOUNTS.length}개 계정\n`);
+  console.log(`${accounts.length}개 계정\n`);
 
   const results: { name: string; status: string }[] = [];
-  for (const acc of ACCOUNTS) {
+  for (const acc of accounts) {
     try {
       results.push({ name: acc.name, status: await processAccount(acc) });
     } catch (err) {

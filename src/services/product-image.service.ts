@@ -33,6 +33,7 @@ export interface ProductDataOptions {
   category?: string;
   dateCode?: string;
   blogName?: string;
+  manuscriptType?: string;
 }
 
 const sanitizeParam = (value: string): string =>
@@ -44,7 +45,7 @@ export interface ProductImageRequestConfig {
   endpoint: 'product-images' | 'category-random';
 }
 
-export const buildProductImageRequest = ({ keyword, blogId, category, dateCode, blogName }: ProductDataOptions): ProductImageRequestConfig => {
+export const buildProductImageRequest = ({ keyword, blogId, category, dateCode, blogName, manuscriptType }: ProductDataOptions): ProductImageRequestConfig => {
   const useCategoryRandom = Boolean(category && CATEGORY_RANDOM_CATEGORIES.includes(category));
   const endpoint: ProductImageRequestConfig['endpoint'] = useCategoryRandom ? 'category-random' : 'product-images';
   const url = `${env.IMAGE_API_URL}/api/image/${endpoint}`;
@@ -57,14 +58,15 @@ export const buildProductImageRequest = ({ keyword, blogId, category, dateCode, 
   if (!useCategoryRandom && blogId) params.blogId = blogId;
   if (dateCode) params.dateCode = sanitizeParam(dateCode);
   if (blogName) params.blogName = sanitizeParam(blogName);
+  if (!useCategoryRandom && manuscriptType) params.manuscriptType = sanitizeParam(manuscriptType);
 
   return { url, params, endpoint };
 };
 
-export const getProductData = async ({ keyword, blogId, category, dateCode, blogName }: ProductDataOptions) => {
-  const { url, params, endpoint } = buildProductImageRequest({ keyword, blogId, category, dateCode, blogName });
+export const getProductData = async ({ keyword, blogId, category, dateCode, blogName, manuscriptType }: ProductDataOptions) => {
+  const { url, params, endpoint } = buildProductImageRequest({ keyword, blogId, category, dateCode, blogName, manuscriptType });
   const progress = new ProgressBar({ label: 'product', total: 1, width: 16 });
-  imageLog.info(progress.start('request'), { url, keyword, blogId, category, dateCode, blogName, endpoint });
+  imageLog.info(progress.start('request'), { url, keyword, blogId, category, dateCode, blogName, manuscriptType, endpoint });
 
   const response = await axios.get(url, {
     params,

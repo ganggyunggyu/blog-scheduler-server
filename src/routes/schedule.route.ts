@@ -4,6 +4,10 @@ import { z } from 'zod';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto.js';
 import { appendScheduledBlogUtmRows } from '../services/google-sheets.service.js';
 import {
+  buildLinkUpdateUtmAccount,
+  prepareLinkUpdatePairs,
+} from '../services/link-update.service.js';
+import {
   buildScheduleTimingOptions,
   calculateSchedule,
   createSchedule,
@@ -495,16 +499,20 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     return { success: true, totalJobs, schedules: results };
   });
 
-  const updateCompatSchema = z.object({
-    queues: z.array(
-      z.object({
-        account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
-        keywords: z.array(z.string()),
-        update_count: z.number().min(1).optional(),
-        start_index: z.number().min(0).optional(),
-        end_index: z.number().min(0).optional(),
-      })
-    ),
+const updateCompatSchema = z.object({
+  queues: z.array(
+    z.object({
+      account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
+      keywords: z.array(z.string()),
+      manuscripts: z.array(z.object({
+        title: z.string().min(1),
+        content: z.string().min(1),
+      })).optional(),
+      update_count: z.number().min(1).optional(),
+      start_index: z.number().min(0).optional(),
+      end_index: z.number().min(0).optional(),
+    })
+  ),
     service: z.string().default('default'),
     ref: z.string().default(''),
     generate_images: z.boolean().default(true),
@@ -527,6 +535,13 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     let totalJobs = 0;
 
     for (const queue of body.queues) {
+      if (queue.manuscripts && queue.manuscripts.length !== queue.keywords.length) {
+        return {
+          success: false,
+          message: `account=${queue.account.id} manuscripts(${queue.manuscripts.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`,
+        };
+      }
+
       const auth = await getValidCookies(queue.account.id, queue.account.password);
 
       let posts: Array<{ logNo: string; title: string; index: number }>;
@@ -573,6 +588,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
           keywordCategory: body.keyword_category,
+          providedManuscript: queue.manuscripts?.[i],
         });
 
         await accountGenerateQueue.add('generate', {
@@ -592,6 +608,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           mode: 'update' as const,
           logNo: post.logNo,
           keywordCategory: body.keyword_category,
+          providedManuscript: queue.manuscripts?.[i],
         }, {
           jobId: identity.jobId,
         });
@@ -616,11 +633,15 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     return { blogId: parts[0], logNo: parts[1] };
   };
 
-  const linkUpdateSchema = z.object({
-    keywords: z.array(z.string().min(1)),
-    links: z.array(z.string().url()),
-    service: z.string().default('default'),
-    ref: z.string().default(''),
+const linkUpdateSchema = z.object({
+  keywords: z.array(z.string().min(1)),
+  links: z.array(z.string().url()),
+  manuscripts: z.array(z.object({
+    title: z.string().min(1),
+    content: z.string().min(1),
+  })).optional(),
+  service: z.string().default('default'),
+  ref: z.string().default(''),
     generate_images: z.boolean().default(true),
     image_count: z.number().default(5),
     image_source: imageSourceSchema,
@@ -631,7 +652,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
   app.post('/bot/link-update', async (req: { body: unknown }, reply: FastifyReply) => {
     const body = linkUpdateSchema.parse(req.body);
-    const { keywords, links } = body;
+    const { keywords, links, manuscripts } = body;
 
     if (keywords.length !== links.length) {
       return reply.status(400).send({
@@ -639,10 +660,16 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       });
     }
 
+    if (manuscripts && manuscripts.length !== keywords.length) {
+      return reply.status(400).send({
+        message: `manuscripts(${manuscripts.length})와 keywords(${keywords.length}) 개수가 일치하지 않음`,
+      });
+    }
+
     const pairs = await Promise.all(keywords.map(async (keyword, i) => {
       const { blogId, logNo } = parseBlogUrl(links[i]);
       const matchedAccount = await findAccountById(blogId);
-      return { keyword, blogId, logNo, matchedAccount };
+      return { inputIndex: i, keyword, blogId, logNo, matchedAccount };
     }));
 
     const missingAccounts = [...new Set(
@@ -655,7 +682,13 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       });
     }
 
-    const validPairs = pairs.filter((pair) => pair.matchedAccount);
+    const validPairs = pairs.filter((pair) => Boolean(pair.matchedAccount)).map((pair) => ({
+      inputIndex: pair.inputIndex,
+      keyword: pair.keyword,
+      blogId: pair.blogId,
+      logNo: pair.logNo,
+      matchedAccount: pair.matchedAccount!,
+    }));
 
     const grouped = new Map<string, typeof validPairs>();
     for (const pair of validPairs) {
@@ -674,34 +707,41 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
     for (const [blogId, accountPairs] of grouped) {
       const { matchedAccount } = accountPairs[0];
+      const blogName = matchedAccount.name;
       const account = { id: matchedAccount!.id, password: matchedAccount!.password, blogId };
       const accountGenerateQueue = getGenerateQueue(account.id);
+      const scheduledAt = new Date().toISOString();
+      const preparedPairs = prepareLinkUpdatePairs(accountPairs, scheduledAt);
 
       const jobsList: Array<{ keyword: string; logNo: string }> = [];
 
-      for (let i = 0; i < accountPairs.length; i++) {
-        const { keyword: rawKeyword, logNo } = accountPairs[i];
-        const parsedKeyword = parseKeywordWithCategory(rawKeyword);
-        const keyword = parsedKeyword.keyword;
+      if (body.manuscript_type === 'hanryeodamwon' && blogName) {
+        await appendScheduledBlogUtmRows([
+          buildLinkUpdateUtmAccount(blogName, preparedPairs),
+        ]);
+      }
+
+      for (const preparedPair of preparedPairs) {
         const identity = buildAdhocGenerateIdentity({
           mode: 'update',
           accountId: account.id,
           blogId,
-          logNo,
-          keyword,
-          category: parsedKeyword.category,
+          logNo: preparedPair.logNo,
+          keyword: preparedPair.keyword,
+          category: preparedPair.category,
           service: body.service,
           ref: body.ref,
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
           keywordCategory: body.keyword_category,
+          providedManuscript: manuscripts?.[preparedPair.inputIndex],
         });
 
         await accountGenerateQueue.add('generate', {
           scheduleId: identity.scheduleId,
           scheduleJobId: identity.scheduleJobId,
-          keyword,
-          category: parsedKeyword.category,
+          keyword: preparedPair.keyword,
+          category: preparedPair.category,
           account,
           service: body.service,
           ref: body.ref,
@@ -710,15 +750,17 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
           delayBetweenPostsSeconds: body.delay_between_posts,
-          scheduledAt: new Date().toISOString(),
+          scheduledAt: preparedPair.scheduledAt,
           mode: 'update' as const,
-          logNo,
+          logNo: preparedPair.logNo,
           keywordCategory: body.keyword_category,
+          providedManuscript: manuscripts?.[preparedPair.inputIndex],
+          blogName,
         }, {
           jobId: identity.jobId,
         });
 
-        jobsList.push({ keyword, logNo });
+        jobsList.push({ keyword: preparedPair.keyword, logNo: preparedPair.logNo });
         totalJobs++;
       }
 

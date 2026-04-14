@@ -111,6 +111,42 @@ test('buildScheduleRequestFingerprint: 시간 정책 차이는 fingerprint에 �
   assert.notEqual(defaultTiming, fixedTiming);
 });
 
+test('buildScheduleRequestFingerprint: 수동 원고가 다르면 fingerprint도 달라짐', () => {
+  const first = buildScheduleRequestFingerprint({
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['브리티쉬숏헤어분양'],
+    manuscripts: [{ title: '첫 제목', content: '첫 본문' }],
+    imageSource: 'product',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+  });
+
+  const second = buildScheduleRequestFingerprint({
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['브리티쉬숏헤어분양'],
+    manuscripts: [{ title: '다른 제목', content: '다른 본문' }],
+    imageSource: 'product',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+  });
+
+  assert.notEqual(first, second);
+});
+
 test('buildScheduleGenerateJobId/buildSchedulePublishJobId: scheduleJob 기준 고정 job id를 생성함', () => {
   const generateJobId = buildScheduleGenerateJobId('job_123');
   const publishJobId = buildSchedulePublishJobId('job_123');
@@ -208,6 +244,39 @@ test('buildAdhocGenerateIdentity: 카테고리가 다르면 다른 id를 반환�
     imageSource: 'product',
     manuscriptType: 'pet',
     keywordCategory: '애견',
+  });
+
+  assert.notEqual(first.jobId, second.jobId);
+  assert.notEqual(first.scheduleJobId, second.scheduleJobId);
+});
+
+test('buildAdhocGenerateIdentity: 수동 원고가 다르면 다른 id를 반환함', () => {
+  const first = buildAdhocGenerateIdentity({
+    mode: 'update',
+    accountId: 'fail5644',
+    blogId: 'fail5644',
+    logNo: '22334455',
+    keyword: '브리티쉬숏헤어분양',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+    providedManuscript: {
+      title: '브리티쉬숏헤어분양 체크 포인트',
+      content: '첫 본문',
+    },
+  });
+
+  const second = buildAdhocGenerateIdentity({
+    mode: 'update',
+    accountId: 'fail5644',
+    blogId: 'fail5644',
+    logNo: '22334455',
+    keyword: '브리티쉬숏헤어분양',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+    providedManuscript: {
+      title: '브리티쉬숏헤어분양 성격 먼저 보기',
+      content: '둘째 본문',
+    },
   });
 
   assert.notEqual(first.jobId, second.jobId);

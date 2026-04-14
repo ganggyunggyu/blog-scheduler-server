@@ -14,6 +14,7 @@ interface ScheduleRequestFingerprintInput {
   manuscriptType?: string;
   keywordCategory?: string;
   scheduleTimingKey?: string;
+  manuscripts?: Array<{ title: string; content: string }>;
 }
 
 interface AdhocGenerateIdentityInput {
@@ -28,6 +29,7 @@ interface AdhocGenerateIdentityInput {
   imageSource?: string;
   manuscriptType?: string;
   keywordCategory?: string;
+  providedManuscript?: { title: string; content: string };
 }
 
 const hashPayload = (payload: unknown): string =>
@@ -35,6 +37,14 @@ const hashPayload = (payload: unknown): string =>
 
 const normalizeKeywords = (keywords: string[]): string[] =>
   keywords.map((keyword) => keyword.trim());
+
+const normalizeManuscripts = (
+  manuscripts: Array<{ title: string; content: string }> = [],
+): Array<{ title: string; content: string }> =>
+  manuscripts.map((manuscript) => ({
+    title: manuscript.title.trim(),
+    content: manuscript.content.trim(),
+  }));
 
 const buildBullJobId = (...parts: string[]): string =>
   parts.map((part) => part.trim()).filter(Boolean).join('_');
@@ -56,6 +66,7 @@ export const buildScheduleRequestFingerprint = (
     manuscriptType: input.manuscriptType ?? 'default',
     keywordCategory: input.keywordCategory ?? '',
     scheduleTimingKey: input.scheduleTimingKey ?? '',
+    manuscripts: normalizeManuscripts(input.manuscripts),
   };
 
   return `schreq_${hashPayload(normalized)}`;
@@ -82,6 +93,10 @@ export const buildAdhocGenerateIdentity = (
     imageSource: input.imageSource ?? '',
     manuscriptType: input.manuscriptType ?? '',
     keywordCategory: input.keywordCategory ?? '',
+    providedManuscript: input.providedManuscript ? {
+      title: input.providedManuscript.title.trim(),
+      content: input.providedManuscript.content.trim(),
+    } : null,
   };
 
   const digest = hashPayload(normalized);

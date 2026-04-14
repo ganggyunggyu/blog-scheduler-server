@@ -10,8 +10,10 @@ export const SELECTORS = {
     content: 'div.se-component-content, div[contenteditable="true"], p.se-text-paragraph',
     imageBtn: 'button[data-name="image"], button.se-toolbar-button-image',
     alignDropdown: 'button[data-name="align-drop-down-with-justify"], button.se-align-left-toolbar-button',
-    alignCenter: 'button.se-toolbar-option-align-center-button[data-value="center"]',
-    alignLeft: 'button.se-toolbar-option-align-left-button[data-value="left"]',
+    alignCenter:
+      'button.se-toolbar-option-align-center-button[data-value="center"], button[data-value="center"], button[aria-label="가운데 정렬"], button[title="가운데 정렬"]',
+    alignLeft:
+      'button.se-toolbar-option-align-left-button[data-value="left"], button[data-value="left"], button[aria-label="왼쪽 정렬"], button[title="왼쪽 정렬"]',
     bold: 'button[data-group="propertyToolbar"][data-name="bold"], button[data-group="contentsToolbar"][data-name="bold"]',
     fontSizeDropdown:
       'button[data-group="propertyToolbar"][data-name="font-size"], button[data-group="contentsToolbar"][data-name="font-size"]',
