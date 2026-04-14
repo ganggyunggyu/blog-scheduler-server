@@ -22,6 +22,7 @@ interface AdhocGenerateIdentityInput {
   blogId?: string;
   logNo?: string;
   keyword: string;
+  category?: string;
   service?: string;
   ref?: string;
   imageSource?: string;
@@ -75,6 +76,7 @@ export const buildAdhocGenerateIdentity = (
     blogId: input.blogId ?? '',
     logNo: input.logNo ?? '',
     keyword: input.keyword.trim(),
+    category: input.category?.trim() ?? '',
     service: input.service ?? '',
     ref: input.ref ?? '',
     imageSource: input.imageSource ?? '',

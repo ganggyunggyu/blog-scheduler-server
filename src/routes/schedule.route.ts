@@ -3,7 +3,12 @@ import type { Queue } from 'bullmq';
 import { z } from 'zod';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto.js';
 import { appendScheduledBlogUtmRows } from '../services/google-sheets.service.js';
-import { buildScheduleTimingOptions, calculateSchedule, createSchedule } from '../services/schedule.service.js';
+import {
+  buildScheduleTimingOptions,
+  calculateSchedule,
+  createSchedule,
+  parseKeywordWithCategory,
+} from '../services/schedule.service.js';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
 import { getValidCookies } from '../services/naver-auth.service.js';
@@ -554,13 +559,15 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
       for (let i = 0; i < posts.length && i < keywordsToUse.length; i++) {
         const post = posts[i];
-        const keyword = keywordsToUse[i];
+        const parsedKeyword = parseKeywordWithCategory(keywordsToUse[i]);
+        const keyword = parsedKeyword.keyword;
         const identity = buildAdhocGenerateIdentity({
           mode: 'update',
           accountId: queue.account.id,
           blogId,
           logNo: post.logNo,
           keyword,
+          category: parsedKeyword.category,
           service: body.service,
           ref: body.ref,
           imageSource: body.image_source,
@@ -572,6 +579,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           scheduleId: identity.scheduleId,
           scheduleJobId: identity.scheduleJobId,
           keyword,
+          category: parsedKeyword.category,
           account: { ...queue.account, blogId },
           service: body.service,
           ref: body.ref,
@@ -672,13 +680,16 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       const jobsList: Array<{ keyword: string; logNo: string }> = [];
 
       for (let i = 0; i < accountPairs.length; i++) {
-        const { keyword, logNo } = accountPairs[i];
+        const { keyword: rawKeyword, logNo } = accountPairs[i];
+        const parsedKeyword = parseKeywordWithCategory(rawKeyword);
+        const keyword = parsedKeyword.keyword;
         const identity = buildAdhocGenerateIdentity({
           mode: 'update',
           accountId: account.id,
           blogId,
           logNo,
           keyword,
+          category: parsedKeyword.category,
           service: body.service,
           ref: body.ref,
           imageSource: body.image_source,
@@ -690,6 +701,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           scheduleId: identity.scheduleId,
           scheduleJobId: identity.scheduleJobId,
           keyword,
+          category: parsedKeyword.category,
           account,
           service: body.service,
           ref: body.ref,

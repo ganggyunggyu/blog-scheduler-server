@@ -184,3 +184,32 @@ test('buildAdhocGenerateIdentity: BullMQ 호환을 위해 custom job id에 콜�
   assert.equal(identity.jobId.includes(':'), false);
   assert.match(identity.jobId, /^generate_adhoc_update_/);
 });
+
+test('buildAdhocGenerateIdentity: 카테고리가 다르면 다른 id를 반환함', () => {
+  const first = buildAdhocGenerateIdentity({
+    mode: 'update',
+    accountId: 'iealpx8p',
+    blogId: 'iealpx8p',
+    logNo: '224251309968',
+    keyword: '강아지임시보호',
+    category: '강아지분양정보',
+    imageSource: 'product',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+  });
+
+  const second = buildAdhocGenerateIdentity({
+    mode: 'update',
+    accountId: 'iealpx8p',
+    blogId: 'iealpx8p',
+    logNo: '224251309968',
+    keyword: '강아지임시보호',
+    category: '강아지품종',
+    imageSource: 'product',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+  });
+
+  assert.notEqual(first.jobId, second.jobId);
+  assert.notEqual(first.scheduleJobId, second.scheduleJobId);
+});
