@@ -5,6 +5,20 @@ import { buildScheduleRequestFingerprint } from './schedule-idempotency.service.
 export type ScheduleMode = '1' | '2' | '3' | '2121';
 const DEFAULT_LEAD_TIME_MINUTES = 60;
 
+const FIXED_SCHEDULE_MODES: Partial<Record<string, ScheduleMode>> = {
+  alibaba: '3',
+};
+
+export const resolveScheduleMode = (
+  requestedMode: ScheduleMode,
+  manuscriptType?: string,
+): ScheduleMode => {
+  if (manuscriptType && FIXED_SCHEDULE_MODES[manuscriptType]) {
+    return FIXED_SCHEDULE_MODES[manuscriptType]!;
+  }
+  return requestedMode;
+};
+
 const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
   switch (mode) {
     case '1':

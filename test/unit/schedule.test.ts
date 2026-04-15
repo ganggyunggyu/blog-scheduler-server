@@ -1,6 +1,6 @@
 import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScheduleTimingOptions, calculateSchedule, parseKeywordWithCategory, type ScheduleMode } from '../../src/services/schedule.service';
+import { buildScheduleTimingOptions, calculateSchedule, parseKeywordWithCategory, resolveScheduleMode, type ScheduleMode } from '../../src/services/schedule.service';
 
 process.env.TZ = 'Asia/Seoul';
 
@@ -152,6 +152,18 @@ test('calculateSchedule: 흑염소도 기본 배치 시간 계산을 사용함',
   assert.equal(items[1]?.scheduledAt.toISOString(), '2099-03-17T23:00:00.000Z');
   assert.equal(items[2]?.scheduledAt.toISOString(), '2099-03-18T21:00:00.000Z');
   assert.equal(randomMock.mock.callCount(), 4);
+});
+
+test('resolveScheduleMode: 알리바바는 항상 모드 3으로 고정', () => {
+  assert.equal(resolveScheduleMode('1', 'alibaba'), '3');
+  assert.equal(resolveScheduleMode('2', 'alibaba'), '3');
+  assert.equal(resolveScheduleMode('2121', 'alibaba'), '3');
+});
+
+test('resolveScheduleMode: 다른 manuscriptType은 요청 모드 그대로 반환', () => {
+  assert.equal(resolveScheduleMode('2', 'default'), '2');
+  assert.equal(resolveScheduleMode('1', 'hanryeodamwon'), '1');
+  assert.equal(resolveScheduleMode('2', undefined), '2');
 });
 
 test('parseKeywordWithCategory: 카테고리 파싱', () => {

@@ -12,6 +12,7 @@ import {
   calculateSchedule,
   createSchedule,
   parseKeywordWithCategory,
+  resolveScheduleMode,
 } from '../services/schedule.service.js';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
@@ -394,6 +395,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   // Python 호환 라우트 (/bot/auto-schedule)
   app.post('/bot/auto-schedule', async (req: { body: unknown }) => {
     const body = pythonCompatSchema.parse(req.body);
+    const effectiveMode = resolveScheduleMode(body.schedule_mode, body.manuscript_type);
     const timingOptions = buildScheduleTimingOptions({
       manuscriptType: body.manuscript_type,
     });
@@ -416,7 +418,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       })) ?? calculateSchedule(
         queue.keywords,
         body.schedule_date,
-        body.schedule_mode,
+        effectiveMode,
         timingOptions,
       );
 
@@ -435,7 +437,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         service: body.service,
         ref: body.ref,
         scheduleDate: body.schedule_date,
-        scheduleMode: body.schedule_mode,
+        scheduleMode: effectiveMode,
         items,
         generateImages: body.generate_images,
         imageCount: body.image_count,
