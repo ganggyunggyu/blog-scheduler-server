@@ -5,9 +5,9 @@ const TARGET_DATE_ARG = process.argv[2];
 const TODAY = TARGET_DATE_ARG ? new Date(`${TARGET_DATE_ARG}T00:00:00+09:00`) : new Date();
 const TODAY_STR = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
 
-const EYE_CATEGORIES = ['안과', '에스앤비안과', '에스앤비안과-백업'];
+const THREE_POST_CATEGORIES = ['안과', '에스앤비안과', '에스앤비안과-백업', '알리바바'];
 const getExpectedCount = (category: string): number =>
-  EYE_CATEGORIES.includes(category) ? 3 : 2;
+  THREE_POST_CATEGORIES.includes(category) ? 3 : 2;
 
 interface Account {
   accountId: string;
