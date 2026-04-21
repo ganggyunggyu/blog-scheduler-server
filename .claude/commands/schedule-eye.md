@@ -7,7 +7,7 @@
 | 항목 | 값 |
 |------|-----|
 | manuscript_type | `default` |
-| image_source | `ai` |
+| image_source | `product` |
 | keyword_category | `안과` |
 
 ## 키워드 관리 규칙
@@ -64,7 +64,7 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
   "schedule_mode": "{모드}",
   "generate_images": true,
   "image_count": 5,
-  "image_source": "ai",
+  "image_source": "product",
   "manuscript_type": "default",
   "delay_between_posts": 10,
   "keyword_category": "안과"
@@ -103,7 +103,7 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
 | 계정 | 계정명(ID) × N개 |
 | 총 키워드 | N개 |
 | 원고 | default |
-| 이미지 | ai |
+| 이미지 | product |
 | 모드 | N (하루 N개) |
 | 예상 소요일 | 계정별 키워드수 ÷ 모드 |
 
