@@ -28,8 +28,8 @@ export const DEFAULT_CONTENT_PIPELINE: ContentBlock[] = [
 export const CONTENT_PIPELINES: Record<string, ContentBlock[]> = {
   default: DEFAULT_CONTENT_PIPELINE,
   애견: ['excluded1', 'maps', 'phone', 'excluded2', 'excluded3', 'link', 'spacing', 'content'],
-  안과: ['allExcluded', 'excludeLibraryLinks', 'maps', 'content', 'multiImages'],
-  안과기본: ['maps', 'content', 'multiImages'],
+  안과: ['allExcluded', 'excludeLibraryLinks', 'maps', 'spacing', 'content', 'multiImages'],
+  안과기본: ['maps', 'spacing', 'content', 'multiImages'],
   한려담원: ['content', 'link'],
 };
 

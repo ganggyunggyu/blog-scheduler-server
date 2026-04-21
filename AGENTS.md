@@ -43,6 +43,9 @@
 - `as any`, `@ts-ignore`, `@ts-expect-error` 금지함.
 ## Schedule Workflow Rules
 - 계정 source of truth 는 MongoDB `cafe-bot.accounts` 임.
+- **MongoDB 접속은 반드시 Atlas 로 함.** 로컬 `mongodb://localhost:27017` 조회 금지. 접속 URI 는 `.env` 의 `MONGO_URI` (`mongodb+srv://...@cluster0.stdrfdm.mongodb.net/...`) 를 그대로 사용함. 로컬에는 최신 계정/카테고리가 없어서 매칭이 전부 실패함.
+- mongosh 호출 예: `mongosh --quiet "$(grep ^MONGO_URI= .env | cut -d= -f2-)" --eval 'use("cafe-bot"); ...'`
+- 애견 카테고리의 DB 값은 `서리펫` 또는 `도그마루 글밥` 임 (payload 상 `keyword_category: "애견"` 과 다름).
 - 입력 계정은 `nickname` 우선, 없으면 `accountId`/`blogId` 로 매칭함.
 - 스케쥴 생성은 `POST /bot/auto-schedule` 흐름을 우선 사용함.
 - 도메인별 설정은 `.claude/commands/schedule-*.md` 를 그대로 따름.

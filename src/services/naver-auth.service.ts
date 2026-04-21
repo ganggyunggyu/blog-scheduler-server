@@ -165,10 +165,33 @@ export const naverLogin = async (
 ): Promise<{ cookies: unknown[]; success: boolean; message: string }> => {
   const maskedAccount = `${id.slice(0, 3)}***`;
   const browser = await getBrowser();
-  const context = await browser.newContext({
+
+  const useFingerprint = process.env.FINGERPRINT_ENABLED === 'true';
+  let contextOptions: Parameters<typeof browser.newContext>[0] = {
     userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
-  });
+  };
+
+  if (useFingerprint) {
+    const { getProfileForAccount } = await import('../lib/fingerprint/index.js');
+    const profile = getProfileForAccount(id);
+    contextOptions = {
+      userAgent: profile.userAgent,
+      viewport: profile.viewport,
+      deviceScaleFactor: profile.deviceScaleFactor,
+      locale: profile.locale,
+      timezoneId: profile.timezoneId,
+      colorScheme: profile.colorScheme,
+    };
+  }
+
+  const context = await browser.newContext(contextOptions);
+
+  if (useFingerprint) {
+    const { getProfileForAccount, applyStealth } = await import('../lib/fingerprint/index.js');
+    await applyStealth(context, getProfileForAccount(id));
+  }
+
   context.setDefaultTimeout(env.PLAYWRIGHT_ACTION_TIMEOUT_MS);
   context.setDefaultNavigationTimeout(env.PLAYWRIGHT_NAVIGATION_TIMEOUT_MS);
   const page = await context.newPage();

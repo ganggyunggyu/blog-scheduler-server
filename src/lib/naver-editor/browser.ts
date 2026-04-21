@@ -20,12 +20,36 @@ const isClosedContextError = (error: unknown): boolean => {
   return CLOSED_CONTEXT_ERROR_PATTERNS.some((pattern) => error.message.includes(pattern));
 };
 
-export const createSession = async (cookies: unknown[]): Promise<BrowserSession> => {
+export const createSession = async (cookies: unknown[], accountId?: string): Promise<BrowserSession> => {
   const browser = await getBrowser();
-  const context = await browser.newContext({
+
+  const useFingerprint = process.env.FINGERPRINT_ENABLED === 'true' && accountId;
+  let contextOptions: Parameters<typeof browser.newContext>[0] = {
     userAgent: USER_AGENT,
     permissions: ['clipboard-read', 'clipboard-write'],
-  });
+  };
+
+  if (useFingerprint) {
+    const { getProfileForAccount } = await import('../fingerprint/index.js');
+    const profile = getProfileForAccount(accountId);
+    contextOptions = {
+      userAgent: profile.userAgent,
+      viewport: profile.viewport,
+      deviceScaleFactor: profile.deviceScaleFactor,
+      locale: profile.locale,
+      timezoneId: profile.timezoneId,
+      colorScheme: profile.colorScheme,
+      permissions: ['clipboard-read', 'clipboard-write'],
+    };
+  }
+
+  const context = await browser.newContext(contextOptions);
+
+  if (useFingerprint) {
+    const { getProfileForAccount, applyStealth } = await import('../fingerprint/index.js');
+    await applyStealth(context, getProfileForAccount(accountId!));
+  }
+
   context.setDefaultTimeout(env.PLAYWRIGHT_ACTION_TIMEOUT_MS);
   context.setDefaultNavigationTimeout(env.PLAYWRIGHT_NAVIGATION_TIMEOUT_MS);
   await context.addCookies(normalizeSessionCookies(cookies));

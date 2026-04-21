@@ -62,6 +62,7 @@ const checkLoginStatus = (page: Page): { loggedIn: boolean; redirectedUrl?: stri
 
 interface BasePostParams {
   cookies: unknown[];
+  accountId?: string;
   title: string;
   content: string;
   images?: string[];
@@ -259,10 +260,10 @@ const executeContentPipeline = async (
 // ============================================================
 
 export const writePost = async (params: WritePostParams): Promise<WriteResult> => {
-  const { cookies, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory, manuscriptType } = params;
+  const { cookies, accountId, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory, manuscriptType } = params;
   const progress = new ProgressBar({ label: 'publish', total: 5, width: 14 });
 
-  const session = await createSession(cookies);
+  const session = await createSession(cookies, accountId);
   const { page } = session;
 
   try {

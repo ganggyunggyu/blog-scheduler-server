@@ -2,13 +2,22 @@
 
 안과 도메인 예약발행 curl 명령어를 생성합니다.
 
-## 도메인 설정 (고정)
+## 도메인 설정
 
 | 항목 | 값 |
 |------|-----|
 | manuscript_type | `default` |
 | image_source | `product` |
-| keyword_category | `안과` |
+| keyword_category | **모드별 분기 (아래)** |
+
+## 파이프라인 모드 (keyword_category 값)
+
+| 모드 | keyword_category | 포함 블록 | 사용 상황 |
+|------|------------------|-----------|----------|
+| **기본** | `안과기본` | maps → content → multiImages | 라이브러리제외 이미지/링크 없이 발행 |
+| **풀패키지** | `안과` | allExcluded → excludeLibraryLinks → maps → content → multiImages | 라이브러리제외 이미지 + 링크 삽입까지 포함 |
+
+모드 선택은 1단계에서 사용자에게 묻습니다. 생략 시 **풀패키지** 기본값.
 
 ## 키워드 관리 규칙
 
@@ -37,6 +46,9 @@
 
 2. **날짜** (YYYY-MM-DD, 생략 시 오늘)
 3. **모드** (1/2/3/2121, 생략 시 2)
+4. **파이프라인** (기본 / 풀패키지, 생략 시 풀패키지)
+   - 기본: 라이브러리제외 이미지·링크 없이 지도/본문/다중이미지만
+   - 풀패키지: 라이브러리제외 이미지 + 라이브러리제외 링크까지 풀 삽입
 ```
 
 ### 2단계: 계정 매칭
@@ -67,9 +79,14 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
   "image_source": "product",
   "manuscript_type": "default",
   "delay_between_posts": 10,
-  "keyword_category": "안과"
+  "keyword_category": "{파이프라인값}"
 }'
 ```
+
+`{파이프라인값}`은 사용자 선택에 따라 아래 둘 중 하나:
+
+- 풀패키지(기본): `"안과"`
+- 기본: `"안과기본"`
 
 ### 4단계: 로그 모니터링 (필수)
 
