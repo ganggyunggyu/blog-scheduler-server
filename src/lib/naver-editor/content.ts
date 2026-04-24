@@ -81,17 +81,39 @@ export const typeLineAvoidingAutoList = async (page: Page, line: string): Promis
   await page.keyboard.type(line, { delay: 30 });
 };
 
-const matchImagesToSubheadings = (paragraphs: string[], images: string[]): Map<number, string> => {
+const getNonEmptyParagraphIndices = (paragraphs: string[]): number[] =>
+  paragraphs
+    .map((paragraph, index) => (paragraph.trim().length > 0 ? index : -1))
+    .filter((index) => index >= 0);
+
+export const buildImageParagraphMap = (
+  paragraphs: string[],
+  images: string[],
+): Map<number, string> => {
   const result = new Map<number, string>();
   const subheadingIndices = paragraphs
     .map((paragraph, index) => (isSubheading(paragraph) ? index : -1))
     .filter((index) => index >= 0);
 
-  subheadingIndices.forEach((index, i) => {
-    if (i < images.length) {
-      result.set(index, images[i]);
-    }
-  });
+  if (subheadingIndices.length > 0) {
+    subheadingIndices.forEach((index, imageIndex) => {
+      if (imageIndex < images.length) {
+        result.set(index, images[imageIndex]);
+      }
+    });
+    return result;
+  }
+
+  const paragraphIndices = getNonEmptyParagraphIndices(paragraphs);
+  const targetCount = Math.min(images.length, paragraphIndices.length);
+
+  for (let imageIndex = 0; imageIndex < targetCount; imageIndex += 1) {
+    const paragraphOrder = Math.min(
+      paragraphIndices.length - 1,
+      Math.floor(((imageIndex + 1) * paragraphIndices.length) / (targetCount + 1)),
+    );
+    result.set(paragraphIndices[paragraphOrder], images[imageIndex]);
+  }
 
   return result;
 };
@@ -105,7 +127,7 @@ export const typeContentWithImages = async (
 ): Promise<void> => {
   const { keywordCategory } = options;
   const paragraphs = content.split('\n');
-  const imageMap = images?.length ? matchImagesToSubheadings(paragraphs, images) : new Map();
+  const imageMap = images?.length ? buildImageParagraphMap(paragraphs, images) : new Map();
   const uploadTotal = imageMap.size;
   const uploadProgress =
     uploadTotal > 0

@@ -1,7 +1,10 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { SELECTORS } from '../../src/constants/selectors.js';
-import { typeContentWithImages } from '../../src/lib/naver-editor/content.js';
+import {
+  buildImageParagraphMap,
+  typeContentWithImages,
+} from '../../src/lib/naver-editor/content.js';
 
 const createMockPage = () => {
   const events: string[] = [];
@@ -122,4 +125,40 @@ test('typeContentWithImages: 기본 카테고리는 pet 전용 reset을 수행�
   assert.equal(events.includes('press:Escape'), false);
   assert.equal(events.includes('click:font-size-15'), false);
   assert.ok(events.includes('type:본문 첫줄'));
+});
+
+test('buildImageParagraphMap: 소제목이 있으면 소제목 위치에 이미지를 매핑함', () => {
+  const imageMap = buildImageParagraphMap(
+    [
+      '도입 문단',
+      '1. 첫 번째 기준',
+      '설명 문단',
+      '2. 두 번째 기준',
+      '마무리 문단',
+    ],
+    ['img-1', 'img-2', 'img-3'],
+  );
+
+  assert.deepEqual([...imageMap.entries()], [
+    [1, 'img-1'],
+    [3, 'img-2'],
+  ]);
+});
+
+test('buildImageParagraphMap: 소제목이 없으면 일반 문단에 이미지를 분산 매핑함', () => {
+  const imageMap = buildImageParagraphMap(
+    [
+      '첫 문단',
+      '둘째 문단',
+      '셋째 문단',
+      '넷째 문단',
+      '다섯째 문단',
+    ],
+    ['img-1', 'img-2'],
+  );
+
+  assert.deepEqual([...imageMap.entries()], [
+    [1, 'img-1'],
+    [3, 'img-2'],
+  ]);
 });
