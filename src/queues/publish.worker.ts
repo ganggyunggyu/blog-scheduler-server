@@ -14,7 +14,7 @@ import type { MultiImageData, ExcludeLibraryLinkItem } from '../services/manuscr
 import { assessLoginFailure } from '../services/login-failure.service.js';
 import type { ManuscriptType } from '../services/manuscript.service.js';
 
-interface PublishJobData {
+export interface PublishJobData {
   scheduleId: string;
   scheduleJobId: string;
   account: { id: string; password: string; blogId?: string };

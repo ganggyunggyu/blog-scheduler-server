@@ -44,6 +44,15 @@ export const invalidateSession = async (accountId: string): Promise<void> => {
   await redis.del(`${SESSION_PREFIX}${accountId}`);
 }
 
+export const invalidateAllSessions = async (): Promise<number> => {
+  const keys = await redis.keys(`${SESSION_PREFIX}*`);
+  if (keys.length === 0) {
+    return 0;
+  }
+
+  return redis.del(...keys);
+}
+
 export const checkRateLimit = async (accountId: string): Promise<boolean> => {
   const key = `${RATE_PREFIX}${accountId}`;
   const count = await redis.incr(key);

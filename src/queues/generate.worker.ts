@@ -10,7 +10,7 @@ import { assessLoginFailure } from '../services/login-failure.service.js';
 import { buildSchedulePublishJobId } from '../services/schedule-idempotency.service.js';
 import { logger } from '../lib/logging/logger.js';
 
-interface GenerateJobData {
+export interface GenerateJobData {
   scheduleId: string;
   scheduleJobId: string;
   keyword: string;

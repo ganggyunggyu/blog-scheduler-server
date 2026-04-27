@@ -1,18 +1,111 @@
-import { Queue, Worker, type ConnectionOptions } from 'bullmq';
+import { Queue, Worker, type ConnectionOptions, type Job } from 'bullmq';
 import { redis } from '../config/redis.js';
 import { defaultJobOptions } from './constants.js';
-import { processGenerate } from './generate.worker.js';
-import { processPublish } from './publish.worker.js';
+import { processGenerate, type GenerateJobData } from './generate.worker.js';
+import { processPublish, type PublishJobData } from './publish.worker.js';
 import { logger } from '../lib/logging/logger.js';
 import { refreshBullBoard } from '../app.js';
+import { runBrowserCleaner } from '../services/browser-cleaner.service.js';
+import { createAccountExecutionCoordinator } from './account-execution.js';
 
 const connection = redis as unknown as ConnectionOptions;
 const log = logger.child({ scope: 'QueueManager' });
 
 const generateQueues = new Map<string, Queue>();
 const publishQueues = new Map<string, Queue>();
-const generateWorkers = new Map<string, Worker>();
-const publishWorkers = new Map<string, Worker>();
+const generateWorkers = new Map<string, Worker<GenerateJobData>>();
+const publishWorkers = new Map<string, Worker<PublishJobData>>();
+
+interface RunnableQueueCounts {
+  waiting: number;
+  active: number;
+  delayed: number;
+  paused: number;
+}
+
+const maskAccountId = (accountId: string): string => `${accountId.slice(0, 6)}***`;
+
+const getRunnableQueueCounts = async (queue: Queue | undefined): Promise<RunnableQueueCounts> => {
+  if (!queue) {
+    return { waiting: 0, active: 0, delayed: 0, paused: 0 };
+  }
+
+  const counts = await queue.getJobCounts('waiting', 'active', 'delayed', 'paused');
+  return {
+    waiting: counts.waiting ?? 0,
+    active: counts.active ?? 0,
+    delayed: counts.delayed ?? 0,
+    paused: counts.paused ?? 0,
+  };
+};
+
+const hasRunnableJobs = (counts: RunnableQueueCounts): boolean => (
+  counts.waiting + counts.active + counts.delayed + counts.paused > 0
+);
+
+const isAccountQueueIdle = async (accountId: string): Promise<boolean> => {
+  const [generateCounts, publishCounts] = await Promise.all([
+    getRunnableQueueCounts(generateQueues.get(accountId)),
+    getRunnableQueueCounts(publishQueues.get(accountId)),
+  ]);
+
+  return !hasRunnableJobs(generateCounts) && !hasRunnableJobs(publishCounts);
+};
+
+const accountExecution = createAccountExecutionCoordinator({
+  isAccountIdle: isAccountQueueIdle,
+  runCleaner: async (accountId) => {
+    await runBrowserCleaner(accountId);
+  },
+  onCleanerError: (accountId, error) => {
+    log.error('account.cleaner.failed', {
+      accountId: maskAccountId(accountId),
+      message: error instanceof Error ? error.message : String(error),
+    });
+  },
+});
+
+const processGenerateWithAccountTurn = async (job: Job<GenerateJobData>): Promise<unknown> => {
+  await accountExecution.waitForAccountTurn(job.data.account.id);
+  return processGenerate(job);
+};
+
+const processPublishWithAccountTurn = async (job: Job<PublishJobData>): Promise<unknown> => {
+  await accountExecution.waitForAccountTurn(job.data.account.id);
+  return processPublish(job);
+};
+
+const releaseAccountTurnAfterSettledJob = async (
+  type: 'generate' | 'publish',
+  accountId: string,
+  jobId?: string
+): Promise<void> => {
+  const released = await accountExecution.releaseAccountTurnIfIdle(accountId);
+  if (!released) {
+    return;
+  }
+
+  log.info('account.turn.released', {
+    type,
+    jobId,
+    accountId: maskAccountId(accountId),
+  });
+};
+
+const scheduleAccountTurnReleaseCheck = (
+  type: 'generate' | 'publish',
+  accountId: string,
+  jobId?: string
+): void => {
+  void releaseAccountTurnAfterSettledJob(type, accountId, jobId).catch((error: unknown) => {
+    log.error('account.turn.release.failed', {
+      type,
+      jobId,
+      accountId: maskAccountId(accountId),
+      message: error instanceof Error ? error.message : String(error),
+    });
+  });
+};
 
 const getQueueName = (type: 'generate' | 'publish', accountId: string): string => {
   const safeAccountId = accountId.replace(/[^a-zA-Z0-9]/g, '_');
@@ -53,7 +146,7 @@ export const initializeExistingQueues = async (): Promise<void> => {
       getPublishQueue(accountId);
     }
 
-    log.info('queues.restored', { count: accountIds.size, accounts: [...accountIds].map(id => id.slice(0, 6) + '***') });
+    log.info('queues.restored', { count: accountIds.size, accounts: [...accountIds].map(maskAccountId) });
   } catch (error) {
     log.error('queues.restore.failed', { error: error instanceof Error ? error.message : String(error) });
   }
@@ -67,7 +160,7 @@ export const getGenerateQueue = (accountId: string): Queue => {
   const queue = new Queue(queueName, { connection, defaultJobOptions });
 
   generateQueues.set(accountId, queue);
-  log.info('queue.created', { type: 'generate', accountId: accountId.slice(0, 6) + '***' });
+  log.info('queue.created', { type: 'generate', accountId: maskAccountId(accountId) });
   ensureGenerateWorker(accountId);
   refreshBullBoard();
 
@@ -82,19 +175,19 @@ export const getPublishQueue = (accountId: string): Queue => {
   const queue = new Queue(queueName, { connection, defaultJobOptions });
 
   publishQueues.set(accountId, queue);
-  log.info('queue.created', { type: 'publish', accountId: accountId.slice(0, 6) + '***' });
+  log.info('queue.created', { type: 'publish', accountId: maskAccountId(accountId) });
   ensurePublishWorker(accountId);
   refreshBullBoard();
 
   return queue;
 };
 
-const ensureGenerateWorker = (accountId: string): Worker => {
+const ensureGenerateWorker = (accountId: string): Worker<GenerateJobData> => {
   const existing = generateWorkers.get(accountId);
   if (existing) return existing;
 
   const queueName = getQueueName('generate', accountId);
-  const worker = new Worker(queueName, processGenerate, {
+  const worker = new Worker<GenerateJobData>(queueName, processGenerateWithAccountTurn, {
     connection,
     concurrency: 1,
     lockDuration: 600000,
@@ -105,30 +198,32 @@ const ensureGenerateWorker = (accountId: string): Worker => {
   worker.on('completed', (job) => {
     log.info('generate.completed', {
       jobId: job.id,
-      accountId: accountId.slice(0, 6) + '***',
+      accountId: maskAccountId(accountId),
     });
+    scheduleAccountTurnReleaseCheck('generate', accountId, job.id);
   });
 
   worker.on('failed', (job, err) => {
     log.error('generate.failed', {
       jobId: job?.id,
-      accountId: accountId.slice(0, 6) + '***',
+      accountId: maskAccountId(accountId),
       message: err.message,
     });
+    scheduleAccountTurnReleaseCheck('generate', accountId, job?.id);
   });
 
   generateWorkers.set(accountId, worker);
-  log.info('worker.created', { type: 'generate', accountId: accountId.slice(0, 6) + '***' });
+  log.info('worker.created', { type: 'generate', accountId: maskAccountId(accountId) });
 
   return worker;
 };
 
-const ensurePublishWorker = (accountId: string): Worker => {
+const ensurePublishWorker = (accountId: string): Worker<PublishJobData> => {
   const existing = publishWorkers.get(accountId);
   if (existing) return existing;
 
   const queueName = getQueueName('publish', accountId);
-  const worker = new Worker(queueName, processPublish, {
+  const worker = new Worker<PublishJobData>(queueName, processPublishWithAccountTurn, {
     connection,
     concurrency: 1,
     lockDuration: 600000,
@@ -139,20 +234,22 @@ const ensurePublishWorker = (accountId: string): Worker => {
   worker.on('completed', (job) => {
     log.info('publish.completed', {
       jobId: job.id,
-      accountId: accountId.slice(0, 6) + '***',
+      accountId: maskAccountId(accountId),
     });
+    scheduleAccountTurnReleaseCheck('publish', accountId, job.id);
   });
 
   worker.on('failed', (job, err) => {
     log.error('publish.failed', {
       jobId: job?.id,
-      accountId: accountId.slice(0, 6) + '***',
+      accountId: maskAccountId(accountId),
       message: err.message,
     });
+    scheduleAccountTurnReleaseCheck('publish', accountId, job?.id);
   });
 
   publishWorkers.set(accountId, worker);
-  log.info('worker.created', { type: 'publish', accountId: accountId.slice(0, 6) + '***' });
+  log.info('worker.created', { type: 'publish', accountId: maskAccountId(accountId) });
 
   return worker;
 };
