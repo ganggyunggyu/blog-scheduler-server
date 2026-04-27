@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { env } from '../config/env.js';
 import { logger } from '../lib/logging/logger.js';
@@ -11,6 +11,8 @@ export type { ExcludeLibraryLinkItem } from '../types/metadata.js';
 export { type MultiImageData } from '../lib/naver-editor/image.js';
 
 const imageLog = logger.child({ scope: 'Image' });
+const DOWNLOAD_ATTEMPTS = 3;
+const DOWNLOAD_RETRY_DELAY_MS = 1000;
 
 export interface ImageData {
   url: string;
@@ -38,6 +40,10 @@ export interface ProductDataOptions {
 
 const sanitizeParam = (value: string): string =>
   value.replace(/[\n\r]/g, '').trim();
+
+const sleep = async (ms: number): Promise<void> => {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export interface ProductImageRequestConfig {
   url: string;
@@ -124,6 +130,35 @@ const isValidUrl = (str: string): boolean => {
   }
 };
 
+export const normalizeImageDownloadUrl = (imageUrl: string): string => {
+  if (isBase64DataUrl(imageUrl)) return imageUrl;
+  return new URL(imageUrl).toString();
+};
+
+const downloadImageBuffer = async (imageUrl: string): Promise<{ buffer: Buffer; ext: string }> => {
+  if (isBase64DataUrl(imageUrl)) {
+    const matches = imageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) {
+      throw new Error('invalid_base64_format');
+    }
+
+    return {
+      ext: `.${matches[1] === 'jpeg' ? 'jpg' : matches[1]}`,
+      buffer: Buffer.from(matches[2], 'base64'),
+    };
+  }
+
+  const url = new URL(imageUrl);
+  const response = await axios.get<ArrayBuffer>(normalizeImageDownloadUrl(imageUrl), {
+    responseType: 'arraybuffer',
+  });
+
+  return {
+    ext: path.extname(url.pathname) || '.png',
+    buffer: Buffer.from(response.data),
+  };
+};
+
 export const downloadImagesToDir = async (
   imageDataList: ImageData[],
   imagesDir: string
@@ -142,39 +177,34 @@ export const downloadImagesToDir = async (
   });
   imageLog.info(progress.start(), { count: validImages.length, dir: imagesDir });
   const saved: string[] = [];
+  await mkdir(imagesDir, { recursive: true });
 
   for (let i = 0; i < validImages.length; i += 1) {
     const { url: imageUrl, filename } = validImages[i];
-    try {
-      let buffer: Buffer;
-      let ext: string;
+    let savedImage = false;
 
-      if (isBase64DataUrl(imageUrl)) {
-        const matches = imageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
-        if (!matches) {
-          imageLog.warn('download.failed', { reason: 'invalid_base64_format' });
-          imageLog.info(progress.tick('fail'));
-          continue;
+    for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt += 1) {
+      try {
+        const { buffer, ext } = await downloadImageBuffer(imageUrl);
+        const finalFilename = filename || `${i + 1}${ext}`;
+        const filePath = path.join(imagesDir, finalFilename);
+
+        await writeFile(filePath, buffer);
+        saved.push(filePath);
+        savedImage = true;
+        imageLog.info(progress.tick('ok'), { filename: finalFilename, attempt });
+        break;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        imageLog.warn('download.failed', { url: imageUrl.slice(0, 80), message, attempt });
+
+        if (attempt < DOWNLOAD_ATTEMPTS) {
+          await sleep(DOWNLOAD_RETRY_DELAY_MS);
         }
-        ext = `.${matches[1] === 'jpeg' ? 'jpg' : matches[1]}`;
-        buffer = Buffer.from(matches[2], 'base64');
-      } else {
-        const url = new URL(imageUrl);
-        ext = path.extname(url.pathname) || '.png';
-        const response = await axios.get<ArrayBuffer>(imageUrl, {
-          responseType: 'arraybuffer',
-        });
-        buffer = Buffer.from(response.data);
       }
+    }
 
-      const finalFilename = filename || `${i + 1}${ext}`;
-      const filePath = path.join(imagesDir, finalFilename);
-
-      await writeFile(filePath, buffer);
-      saved.push(filePath);
-      imageLog.info(progress.tick('ok'), { filename: finalFilename });
-    } catch {
-      imageLog.warn('download.failed', { url: imageUrl.slice(0, 80) });
+    if (!savedImage) {
       imageLog.info(progress.tick('fail'));
     }
   }
@@ -202,6 +232,9 @@ export const prepareProductImages = async ({
     })),
     imagesDir
   );
+  if (data.excludeLibrary.length > 0 && excludeLibrary.length !== data.excludeLibrary.length) {
+    throw new Error(`excludeLibrary download failed: expected=${data.excludeLibrary.length} actual=${excludeLibrary.length}`);
+  }
 
   const multiImages: MultiImageData = {};
   if (data.multiImages.individual.length) {
