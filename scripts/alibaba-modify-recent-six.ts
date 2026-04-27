@@ -5,7 +5,7 @@ import type { Queue } from 'bullmq';
 import { ScheduleJobModel, ScheduleModel } from '../src/schemas/schedule.schema.js';
 import { formatKst } from '../src/services/schedule.service.js';
 import { buildScheduleGenerateJobId } from '../src/services/schedule-idempotency.service.js';
-import { getGenerateQueue, closeAllQueues } from '../src/queues/queue-manager.js';
+import { getGenerateQueue, getPublishQueue, closeAllQueues } from '../src/queues/queue-manager.js';
 import { closeBrowser } from '../src/lib/browser/playwright.js';
 import { redis } from '../src/config/redis.js';
 
@@ -17,6 +17,7 @@ const DELAY_BETWEEN_POSTS_SECONDS = 10;
 const RECENT_POST_COUNT = 6;
 const MONITOR_INTERVAL_MS = 30_000;
 const MONITOR_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+const ACTIVE_JOB_RECOVERY_MS = 60_000;
 
 const REQUESTED_KEYWORDS = new Map<string, string[]>([
   ['weed3122', ['글로벌소싱순위', '중국구매대행추천', '중국수입절차', '도매거래절차', '도매거래하는법', '도매구매대행']],
@@ -25,6 +26,22 @@ const REQUESTED_KEYWORDS = new Map<string, string[]>([
   ['copy11525', ['1688배대지수수료', '관세비용', '해외구매대행', '1688결제방법', '1688직구방법', '알리바바닷컴사입하는법']],
   ['individual14144', ['물류플랫폼', '수출플랫폼', '중국구매대행사이트', '수출컨설팅', '알리바바닷컴판매', '해외진출컨설팅']],
 ]);
+
+const ACCOUNT_FILTER = new Set(
+  (process.env.ALIBABA_ACCOUNTS ?? '')
+    .split(',')
+    .map((accountId) => accountId.trim())
+    .filter(Boolean),
+);
+
+const requestedEntries = (): Array<[string, string[]]> => {
+  const entries = [...REQUESTED_KEYWORDS.entries()];
+  if (ACCOUNT_FILTER.size === 0) {
+    return entries;
+  }
+
+  return entries.filter(([accountId]) => ACCOUNT_FILTER.has(accountId));
+};
 
 interface AccountDoc {
   accountId: string;
@@ -59,6 +76,7 @@ interface ExistingScheduleJob {
   slot: number;
   status: string;
   generateJobId?: string;
+  publishJobId?: string;
   postUrl?: string;
 }
 
@@ -169,7 +187,11 @@ const fetchLatestPosts = async (blogId: string): Promise<PostItem[]> => {
 
 const resolveAccounts = async (): Promise<AccountDoc[]> => {
   const cafeDb = mongoose.connection.useDb('cafe-bot');
-  const ids = [...REQUESTED_KEYWORDS.keys()];
+  const ids = requestedEntries().map(([accountId]) => accountId);
+  if (ids.length === 0) {
+    throw new Error(`처리할 계정 없음: ${[...ACCOUNT_FILTER].join(', ')}`);
+  }
+
   const accounts = await cafeDb.collection<AccountDoc>('accounts')
     .find(
       {
@@ -244,6 +266,67 @@ const addGenerateJob = async (
   });
 };
 
+const isStaleActiveState = async (job: { getState: () => Promise<string>; processedOn?: number; timestamp: number }): Promise<boolean> => {
+  const state = await job.getState();
+  if (state !== 'active') {
+    return false;
+  }
+
+  const startedAt = job.processedOn ?? job.timestamp;
+  return Date.now() - startedAt > ACTIVE_JOB_RECOVERY_MS;
+};
+
+const recoverPublishJob = async (
+  queue: Queue,
+  generateQueue: Queue,
+  account: AccountDoc,
+  scheduleId: string,
+  scheduleJob: ExistingScheduleJob,
+  post: PostItem,
+  keyword: string,
+  scheduledAt: string,
+): Promise<string | null> => {
+  if (!['generated', 'publishing'].includes(scheduleJob.status)) {
+    return null;
+  }
+
+  if (!scheduleJob.publishJobId) {
+    const retryJobId = `${buildScheduleGenerateJobId(scheduleJob._id)}_resume_${Date.now()}`;
+    await addGenerateJob(generateQueue, account, scheduleId, scheduleJob._id, post, keyword, scheduledAt, retryJobId);
+    return 'publish-missing-regenerate';
+  }
+
+  const publishJob = await queue.getJob(scheduleJob.publishJobId);
+  if (!publishJob) {
+    const retryJobId = `${buildScheduleGenerateJobId(scheduleJob._id)}_resume_${Date.now()}`;
+    await addGenerateJob(generateQueue, account, scheduleId, scheduleJob._id, post, keyword, scheduledAt, retryJobId);
+    return 'publish-missing-regenerate';
+  }
+
+  const state = await publishJob.getState();
+  if (state === 'failed') {
+    await publishJob.retry('failed');
+    await ScheduleJobModel.findByIdAndUpdate(scheduleJob._id, {
+      status: 'generated',
+      $unset: { error: 1, completedAt: 1 },
+    });
+    return 'publish-retried';
+  }
+
+  if (await isStaleActiveState(publishJob)) {
+    const retryJobId = `${scheduleJob.publishJobId}_resume_${Date.now()}`;
+    await queue.add(publishJob.name, publishJob.data, { jobId: retryJobId });
+    await ScheduleJobModel.findByIdAndUpdate(scheduleJob._id, {
+      publishJobId: retryJobId,
+      status: 'generated',
+      $unset: { error: 1, completedAt: 1 },
+    });
+    return 'publish-requeued-active';
+  }
+
+  return `publish-${state}`;
+};
+
 const ensureExistingGenerateJob = async (
   queue: Queue,
   account: AccountDoc,
@@ -277,6 +360,12 @@ const ensureExistingGenerateJob = async (
     return 'retried';
   }
 
+  if (await isStaleActiveState(existingBullJob)) {
+    const retryJobId = `${buildScheduleGenerateJobId(scheduleJob._id)}_resume_${Date.now()}`;
+    await addGenerateJob(queue, account, scheduleId, scheduleJob._id, post, keyword, scheduledAt, retryJobId);
+    return 'requeued-active';
+  }
+
   return state;
 };
 
@@ -288,6 +377,7 @@ const createOrRecoverAccountSchedule = async (
   const keywords = REQUESTED_KEYWORDS.get(accountId) ?? [];
   const scheduleDate = format(new Date(), 'yyyy-MM-dd');
   const queue = getGenerateQueue(accountId);
+  const publishQueue = getPublishQueue(accountId);
 
   const existing = await ScheduleModel.findOne({ accountId, service: SERVICE, ref: REF })
     .lean<ExistingSchedule>();
@@ -338,7 +428,8 @@ const createOrRecoverAccountSchedule = async (
         continue;
       }
 
-      const state = await ensureExistingGenerateJob(
+      const state = await recoverPublishJob(
+        publishQueue,
         queue,
         account,
         existing._id,
@@ -346,7 +437,15 @@ const createOrRecoverAccountSchedule = async (
         post,
         keyword,
         scheduledAt,
-      );
+      ) ?? await ensureExistingGenerateJob(
+          queue,
+          account,
+          existing._id,
+          existingJob,
+          post,
+          keyword,
+          scheduledAt,
+        );
       console.log(`[resume] ${account.nickname || accountId} ${slot}/${posts.length} job=${state} logNo=${post.logNo} kw=${keyword}`);
     }
 
