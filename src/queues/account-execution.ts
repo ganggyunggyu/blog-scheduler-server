@@ -23,10 +23,9 @@ export const createAccountExecutionCoordinator = ({
 }: AccountExecutionCoordinatorInput): AccountExecutionCoordinator => {
   const activeAccountIds = new Set<string>();
   const cleanupPromises = new Map<string, Promise<void>>();
-  const releasePromises = new Map<string, Promise<boolean>>();
   const waiters: WaitingAccount[] = [];
 
-  const resolveAccountWaiters = (accountId: string): void => {
+  const resolveNextAccountWaiter = (accountId: string): boolean => {
     for (let index = 0; index < waiters.length;) {
       const waiter = waiters[index];
       if (waiter.accountId !== accountId) {
@@ -36,7 +35,10 @@ export const createAccountExecutionCoordinator = ({
 
       waiters.splice(index, 1);
       waiter.resolve();
+      return true;
     }
+
+    return false;
   };
 
   const runCleanup = async (accountId: string): Promise<void> => {
@@ -45,15 +47,13 @@ export const createAccountExecutionCoordinator = ({
     } catch (error) {
       await onCleanerError?.(accountId, error);
     } finally {
-      activeAccountIds.delete(accountId);
       cleanupPromises.delete(accountId);
-      resolveAccountWaiters(accountId);
+      resolveNextAccountWaiter(accountId);
     }
   };
 
   const waitForAccountTurn = async (accountId: string): Promise<void> => {
-    const cleanupPromise = cleanupPromises.get(accountId);
-    if (cleanupPromise) {
+    while (activeAccountIds.has(accountId) || cleanupPromises.has(accountId)) {
       await new Promise<void>((resolve) => {
         waiters.push({ accountId, resolve });
       });
@@ -63,32 +63,30 @@ export const createAccountExecutionCoordinator = ({
   };
 
   const releaseAccountTurnIfIdle = async (accountId: string): Promise<boolean> => {
-    const existingRelease = releasePromises.get(accountId);
-    if (existingRelease) {
-      return existingRelease;
+    if (!activeAccountIds.has(accountId) || cleanupPromises.has(accountId)) {
+      return false;
     }
 
-    const releasePromise = (async () => {
-      if (!activeAccountIds.has(accountId) || cleanupPromises.has(accountId)) {
-        return false;
-      }
+    activeAccountIds.delete(accountId);
 
-      const idle = await isAccountIdle(accountId);
-      if (!idle) {
-        return false;
-      }
+    if (resolveNextAccountWaiter(accountId)) {
+      return false;
+    }
 
-      const cleanupPromise = runCleanup(accountId);
-      cleanupPromises.set(accountId, cleanupPromise);
-      await cleanupPromise;
-      return true;
-    })().finally(() => {
-      releasePromises.delete(accountId);
-    });
+    const idle = await isAccountIdle(accountId);
+    if (!idle || activeAccountIds.has(accountId) || resolveNextAccountWaiter(accountId)) {
+      return false;
+    }
 
-    releasePromises.set(accountId, releasePromise);
+    if (activeAccountIds.size > 0) {
+      return false;
+    }
 
-    return releasePromise;
+    const cleanupPromise = runCleanup(accountId);
+    cleanupPromises.set(accountId, cleanupPromise);
+    await cleanupPromise;
+
+    return true;
   };
 
   return {
