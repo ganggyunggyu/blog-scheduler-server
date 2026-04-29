@@ -244,7 +244,10 @@ const executeContentPipeline = async (
   ctx: ContentBlockContext,
   options: { keywordCategory?: string; manuscriptType?: ManuscriptType }
 ): Promise<void> => {
-  const pipeline = getContentPipeline(options);
+  const pipeline = getContentPipeline({
+    ...options,
+    hasExcludeLibrary: (ctx.excludeLibrary?.length ?? 0) > 0,
+  });
   log.info('pipeline.start', {
     category: options.keywordCategory ?? 'default',
     manuscriptType: options.manuscriptType ?? 'default',

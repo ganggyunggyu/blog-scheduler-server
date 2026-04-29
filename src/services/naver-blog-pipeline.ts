@@ -43,19 +43,29 @@ export const ALIBABA_CONTENT_PIPELINE: ContentBlock[] = [
 interface ContentPipelineOptions {
   keywordCategory?: string;
   manuscriptType?: ManuscriptType;
+  hasExcludeLibrary?: boolean;
 }
+
+const EYE_PIPELINE_CATEGORIES = new Set(['안과', '안과기본']);
 
 export const getContentPipeline = ({
   keywordCategory,
   manuscriptType,
+  hasExcludeLibrary,
 }: ContentPipelineOptions = {}): ContentBlock[] => {
+  let pipeline: ContentBlock[];
+
   if (manuscriptType === 'alibaba') {
-    return [...ALIBABA_CONTENT_PIPELINE];
+    pipeline = ALIBABA_CONTENT_PIPELINE;
+  } else if (keywordCategory && CONTENT_PIPELINES[keywordCategory]) {
+    pipeline = CONTENT_PIPELINES[keywordCategory];
+  } else {
+    pipeline = CONTENT_PIPELINES.default;
   }
 
-  if (keywordCategory && CONTENT_PIPELINES[keywordCategory]) {
-    return [...CONTENT_PIPELINES[keywordCategory]];
+  if (keywordCategory && EYE_PIPELINE_CATEGORIES.has(keywordCategory) && hasExcludeLibrary === false) {
+    return pipeline.filter((block) => block !== 'spacing');
   }
 
-  return [...CONTENT_PIPELINES.default];
+  return [...pipeline];
 };

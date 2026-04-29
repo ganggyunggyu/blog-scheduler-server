@@ -38,3 +38,32 @@ test('getContentPipeline: 알리바바 manuscriptType은 category 분기보다 �
     ALIBABA_CONTENT_PIPELINE,
   );
 });
+
+test('getContentPipeline: 안과는 라이브러리제외 이미지가 없으면 spacing을 제외함', () => {
+  assert.deepEqual(getContentPipeline({ keywordCategory: '안과', hasExcludeLibrary: false }), [
+    'allExcluded',
+    'excludeLibraryLinks',
+    'maps',
+    'content',
+    'multiImages',
+  ]);
+});
+
+test('getContentPipeline: 안과기본은 라이브러리제외 이미지가 없으면 spacing을 제외함', () => {
+  assert.deepEqual(getContentPipeline({ keywordCategory: '안과기본', hasExcludeLibrary: false }), [
+    'maps',
+    'content',
+    'multiImages',
+  ]);
+});
+
+test('getContentPipeline: 안과는 라이브러리제외 이미지가 있으면 spacing을 유지함', () => {
+  assert.deepEqual(getContentPipeline({ keywordCategory: '안과', hasExcludeLibrary: true }), [
+    'allExcluded',
+    'excludeLibraryLinks',
+    'maps',
+    'spacing',
+    'content',
+    'multiImages',
+  ]);
+});
