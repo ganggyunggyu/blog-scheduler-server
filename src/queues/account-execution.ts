@@ -2,6 +2,7 @@ export interface AccountExecutionCoordinator {
   waitForAccountTurn: (accountId: string) => Promise<void>;
   releaseAccountTurnIfIdle: (accountId: string) => Promise<boolean>;
   getActiveAccountId: () => string | null;
+  getActiveAccountIds: () => string[];
 }
 
 interface AccountExecutionCoordinatorInput {
@@ -20,19 +21,15 @@ export const createAccountExecutionCoordinator = ({
   runCleaner,
   onCleanerError,
 }: AccountExecutionCoordinatorInput): AccountExecutionCoordinator => {
-  let activeAccountId: string | null = null;
-  let cleanupPromise: Promise<void> | null = null;
-  let releasePromise: Promise<boolean> | null = null;
+  const activeAccountIds = new Set<string>();
+  const cleanupPromises = new Map<string, Promise<void>>();
+  const releasePromises = new Map<string, Promise<boolean>>();
   const waiters: WaitingAccount[] = [];
 
-  const resolveActiveAccountWaiters = (): void => {
-    if (!activeAccountId) {
-      return;
-    }
-
+  const resolveAccountWaiters = (accountId: string): void => {
     for (let index = 0; index < waiters.length;) {
       const waiter = waiters[index];
-      if (waiter.accountId !== activeAccountId) {
+      if (waiter.accountId !== accountId) {
         index += 1;
         continue;
       }
@@ -42,62 +39,37 @@ export const createAccountExecutionCoordinator = ({
     }
   };
 
-  const activateNextAccount = (): void => {
-    if (activeAccountId) {
-      resolveActiveAccountWaiters();
-      return;
-    }
-
-    const next = waiters.shift();
-    if (!next) {
-      return;
-    }
-
-    activeAccountId = next.accountId;
-    next.resolve();
-    resolveActiveAccountWaiters();
-  };
-
   const runCleanup = async (accountId: string): Promise<void> => {
     try {
       await runCleaner(accountId);
     } catch (error) {
       await onCleanerError?.(accountId, error);
     } finally {
-      if (activeAccountId === accountId) {
-        activeAccountId = null;
-      }
-      cleanupPromise = null;
-      activateNextAccount();
+      activeAccountIds.delete(accountId);
+      cleanupPromises.delete(accountId);
+      resolveAccountWaiters(accountId);
     }
   };
 
   const waitForAccountTurn = async (accountId: string): Promise<void> => {
+    const cleanupPromise = cleanupPromises.get(accountId);
     if (cleanupPromise) {
-      await cleanupPromise;
+      await new Promise<void>((resolve) => {
+        waiters.push({ accountId, resolve });
+      });
     }
 
-    if (!activeAccountId) {
-      activeAccountId = accountId;
-      return;
-    }
-
-    if (activeAccountId === accountId) {
-      return;
-    }
-
-    await new Promise<void>((resolve) => {
-      waiters.push({ accountId, resolve });
-    });
+    activeAccountIds.add(accountId);
   };
 
   const releaseAccountTurnIfIdle = async (accountId: string): Promise<boolean> => {
-    if (releasePromise) {
-      return releasePromise;
+    const existingRelease = releasePromises.get(accountId);
+    if (existingRelease) {
+      return existingRelease;
     }
 
-    releasePromise = (async () => {
-      if (activeAccountId !== accountId || cleanupPromise) {
+    const releasePromise = (async () => {
+      if (!activeAccountIds.has(accountId) || cleanupPromises.has(accountId)) {
         return false;
       }
 
@@ -106,12 +78,15 @@ export const createAccountExecutionCoordinator = ({
         return false;
       }
 
-      cleanupPromise = runCleanup(accountId);
+      const cleanupPromise = runCleanup(accountId);
+      cleanupPromises.set(accountId, cleanupPromise);
       await cleanupPromise;
       return true;
     })().finally(() => {
-      releasePromise = null;
+      releasePromises.delete(accountId);
     });
+
+    releasePromises.set(accountId, releasePromise);
 
     return releasePromise;
   };
@@ -119,6 +94,7 @@ export const createAccountExecutionCoordinator = ({
   return {
     waitForAccountTurn,
     releaseAccountTurnIfIdle,
-    getActiveAccountId: () => activeAccountId,
+    getActiveAccountId: () => Array.from(activeAccountIds)[0] ?? null,
+    getActiveAccountIds: () => Array.from(activeAccountIds),
   };
 };

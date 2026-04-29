@@ -106,6 +106,16 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     generateImages,
   });
 
+  const [schedule, scheduleJob] = await Promise.all([
+    ScheduleModel.findById(scheduleId).select('status').lean(),
+    ScheduleJobModel.findById(scheduleJobId).select('status').lean(),
+  ]);
+
+  if (schedule?.status === 'cancelled' || scheduleJob?.status === 'cancelled') {
+    log.warn('cancelled.skip', { jobId: job.id, scheduleId, scheduleJobId });
+    return { scheduleJobId, skipped: true };
+  }
+
   await ScheduleModel.findOneAndUpdate({ _id: scheduleId, status: 'pending' }, { status: 'processing' });
 
   await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {

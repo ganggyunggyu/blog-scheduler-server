@@ -186,7 +186,15 @@ export const processPublish = async (job: Job<PublishJobData>) => {
     titlePreview: manuscript.title.slice(0, 30),
   });
 
-  const existing = await ScheduleJobModel.findById(scheduleJobId);
+  const [schedule, existing] = await Promise.all([
+    ScheduleModel.findById(scheduleId).select('status').lean(),
+    ScheduleJobModel.findById(scheduleJobId),
+  ]);
+  if (schedule?.status === 'cancelled' || existing?.status === 'cancelled') {
+    log.warn('cancelled.skip', { jobId: job.id, scheduleId, scheduleJobId });
+    return { success: true, skipped: true };
+  }
+
   if (existing?.status === 'published' && existing?.postUrl) {
     log.warn('already.published', { scheduleJobId, postUrl: existing.postUrl });
     return { success: true, postUrl: existing.postUrl };
