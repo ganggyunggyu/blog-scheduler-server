@@ -139,7 +139,59 @@ const selectAllTextParagraphsByKeyboard = async (
   });
 
   log.info('fontColor.white.keyboardSelect.ready', { selectedLength });
-  return true;
+  return selectedLength > 0;
+};
+
+const activateTextToolbarSelectionByMouse = async (page: Page, frame: Frame): Promise<boolean> => {
+  const textNodes = await frame.$$(
+    '.se-component.se-text:not(.se-documentTitle) p.se-text-paragraph span'
+  );
+
+  for (const node of textNodes) {
+    const text = (await node.textContent())?.replace(/\s+/g, '') ?? '';
+    const box = await node.boundingBox();
+    if (!text || !box || box.width <= 20 || box.height <= 5) {
+      continue;
+    }
+
+    await node.scrollIntoViewIfNeeded();
+    const visibleBox = await node.boundingBox();
+    if (!visibleBox) {
+      continue;
+    }
+
+    const y = visibleBox.y + visibleBox.height / 2;
+    await page.mouse.move(visibleBox.x + 3, y);
+    await page.mouse.down();
+    await page.mouse.move(visibleBox.x + Math.min(visibleBox.width - 3, 260), y, { steps: 12 });
+    await page.mouse.up();
+    await page.waitForTimeout(500);
+
+    log.info('fontColor.white.mouseSelect.ready', { textPreview: text.slice(0, 20) });
+    return true;
+  }
+
+  log.warn('fontColor.white.mouseSelect.failed');
+  return false;
+};
+
+const selectAllTextForFontColorToolbar = async (page: Page, frame: Frame): Promise<boolean> => {
+  const mouseSelected = await activateTextToolbarSelectionByMouse(page, frame).catch((error: unknown) => {
+    log.warn('fontColor.white.mouseSelect.error', {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return false;
+  });
+
+  if (mouseSelected) {
+    await page.keyboard.press('Meta+a');
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Meta+a');
+    await page.waitForTimeout(500);
+    return true;
+  }
+
+  return selectAllTextParagraphsByKeyboard(page, frame);
 };
 
 const getAlignmentStatus = async (frame: FrameController): Promise<AlignmentStatus> => {
@@ -791,7 +843,7 @@ export const setFontColorWhite = async (page: Page, frame: Frame): Promise<boole
     await removeEditorOverlays(frame);
     await page.waitForTimeout(200);
 
-    const selected = await selectAllTextParagraphsByKeyboard(page, frame);
+    const selected = await selectAllTextForFontColorToolbar(page, frame);
     if (!selected) {
       const domSelected = await selectAllTextParagraphs(frame);
       if (!domSelected) {
