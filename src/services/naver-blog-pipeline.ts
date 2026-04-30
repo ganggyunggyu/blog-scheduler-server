@@ -77,13 +77,7 @@ interface ContentImagesForBlockOptions {
 }
 
 export const getContentImagesForBlock = ({
-  manuscriptType,
-  block,
   normalImages,
 }: ContentImagesForBlockOptions): string[] => {
-  if (manuscriptType === 'alibaba' && block === 'content') {
-    return [];
-  }
-
   return normalImages;
 };

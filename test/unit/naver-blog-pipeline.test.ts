@@ -39,14 +39,14 @@ test('getContentPipeline: 알리바바 manuscriptType은 category 분기보다 �
   );
 });
 
-test('getContentImagesForBlock: 알리바바 content 단계는 body 이미지를 삽입하지 않음', () => {
+test('getContentImagesForBlock: 알리바바 content 단계는 body 이미지를 유지함', () => {
   assert.deepEqual(
     getContentImagesForBlock({
       manuscriptType: 'alibaba',
       block: 'content',
       normalImages: ['body_1.webp', 'body_2.webp'],
     }),
-    [],
+    ['body_1.webp', 'body_2.webp'],
   );
 });
 
