@@ -27,6 +27,7 @@ import {
   insertPhone,
   uploadFromMultiImageData,
   addSpacing,
+  focusLastParagraphEnd,
   setFontColorWhite,
   uploadImage,
   removeImage,
@@ -35,7 +36,7 @@ import {
   type WriteResult,
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
-import { getContentPipeline, type ContentBlock } from './naver-blog-pipeline.js';
+import { getContentImagesForBlock, getContentPipeline, type ContentBlock } from './naver-blog-pipeline.js';
 import type { ManuscriptType } from './manuscript.service.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
@@ -198,8 +199,13 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.2.uploaded');
   },
-  content: async ({ page, frame, content, normalImages, keywordCategory }) => {
-    await typeContentWithImages(page, frame, content, normalImages, { keywordCategory });
+  content: async ({ page, frame, content, normalImages, keywordCategory, manuscriptType }) => {
+    const contentImages = getContentImagesForBlock({
+      manuscriptType,
+      block: 'content',
+      normalImages,
+    });
+    await typeContentWithImages(page, frame, content, contentImages, { keywordCategory });
     log.info('content.entered');
   },
   excluded3: async ({ page, excluded3 }) => {
@@ -208,15 +214,20 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.3.uploaded');
   },
-  allExcluded: async ({ page, excludeLibrary }) => {
+  allExcluded: async ({ page, frame, excludeLibrary }) => {
     if (!excludeLibrary?.length) return;
     for (const imagePath of excludeLibrary) {
-      await uploadExcludedImage(page, imagePath);
+      const uploaded = await uploadExcludedImage(page, imagePath);
+      if (!uploaded) {
+        throw new Error(`excludeLibrary upload failed: ${imagePath}`);
+      }
       await page.waitForTimeout(500);
     }
+    await focusLastParagraphEnd(frame);
     log.info('allExcluded.uploaded', { count: excludeLibrary.length });
   },
-  spacing: async ({ page }) => {
+  spacing: async ({ page, frame }) => {
+    await focusLastParagraphEnd(frame);
     await addSpacing(page);
   },
   excludeLibraryLinks: async ({ page, frame, excludeLibraryLink }) => {

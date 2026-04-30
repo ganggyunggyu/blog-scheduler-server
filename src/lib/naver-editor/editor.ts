@@ -735,12 +735,28 @@ export const applyFontColorWhite = async (
 
 export const setFontColorWhite = async (page: Page, frame: Frame): Promise<boolean> => {
   try {
-    await page.keyboard.press('Meta+a');
+    await removeEditorOverlays(frame);
+    await page.waitForTimeout(200);
+
+    const selected = await selectAllTextParagraphs(frame);
+    if (!selected) {
+      const focused = await focusFirstTextParagraph(frame);
+      if (!focused) {
+        return false;
+      }
+
+      await page.waitForTimeout(300);
+      await page.keyboard.press('Meta+a');
+      await page.waitForTimeout(300);
+      await page.keyboard.press('Meta+a');
+    }
+
     await page.waitForTimeout(300);
 
     return await applyFontColorWhite(page, frame);
-  } catch {
-    log.warn('fontColor.white.failed');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    log.warn('fontColor.white.failed', { message });
   }
   return false;
 };

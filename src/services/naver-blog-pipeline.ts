@@ -69,3 +69,21 @@ export const getContentPipeline = ({
 
   return [...pipeline];
 };
+
+interface ContentImagesForBlockOptions {
+  manuscriptType?: ManuscriptType;
+  block: ContentBlock;
+  normalImages: string[];
+}
+
+export const getContentImagesForBlock = ({
+  manuscriptType,
+  block,
+  normalImages,
+}: ContentImagesForBlockOptions): string[] => {
+  if (manuscriptType === 'alibaba' && block === 'content') {
+    return [];
+  }
+
+  return normalImages;
+};
