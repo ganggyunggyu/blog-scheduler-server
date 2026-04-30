@@ -1,7 +1,7 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { SELECTORS } from '../../src/constants/selectors.js';
-import { forceTextComponentsFontColorWhite, setAlignCenter } from '../../src/lib/naver-editor/editor.js';
+import { forceTextComponentsFontColorWhite, setAlignCenter, setFontColorWhite } from '../../src/lib/naver-editor/editor.js';
 
 const createMockPage = () => {
   const events: string[] = [];
@@ -116,4 +116,21 @@ test('forceTextComponentsFontColorWhite: DOM fallback 적용 개수를 반환함
   const result = await forceTextComponentsFontColorWhite(frame as never);
 
   assert.equal(result, 4);
+});
+
+test('setFontColorWhite: 에디터 모델 저장을 위해 키보드 전체 선택을 우선 사용함', async () => {
+  const page = createMockPage();
+  const frame = createMockFrame(page.getEvents(), [
+    undefined,
+    true,
+    12,
+    true,
+    true,
+    5,
+  ]);
+
+  const result = await setFontColorWhite(page as never, frame as never);
+
+  assert.equal(result, true);
+  assert.equal(page.getEvents().filter((event) => event === 'press:Meta+a').length, 2);
 });

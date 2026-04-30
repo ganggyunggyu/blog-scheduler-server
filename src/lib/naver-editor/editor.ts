@@ -118,6 +118,30 @@ const selectAllTextParagraphs = async (frame: FrameController): Promise<boolean>
   return true;
 };
 
+const selectAllTextParagraphsByKeyboard = async (
+  page: PageController,
+  frame: FrameController
+): Promise<boolean> => {
+  const focused = await focusFirstTextParagraph(frame);
+  if (!focused || !page.keyboard) {
+    log.warn('fontColor.white.keyboardSelect.failed');
+    return false;
+  }
+
+  await page.waitForTimeout(300);
+  await page.keyboard.press('Meta+a');
+  await page.waitForTimeout(300);
+  await page.keyboard.press('Meta+a');
+  await page.waitForTimeout(300);
+
+  const selectedLength = await frame.evaluate(() => {
+    return window.getSelection()?.toString().replace(/\s+/g, '').length ?? 0;
+  });
+
+  log.info('fontColor.white.keyboardSelect.ready', { selectedLength });
+  return true;
+};
+
 const getAlignmentStatus = async (frame: FrameController): Promise<AlignmentStatus> => {
   return frame.evaluate(() => {
     const textComponents = Array.from(
@@ -767,15 +791,10 @@ export const setFontColorWhite = async (page: Page, frame: Frame): Promise<boole
     await removeEditorOverlays(frame);
     await page.waitForTimeout(200);
 
-    const selected = await selectAllTextParagraphs(frame);
+    const selected = await selectAllTextParagraphsByKeyboard(page, frame);
     if (!selected) {
-      const focused = await focusFirstTextParagraph(frame);
-      if (focused) {
-        await page.waitForTimeout(300);
-        await page.keyboard.press('Meta+a');
-        await page.waitForTimeout(300);
-        await page.keyboard.press('Meta+a');
-      } else {
+      const domSelected = await selectAllTextParagraphs(frame);
+      if (!domSelected) {
         log.warn('fontColor.white.selection.failed');
       }
     }
