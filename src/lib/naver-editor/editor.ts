@@ -733,6 +733,35 @@ export const applyFontColorWhite = async (
   return true;
 };
 
+export const forceTextComponentsFontColorWhite = async (frame: FrameController): Promise<number> => {
+  const updated = await frame.evaluate(() => {
+    const textComponents = Array.from(
+      document.querySelectorAll<HTMLElement>('.se-component.se-text:not(.se-documentTitle)')
+    );
+
+    let count = 0;
+    for (const component of textComponents) {
+      const textNodes = component.querySelectorAll<HTMLElement>(
+        'p.se-text-paragraph, p.se-text-paragraph span, p.se-text-paragraph b, p.se-text-paragraph i, p.se-text-paragraph u'
+      );
+
+      for (const node of textNodes) {
+        if ((node.textContent?.replace(/\s+/g, '') ?? '').length === 0) {
+          continue;
+        }
+
+        node.style.color = 'rgb(255, 255, 255)';
+        count += 1;
+      }
+    }
+
+    return count;
+  });
+
+  log.info('fontColor.white.dom.applied', { updated });
+  return updated;
+};
+
 export const setFontColorWhite = async (page: Page, frame: Frame): Promise<boolean> => {
   try {
     await removeEditorOverlays(frame);
@@ -741,19 +770,21 @@ export const setFontColorWhite = async (page: Page, frame: Frame): Promise<boole
     const selected = await selectAllTextParagraphs(frame);
     if (!selected) {
       const focused = await focusFirstTextParagraph(frame);
-      if (!focused) {
-        return false;
+      if (focused) {
+        await page.waitForTimeout(300);
+        await page.keyboard.press('Meta+a');
+        await page.waitForTimeout(300);
+        await page.keyboard.press('Meta+a');
+      } else {
+        log.warn('fontColor.white.selection.failed');
       }
-
-      await page.waitForTimeout(300);
-      await page.keyboard.press('Meta+a');
-      await page.waitForTimeout(300);
-      await page.keyboard.press('Meta+a');
     }
 
     await page.waitForTimeout(300);
 
-    return await applyFontColorWhite(page, frame);
+    const toolbarApplied = await applyFontColorWhite(page, frame);
+    const forcedCount = await forceTextComponentsFontColorWhite(frame);
+    return toolbarApplied || forcedCount > 0;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     log.warn('fontColor.white.failed', { message });

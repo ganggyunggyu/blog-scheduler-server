@@ -269,6 +269,19 @@ const executeContentPipeline = async (
   }
 };
 
+const applyFinalAlibabaWhiteText = async (
+  page: Page,
+  frame: Frame,
+  manuscriptType?: ManuscriptType
+): Promise<void> => {
+  if (manuscriptType !== 'alibaba') {
+    return;
+  }
+
+  const applied = await setFontColorWhite(page, frame);
+  log.info('whiteText.final.applied', { applied });
+};
+
 // ============================================================
 // Write Post
 // ============================================================
@@ -325,6 +338,8 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
 
     await dismissPopups(frame);
     await setAlignCenter(page, frame);
+    await page.waitForTimeout(500);
+    await applyFinalAlibabaWhiteText(page, frame, manuscriptType);
     await page.waitForTimeout(500);
 
     await dismissPopups(frame);
@@ -407,6 +422,8 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
 
     await dismissPopups(frame);
     await setAlignCenter(page, frame);
+    await page.waitForTimeout(500);
+    await applyFinalAlibabaWhiteText(page, frame, manuscriptType);
     await page.waitForTimeout(500);
 
     await dismissPopups(frame);

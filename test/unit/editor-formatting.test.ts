@@ -1,7 +1,7 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { SELECTORS } from '../../src/constants/selectors.js';
-import { setAlignCenter } from '../../src/lib/naver-editor/editor.js';
+import { forceTextComponentsFontColorWhite, setAlignCenter } from '../../src/lib/naver-editor/editor.js';
 
 const createMockPage = () => {
   const events: string[] = [];
@@ -107,4 +107,13 @@ test('setAlignCenter: toolbar 정렬이 모두 실패하면 DOM fallback으로 �
   assert.equal(result, true);
   assert.equal(page.getEvents().includes('click:align-dropdown'), true);
   assert.equal(page.getEvents().includes('click:align-center'), true);
+});
+
+test('forceTextComponentsFontColorWhite: DOM fallback 적용 개수를 반환함', async () => {
+  const events: string[] = [];
+  const frame = createMockFrame(events, [4]);
+
+  const result = await forceTextComponentsFontColorWhite(frame as never);
+
+  assert.equal(result, 4);
 });
