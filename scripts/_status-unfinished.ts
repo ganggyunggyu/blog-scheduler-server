@@ -4,7 +4,7 @@ import { ScheduleModel, ScheduleJobModel } from '../src/schemas/schedule.schema'
 
 const main = async () => {
   await mongoose.connect(process.env.MONGO_URI!);
-  const today = '2026-04-30';
+  const today = process.argv[2] || '2026-04-30';
 
   const unfinished = await ScheduleJobModel.find({
     scheduledAt: { $regex: `^${today}` },
