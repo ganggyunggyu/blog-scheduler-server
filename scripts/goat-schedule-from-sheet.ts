@@ -175,6 +175,123 @@ const shuffleKeywords = (keywords: string[], seedValue: string): string[] => {
   return copied;
 };
 
+const MAIN_KEYWORD_ROOTS = [
+  '비타민b12',
+  '십전대보탕',
+  '보중익기탕',
+  '레이노증후군',
+  '당화혈색소',
+  '중성지방',
+  '수족냉증',
+  '혈액순환',
+  '소양인',
+  '소음인',
+  '임산부',
+  '흑염소',
+  '염소즙',
+  '관절',
+  '빈혈',
+  '손발',
+  '손끝',
+  '당뇨',
+  '간수치',
+  '숙취',
+  '면역력',
+  '입맛',
+  '감초',
+  '키성장',
+  '뼈',
+  '위',
+  '눈떨림',
+  '콜레스테롤',
+  '고콜레스테롤',
+  '마그네슘',
+] as const;
+
+const ROOT_SUFFIXES = [
+  '에좋은영양제',
+  '에좋은음식',
+  '에좋은식품',
+  '좋은영양제',
+  '좋은음식',
+  '좋은식품',
+  '좋은차',
+  '영양제',
+  '효능부작용',
+  '효능',
+  '효과',
+  '복용법',
+  '먹는법',
+  '부작용',
+  '정상수치',
+  '낮추는법',
+  '낮추기',
+  '수치',
+  '원인',
+  '치료음식',
+  '음식추천',
+  '추천',
+  '선물',
+  '방법',
+  '특징',
+  '식단',
+  '음식',
+] as const;
+
+const normalizeKeywordForRoot = (keyword: string): string =>
+  keyword.replace(/\s+/g, '').toLowerCase();
+
+const getMainKeywordRoot = (keyword: string): string => {
+  const normalized = normalizeKeywordForRoot(keyword);
+  const explicitRoot = MAIN_KEYWORD_ROOTS.find((root) => normalized.includes(root));
+
+  if (explicitRoot) {
+    return explicitRoot;
+  }
+
+  let root = normalized;
+  for (const suffix of ROOT_SUFFIXES) {
+    if (root.endsWith(suffix) && root.length > suffix.length) {
+      root = root.slice(0, -suffix.length);
+      break;
+    }
+  }
+
+  return root || normalized;
+};
+
+const assignDiversifiedKeywords = (
+  accounts: ResolvedAccount[],
+  keywords: string[],
+  neededPerAccount: number,
+): Array<ResolvedAccount & { keywords: string[] }> => {
+  const assigned = accounts.map((account) => ({
+    ...account,
+    keywords: [] as string[],
+    rootSet: new Set<string>(),
+  }));
+  const remaining = [...keywords];
+
+  for (let round = 0; round < neededPerAccount; round += 1) {
+    for (const account of assigned) {
+      const keywordIndex = remaining.findIndex((keyword) => {
+        const root = getMainKeywordRoot(keyword);
+        return !account.rootSet.has(root);
+      });
+
+      if (keywordIndex < 0) {
+        throw new Error(`not enough diversified keywords for ${account.displayName}`);
+      }
+
+      const [keyword] = remaining.splice(keywordIndex, 1);
+      account.keywords.push(keyword);
+      account.rootSet.add(getMainKeywordRoot(keyword));
+    }
+  }
+
+  return assigned.map(({ rootSet: _rootSet, ...account }) => account);
+};
+
 const fetchSheetKeywords = async (): Promise<string[]> => {
   const response = await fetch(SHEET_CSV_URL, {
     headers: {
@@ -292,15 +409,8 @@ const main = async (): Promise<void> => {
       throw new Error(`not enough keywords: ${shuffledKeywords.length} < ${neededKeywords}`);
     }
 
-    const selectedKeywords = shuffledKeywords.slice(0, neededKeywords);
-    const assigned = accounts.map((account) => ({
-      ...account,
-      keywords: [] as string[],
-    }));
-
-    for (const [index, keyword] of selectedKeywords.entries()) {
-      assigned[index % assigned.length].keywords.push(keyword);
-    }
+    const assigned = assignDiversifiedKeywords(accounts, shuffledKeywords, neededPerAccount);
+    const selectedKeywords = assigned.flatMap((account) => account.keywords);
 
     const previews: PreviewAccount[] = assigned.map((account) => ({
       id: account.id,
