@@ -6,8 +6,8 @@ const main = async () => {
   await mongoose.connect(process.env.MONGO_URI!);
   const schedules = await ScheduleModel.find({
     accountId: 'k7d9x2m4',
-    service: 'pet-modify-redo',
-  }).sort({ createdAt: -1 }).limit(5).lean();
+    service: { $in: ['pet-modify-redo', 'pet-modify-k7d-fix'] },
+  }).sort({ createdAt: -1 }).limit(10).lean();
   for (const s of schedules) {
     const jobs = await ScheduleJobModel.find({ scheduleId: s._id }).lean();
     console.log(`schedule=${s._id} ref=${s.ref} status=${s.status}`);
