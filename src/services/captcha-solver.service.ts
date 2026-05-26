@@ -5,7 +5,7 @@ import { logger } from '../lib/logging/logger.js';
 
 const log = logger.child({ scope: 'Captcha' });
 
-const MODEL = 'gemini-3.1-flash-lite-preview';
+const MODEL = 'gemini-2.5-flash-lite';
 const MAX_ATTEMPTS = 3;
 const CAPTCHA_INPUT_DELAY_MS = 200;
 const PW_INPUT_DELAY_MS = 150;
