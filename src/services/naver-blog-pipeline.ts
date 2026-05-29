@@ -10,6 +10,7 @@ export type ContentBlock =
   | 'content'
   | 'excludeLibraryLinks'
   | 'spacing'
+  | 'bottomSpacing'
   | 'link'
   | 'multiImages'
   | 'whiteText';
@@ -37,7 +38,7 @@ export const ALIBABA_CONTENT_PIPELINE: ContentBlock[] = [
   'allExcluded',
   'spacing',
   'content',
-  'spacing',
+  'bottomSpacing',
   'multiImages',
   'whiteText',
 ];

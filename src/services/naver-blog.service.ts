@@ -230,6 +230,15 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await focusLastParagraphEnd(frame);
     await addSpacing(page);
   },
+  bottomSpacing: async ({ page, frame, multiImages }) => {
+    const imageCount =
+      (multiImages?.individual?.length ?? 0) +
+      (multiImages?.slide?.length ?? 0) +
+      (multiImages?.collage?.length ?? 0);
+    if (imageCount === 0) return;
+    await focusLastParagraphEnd(frame);
+    await addSpacing(page);
+  },
   excludeLibraryLinks: async ({ page, frame, excludeLibraryLink }) => {
     if (!excludeLibraryLink?.length) return;
     const result = await insertExcludeLibraryLinks(page, frame, excludeLibraryLink);

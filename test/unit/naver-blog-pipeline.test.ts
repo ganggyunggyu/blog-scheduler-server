@@ -28,7 +28,7 @@ test('getContentPipeline: default 파이프라인은 기존 순서 유지', () =
   ]);
 });
 
-test('getContentPipeline: 알리바바는 본문 뒤 하단 이미지 전 여백을 넣고 multiImages를 업로드함', () => {
+test('getContentPipeline: 알리바바는 본문 뒤 multiImages가 있을 때만 하단 여백을 넣고 업로드함', () => {
   assert.deepEqual(getContentPipeline({ manuscriptType: 'alibaba' }), ALIBABA_CONTENT_PIPELINE);
 });
 

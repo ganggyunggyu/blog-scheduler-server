@@ -166,7 +166,7 @@ const createAccountSchedule = async (account: AccountDoc): Promise<string> => {
   }).lean<{ _id: string; status: string }>();
 
   if (existing) {
-    await ScheduleJobModel.deleteMany({ scheduleId: existing._id, status: { $ne: 'publishing' } });
+    await ScheduleJobModel.deleteMany({ scheduleId: existing._id });
     await ScheduleModel.findByIdAndUpdate(existing._id, {
       status: 'pending',
       completedJobs: 0,

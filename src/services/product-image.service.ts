@@ -28,6 +28,9 @@ export interface PreparedProductData {
 }
 
 const CATEGORY_RANDOM_CATEGORIES = ['한려담원'];
+const ALIBABA_IMAGE_FALLBACK_BY_BLOG_ID = new Map([
+  ['mad1651', { blogId: 'weed3122', blogName: '알리바바 신규4' }],
+]);
 
 export interface ProductDataOptions {
   keyword: string;
@@ -221,7 +224,28 @@ export const prepareProductImages = async ({
   imagesDir,
   ...productDataOptions
 }: PrepareProductImagesOptions): Promise<PreparedProductData> => {
-  const data = await getProductData(productDataOptions);
+  let data = await getProductData(productDataOptions);
+
+  if (
+    productDataOptions.manuscriptType === 'alibaba' &&
+    productDataOptions.blogId &&
+    ALIBABA_IMAGE_FALLBACK_BY_BLOG_ID.has(productDataOptions.blogId) &&
+    ((data.bodyImages.length === 0) || (data.excludeLibrary.length === 0))
+  ) {
+    const fallback = ALIBABA_IMAGE_FALLBACK_BY_BLOG_ID.get(productDataOptions.blogId)!;
+    imageLog.warn('product.alibaba.fallback', {
+      keyword: productDataOptions.keyword,
+      fromBlogId: productDataOptions.blogId,
+      toBlogId: fallback.blogId,
+      body: data.bodyImages.length,
+      excludeLibrary: data.excludeLibrary.length,
+    });
+    data = await getProductData({
+      ...productDataOptions,
+      blogId: fallback.blogId,
+      blogName: fallback.blogName,
+    });
+  }
 
   const bodyImages = await downloadImagesToDir(data.bodyImages, imagesDir);
 
