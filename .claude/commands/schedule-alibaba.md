@@ -14,7 +14,7 @@
 운영 메모:
 - 알리바바 원고는 `/generate/blog-filler` 엔드포인트로 생성됨
 - `schedule_mode`는 요청에 뭘 보내든 서버(`resolveScheduleMode`)가 `3`으로 강제함
-- 에디터 파이프라인은 `ALIBABA_CONTENT_PIPELINE` (라이브러리제외 → spacing → content → whiteText)
+- 에디터 파이프라인은 `ALIBABA_CONTENT_PIPELINE` (라이브러리제외 → spacing → content → spacing → multiImages → whiteText)
 
 ## 실행 흐름
 

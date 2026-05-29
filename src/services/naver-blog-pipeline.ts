@@ -37,6 +37,8 @@ export const ALIBABA_CONTENT_PIPELINE: ContentBlock[] = [
   'allExcluded',
   'spacing',
   'content',
+  'spacing',
+  'multiImages',
   'whiteText',
 ];
 
