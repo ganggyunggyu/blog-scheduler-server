@@ -38,7 +38,7 @@ const scheduleItemSchema = z.object({
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
-      account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
+      account: z.object({ id: z.string(), password: z.string().optional(), blogId: z.string().optional() }),
       keywords: z.array(z.string()),
       items: z.array(scheduleItemSchema).optional(),
       blog_name: z.string().optional(),
@@ -69,6 +69,26 @@ interface QueueAccount {
   password: string;
   blogId?: string;
 }
+
+const resolveQueueAccount = async (
+  account: { id: string; password?: string; blogId?: string },
+): Promise<{ account: QueueAccount; blogName?: string }> => {
+  const matchedAccount = await findAccountById(account.id);
+  const password = account.password ?? matchedAccount?.password;
+
+  if (!password) {
+    throw new Error(`Account credentials not provided: ${account.id}`);
+  }
+
+  return {
+    account: {
+      id: account.id,
+      password,
+      blogId: account.blogId ?? matchedAccount?.blogId,
+    },
+    blogName: matchedAccount?.name,
+  };
+};
 
 interface ScheduleQueueJob {
   _id: unknown;
@@ -338,17 +358,17 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       return reply.status(400).send({ message: 'Account mismatch' });
     }
 
-    const matchedAccount = body.account.password
-      ? null
-      : await findAccountById(body.account.id);
+    const matchedAccount = await findAccountById(body.account.id);
 
-    if (!body.account.password && !matchedAccount) {
+    const password = body.account.password ?? matchedAccount?.password;
+
+    if (!password) {
       return reply.status(400).send({ message: 'Account credentials not found' });
     }
 
     const account = {
       id: body.account.id,
-      password: body.account.password ?? matchedAccount!.password,
+      password,
       blogId: body.account.blogId ?? matchedAccount?.blogId,
     };
 
@@ -408,8 +428,8 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       jobs: Array<{ id: string; keyword: string; scheduledAt: string; slot: number }>;
     }> = [];
 
-    const preparedQueues = await Promise.all(body.queues.map(async (queue) => {
-      const matchedAccount = await findAccountById(queue.account.id);
+    const preparedQueuesResult = await Promise.all(body.queues.map(async (queue) => {
+      const resolved = await resolveQueueAccount(queue.account);
       const items = queue.items?.map((item) => ({
         keyword: item.keyword,
         category: item.category,
@@ -424,16 +444,29 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
       return {
         queue,
-        blogName: queue.blog_name || matchedAccount?.name,
+        account: resolved.account,
+        blogName: queue.blog_name || resolved.blogName,
         items,
       };
-    }));
+    })).then(
+      (queues) => ({ ok: true as const, queues }),
+      (error: unknown) => ({
+        ok: false as const,
+        message: error instanceof Error ? error.message : String(error),
+      }),
+    );
+
+    if (!preparedQueuesResult.ok) {
+      return { success: false, message: preparedQueuesResult.message };
+    }
+
+    const preparedQueues = preparedQueuesResult.queues;
 
     let totalJobs = 0;
 
-    for (const { queue, blogName, items } of preparedQueues) {
+    for (const { queue, account, blogName, items } of preparedQueues) {
       const { schedule, jobs, reused } = await createSchedule({
-        accountId: queue.account.id,
+        accountId: account.id,
         service: body.service,
         ref: body.ref,
         scheduleDate: body.schedule_date,
@@ -457,7 +490,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
       totalJobs += jobs.length;
 
-      const accountGenerateQueue = getGenerateQueue(queue.account.id);
+      const accountGenerateQueue = getGenerateQueue(account.id);
 
       for (const jobItem of jobs) {
         await enqueueScheduleGenerateJob({
@@ -471,7 +504,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
             slot: jobItem.slot,
             status: jobItem.status,
           },
-          account: queue.account,
+          account,
           service: body.service,
           ref: body.ref,
           generateImages: body.generate_images,
@@ -486,7 +519,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
       results.push({
         scheduleId: String(schedule._id),
-        account: maskAccountId(queue.account.id),
+        account: maskAccountId(account.id),
         reused,
         totalJobs: jobs.length,
         jobs: jobs.map((jobItem: { _id: unknown; keyword: string; scheduledAt: string; slot: number }) => ({
@@ -504,7 +537,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 const updateCompatSchema = z.object({
   queues: z.array(
     z.object({
-      account: z.object({ id: z.string(), password: z.string(), blogId: z.string().optional() }),
+      account: z.object({ id: z.string(), password: z.string().optional(), blogId: z.string().optional() }),
       keywords: z.array(z.string()),
       manuscripts: z.array(z.object({
         title: z.string().min(1),
@@ -544,7 +577,8 @@ const updateCompatSchema = z.object({
         };
       }
 
-      const auth = await getValidCookies(queue.account.id, queue.account.password);
+      const resolved = await resolveQueueAccount(queue.account);
+      const auth = await getValidCookies(resolved.account.id, resolved.account.password);
 
       let posts: Array<{ logNo: string; title: string; index: number }>;
       let blogId: string;
@@ -572,7 +606,7 @@ const updateCompatSchema = z.object({
       const keywordsToUse = queue.keywords.slice(0, posts.length);
       const jobsToCreate: Array<{ logNo: string; title: string; keyword: string; index: number }> = [];
 
-      const accountGenerateQueue = getGenerateQueue(queue.account.id);
+      const accountGenerateQueue = getGenerateQueue(resolved.account.id);
 
       for (let i = 0; i < posts.length && i < keywordsToUse.length; i++) {
         const post = posts[i];
@@ -580,7 +614,7 @@ const updateCompatSchema = z.object({
         const keyword = parsedKeyword.keyword;
         const identity = buildAdhocGenerateIdentity({
           mode: 'update',
-          accountId: queue.account.id,
+          accountId: resolved.account.id,
           blogId,
           logNo: post.logNo,
           keyword,
@@ -598,7 +632,7 @@ const updateCompatSchema = z.object({
           scheduleJobId: identity.scheduleJobId,
           keyword,
           category: parsedKeyword.category,
-          account: { ...queue.account, blogId },
+          account: { ...resolved.account, blogId },
           service: body.service,
           ref: body.ref,
           generateImages: body.generate_images,
@@ -710,7 +744,12 @@ const linkUpdateSchema = z.object({
     for (const [blogId, accountPairs] of grouped) {
       const { matchedAccount } = accountPairs[0];
       const blogName = matchedAccount.name;
-      const account = { id: matchedAccount!.id, password: matchedAccount!.password, blogId };
+      if (!matchedAccount.password) {
+        return reply.status(400).send({
+          message: `DB 계정에 실행 비밀번호가 없음: ${blogId}`,
+        });
+      }
+      const account = { id: matchedAccount.id, password: matchedAccount.password, blogId };
       const accountGenerateQueue = getGenerateQueue(account.id);
       const scheduledAt = new Date().toISOString();
       const preparedPairs = prepareLinkUpdatePairs(accountPairs, scheduledAt);
@@ -821,7 +860,12 @@ const linkUpdateSchema = z.object({
 
     for (const [blogId, accountPairs] of grouped) {
       const { matchedAccount } = accountPairs[0];
-      const account = { id: matchedAccount!.id, password: matchedAccount!.password, blogId };
+      if (!matchedAccount?.password) {
+        return reply.status(400).send({
+          message: `DB 계정에 실행 비밀번호가 없음: ${blogId}`,
+        });
+      }
+      const account = { id: matchedAccount.id, password: matchedAccount.password, blogId };
       const accountGenerateQueue = getGenerateQueue(account.id);
 
       const jobsList: Array<{ logNo: string }> = [];

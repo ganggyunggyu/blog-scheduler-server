@@ -1,21 +1,22 @@
 import mongoose, { Schema, type FilterQuery, type Model } from 'mongoose';
 
-const ACCOUNT_DIRECTORY_DB_NAME = 'cafe-bot';
-const ACCOUNT_DIRECTORY_COLLECTION_NAME = 'accounts';
+const ACCOUNT_DIRECTORY_COLLECTION_NAME = 'blogaccounts';
 const ACCOUNT_DIRECTORY_MODEL_NAME = 'AccountDirectory';
 
-interface AccountDirectoryRecord {
+export interface AccountDirectoryRecord {
   accountId?: string;
   password?: string;
   nickname?: string;
   blogId?: string;
   category?: string;
-  isActive?: boolean;
+  isEnabled?: boolean;
+  status?: string;
+  note?: string;
 }
 
 export interface ResolvedAccount {
   id: string;
-  password: string;
+  password?: string;
   name: string;
   blogId?: string;
   category?: string;
@@ -28,7 +29,9 @@ const accountDirectorySchema = new Schema<AccountDirectoryRecord>(
     nickname: String,
     blogId: String,
     category: String,
-    isActive: Boolean,
+    isEnabled: Boolean,
+    status: String,
+    note: String,
   },
   {
     collection: ACCOUNT_DIRECTORY_COLLECTION_NAME,
@@ -38,14 +41,13 @@ const accountDirectorySchema = new Schema<AccountDirectoryRecord>(
 );
 
 const getAccountDirectoryModel = (): Model<AccountDirectoryRecord> => {
-  const accountDb = mongoose.connection.useDb(ACCOUNT_DIRECTORY_DB_NAME, { useCache: true });
-  const existingModel = accountDb.models[ACCOUNT_DIRECTORY_MODEL_NAME] as Model<AccountDirectoryRecord> | undefined;
+  const existingModel = mongoose.models[ACCOUNT_DIRECTORY_MODEL_NAME] as Model<AccountDirectoryRecord> | undefined;
 
   if (existingModel) {
     return existingModel;
   }
 
-  return accountDb.model<AccountDirectoryRecord>(
+  return mongoose.model<AccountDirectoryRecord>(
     ACCOUNT_DIRECTORY_MODEL_NAME,
     accountDirectorySchema,
   );
@@ -55,8 +57,8 @@ export const buildAccountLookupQuery = (identity: string): FilterQuery<AccountDi
   $and: [
     {
       $or: [
-        { isActive: { $exists: false } },
-        { isActive: true },
+        { isEnabled: { $exists: false } },
+        { isEnabled: true },
       ],
     },
     {
@@ -72,7 +74,7 @@ export const buildAccountLookupQuery = (identity: string): FilterQuery<AccountDi
 export const mapAccountRecord = (
   record: AccountDirectoryRecord | null | undefined,
 ): ResolvedAccount | null => {
-  if (!record?.accountId || !record.password) {
+  if (!record?.accountId) {
     return null;
   }
 
@@ -99,4 +101,23 @@ export const findAccountById = async (identity: string): Promise<ResolvedAccount
     .exec();
 
   return mapAccountRecord(record);
+};
+
+export const listManagedBlogAccounts = async (): Promise<ResolvedAccount[]> => {
+  const accountDirectoryModel = getAccountDirectoryModel();
+  const records = await accountDirectoryModel
+    .find({
+      $or: [
+        { isEnabled: { $exists: false } },
+        { isEnabled: true },
+      ],
+    })
+    .sort({ category: 1, nickname: 1, accountId: 1 })
+    .lean<AccountDirectoryRecord[]>()
+    .exec();
+
+  return records.flatMap((record) => {
+    const account = mapAccountRecord(record);
+    return account ? [account] : [];
+  });
 };

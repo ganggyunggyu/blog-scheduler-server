@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { ScheduleModel, ScheduleJobModel } from '../src/schemas/schedule.schema.js';
+import { listManagedBlogAccounts } from '../src/services/account-directory.service.js';
 
 const TARGET_DATE_ARG = process.argv[2];
 const TODAY = TARGET_DATE_ARG ? new Date(`${TARGET_DATE_ARG}T00:00:00+09:00`) : new Date();
@@ -69,17 +70,11 @@ const countRemainingScheduled = async (accountId: string): Promise<number> => {
 
 const main = async () => {
   await mongoose.connect(process.env.MONGO_URI!);
-  const cafeDb = mongoose.connection.useDb('cafe-bot');
-  const accountCol = cafeDb.collection('accounts');
-  const docs = await accountCol
-    .find({ isActive: { $ne: false }, category: { $exists: true, $nin: ['', null] } })
-    .toArray();
-
-  const accounts: Account[] = docs.map((d) => ({
-    accountId: d.accountId as string,
-    nickname: (d.nickname as string) || (d.accountId as string),
-    blogId: (d.blogId as string) || (d.accountId as string),
-    category: (d.category as string) || '-',
+  const accounts: Account[] = (await listManagedBlogAccounts()).map((account) => ({
+    accountId: account.id,
+    nickname: account.name,
+    blogId: account.blogId || account.id,
+    category: account.category || '-',
   }));
 
   const results: VerifyResult[] = [];
