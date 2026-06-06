@@ -29,6 +29,7 @@ export interface GenerateJobData {
   keywordCategory?: string;
   blogName?: string;
   providedManuscript?: ProvidedManuscript;
+  imageDateCode?: string;
 }
 
 const log = logger.child({ scope: 'Generate' });
@@ -95,6 +96,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     keywordCategory: providedCategory,
     blogName,
     providedManuscript,
+    imageDateCode,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
 
@@ -141,7 +143,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
 
       const blogId = account.blogId || account.id;
       const keywordCategory = providedCategory || await getCategory(keyword);
-      const dateCodeForImages = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
+      const dateCodeForImages = imageDateCode ?? scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
       const productData = await prepareProductImages({
         keyword,
         imagesDir,
@@ -212,7 +214,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     if (imageSource === 'product') {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const blogId = account.blogId || account.id;
-      const dateCodeForProduct = scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
+      const dateCodeForProduct = imageDateCode ?? scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
       productData = await prepareProductImages({
         keyword,
         imagesDir,

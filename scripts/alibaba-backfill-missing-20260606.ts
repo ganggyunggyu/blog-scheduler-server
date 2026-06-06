@@ -7,12 +7,13 @@ import { getGenerateQueue, getPublishQueue, closeAllQueues } from '../src/queues
 import { closeBrowser } from '../src/lib/browser/playwright.js';
 import { redis } from '../src/config/redis.js';
 
-const SERVICE = 'alibaba-backfill-missing-20260606';
-const REF = 'keyword-plan-unpublished-backfill';
+const SERVICE = 'alibaba-backfill-rescue-20260606';
+const REF = 'keyword-plan-unpublished-backfill-0606-images';
 const CATEGORY = '기타';
 const IMAGE_COUNT = 5;
 const DELAY_BETWEEN_POSTS_SECONDS = 180;
-const MIN_START_AT = '2026-06-06T19:30:00+09:00';
+const MIN_START_AT = '2026-06-06T22:00:00+09:00';
+const IMAGE_DATE_CODE = '0606';
 const GAP_MINUTES = 35;
 const ACCOUNT_STAGGER_MINUTES = 5;
 const MONITOR_INTERVAL_MS = 30_000;
@@ -247,6 +248,7 @@ const enqueueAccount = async (
       generateImages: true,
       imageCount: IMAGE_COUNT,
       imageSource: 'product',
+      imageDateCode: IMAGE_DATE_CODE,
       manuscriptType: 'alibaba',
       delayBetweenPostsSeconds: DELAY_BETWEEN_POSTS_SECONDS,
       scheduledAt,
