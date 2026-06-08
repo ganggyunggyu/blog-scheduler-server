@@ -17,32 +17,16 @@ const GROUP_135_PATH = '/Users/ganggyunggyu/Downloads/알리바ᄇ�
 const STATE_PATH = path.join(process.cwd(), 'data', 'alibaba-delete-excess-after-june-state.json');
 const PREVIOUSLY_DELETED_LOGNOS = [
   '224303795390',
-  '224305136715',
-  '224305133219',
-  '224307762416',
-  '224307747730',
-  '224305567427',
-  '224305554565',
-  '224307748487',
-  '224307757233',
-  '224307828980',
-  '224307829157',
-  '224307834755',
-  '224307870378',
-  '224307853656',
-  '224307885334',
-  '224307844983',
-  '224307875299',
-  '224307869906',
-  '224303800996',
-  '224303809995',
-  '224307951484',
-  '224305563010',
 ];
 
 const GROUP_246 = ['mad1651', 'weed3122', 'individual14144'];
 const GROUP_135 = ['crvfwy7062', 'heavymouse448', 'rqr1io45'];
-const ACCOUNT_IDS = [...GROUP_135, ...GROUP_246];
+const ALL_ACCOUNT_IDS = [...GROUP_135, ...GROUP_246];
+const ACCOUNT_FILTER = new Set((process.env.ACCOUNT_FILTER ?? '').split(',').map((value) => value.trim()).filter(Boolean));
+const ACCOUNT_IDS = ACCOUNT_FILTER.size > 0
+  ? ALL_ACCOUNT_IDS.filter((accountId) => ACCOUNT_FILTER.has(accountId))
+  : ALL_ACCOUNT_IDS;
+const DELETE_LIMIT = Number(process.env.DELETE_LIMIT ?? '0');
 
 interface AccountDoc {
   accountId: string;
@@ -388,23 +372,37 @@ const deletePost = async (page: Page, blogId: string, logNo: string): Promise<bo
   const frame = await waitForFrame(page, 'mainFrame', 30_000);
   await sleep(1000);
 
-  const result = await frame.evaluate(() => {
+  const result = await frame.evaluate((targetLogNo) => {
     window.confirm = () => true;
-    const menuButton = document.querySelector(
-      'button._open_overflowmenu, a._open_overflowmenu, [class*="_open_overflowmenu"], .se-module-more-button',
-    ) as HTMLElement | null;
-    menuButton?.click();
+    const deleteButton = [...document.querySelectorAll('a.btn_del._deletePost, a._deletePost')]
+      .find((element) => {
+        const className = String((element as HTMLElement).className || '');
+        const text = (element.textContent || '').trim();
+        return className.includes(`_param(${targetLogNo}|`) || text === '삭제하기';
+      }) as HTMLElement | undefined;
 
-    const directButtons = [...document.querySelectorAll('a, button, span')];
-    const deleteButton = directButtons.find((element) => (element.textContent || '').trim() === '삭제') as HTMLElement | undefined;
     deleteButton?.click();
-
     return Boolean(deleteButton);
-  });
+  }, logNo);
 
   if (!result) return deletePostFromManagement(page, blogId, logNo);
-  await sleep(3000);
-  return true;
+  await sleep(1000);
+
+  const confirmed = await frame.evaluate(() => {
+    const confirmButton = document.querySelector('a._deletePostConfirm') as HTMLElement | null;
+    confirmButton?.click();
+    return Boolean(confirmButton);
+  });
+
+  if (!confirmed) return false;
+  await sleep(4000);
+
+  const response = await fetch(`https://blog.naver.com/PostView.naver?blogId=${encodeURIComponent(blogId)}&logNo=${encodeURIComponent(logNo)}`, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' },
+    signal: AbortSignal.timeout(15_000),
+  });
+  const text = await response.text();
+  return response.status === 404 || !text.includes('btn_del _deletePost');
 };
 
 const deletePostFromManagement = async (page: Page, blogId: string, logNo: string): Promise<boolean> => {
@@ -481,11 +479,12 @@ const main = async (): Promise<void> => {
 
   const planned = await collectPlannedPosts(expectedByAccountDate);
   const deletedLogNos = await loadDeletedLogNos();
-  const toDelete = planned.filter((post) => !post.keep && !deletedLogNos.has(post.logNo));
+  const toDeleteAll = planned.filter((post) => !post.keep && !deletedLogNos.has(post.logNo));
+  const toDelete = DELETE_LIMIT > 0 ? toDeleteAll.slice(0, DELETE_LIMIT) : toDeleteAll;
   const toKeep = planned.filter((post) => post.keep);
 
   console.log(`\n=== 알리바바 6월 이후 초과 삭제 ${DRY_RUN ? 'DRY-RUN' : 'EXECUTE'} ===`);
-  console.log(`matched=${planned.length} keep=${toKeep.length} alreadyDeleted=${deletedLogNos.size} delete=${toDelete.length}`);
+  console.log(`matched=${planned.length} keep=${toKeep.length} alreadyDeleted=${deletedLogNos.size} delete=${toDelete.length}${DELETE_LIMIT > 0 ? ` limit=${DELETE_LIMIT}` : ''}`);
 
   for (const post of toDelete) {
     console.log(`[delete] ${post.nickname} ${post.date} ${post.logNo} ${post.keyword} | ${post.title.slice(0, 60)}`);
