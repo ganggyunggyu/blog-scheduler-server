@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { buildManuscriptRequest, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+import axios from 'axios';
+import { buildManuscriptRequest, generateImageUrls, prepareProvidedJob } from '../../src/services/manuscript.service.js';
 
 test('buildManuscriptRequest: default 는 blog-filler 엔드포인트를 사용함', () => {
   const result = buildManuscriptRequest('default', '강아지 산책', 'default', '');
@@ -69,4 +70,38 @@ test('prepareProvidedJob: 외부에서 만든 원고를 job 아티팩트로 저�
   };
   assert.equal(savedMeta.source, 'manual');
   assert.equal(savedMeta.manuscriptType, 'pet');
+});
+
+test('generateImageUrls: AI 생성 요청에 count 를 싣고 부족분을 보충함', async () => {
+  const originalPost = axios.post;
+  const bodies: Array<{ keyword?: string; category?: string; count?: number }> = [];
+
+  axios.post = (async (...args: Parameters<typeof axios.post>) => {
+    const body = args[1] as { keyword?: string; category?: string; count?: number };
+    bodies.push(body);
+
+    const offset = bodies.length === 1 ? 0 : 4;
+    const count = body.count ?? 0;
+    const returnedCount = bodies.length === 1 ? Math.max(0, count - 1) : count;
+
+    return {
+      data: {
+        images: Array.from({ length: returnedCount }, (_, index) => ({
+          url: `https://example.com/${offset + index + 1}.png`,
+        })),
+      },
+    } as Awaited<ReturnType<typeof axios.post>>;
+  }) as typeof axios.post;
+
+  try {
+    const images = await generateImageUrls('스핑크스', 5, '애견', 'ai');
+
+    assert.equal(images.length, 5);
+    assert.deepEqual(bodies, [
+      { keyword: '스핑크스', category: '애견', count: 5 },
+      { keyword: '스핑크스', category: '애견', count: 1 },
+    ]);
+  } finally {
+    axios.post = originalPost;
+  }
 });

@@ -192,16 +192,38 @@ const generateImageUrlsFromAI = async (
     source: 'ai',
   });
 
-  const response = await axios.post(
-    url,
-    { keyword, category: category ?? '' },
-    { timeout: 300000 }
-  );
+  const urls: string[] = [];
+  const maxAttempts = 3;
 
-  const urls = parseImageResponse(response.data);
+  for (let attempt = 1; urls.length < imageCount && attempt <= maxAttempts; attempt += 1) {
+    const requestedCount = imageCount - urls.length;
+    const response = await axios.post(
+      url,
+      { keyword, category: category ?? '', count: requestedCount },
+      { timeout: 300000 }
+    );
+
+    const nextUrls = parseImageResponse(response.data)
+      .filter((imageUrl) => !urls.includes(imageUrl));
+    urls.push(...nextUrls);
+
+    if (nextUrls.length === 0) {
+      break;
+    }
+
+    if (urls.length < imageCount) {
+      imageLog.warn('image.shortfall.retry', {
+        keyword,
+        requested: imageCount,
+        received: urls.length,
+        attempt,
+      });
+    }
+  }
+
   imageLog.info(progress.done('done'), { count: urls.length });
 
-  return urls;
+  return urls.slice(0, imageCount);
 };
 
 const generateImageUrlsFromGoogle = async (
