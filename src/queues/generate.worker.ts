@@ -234,13 +234,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         collage: productData.multiImages.collage?.length ?? 0,
       });
 
-      if (productData.bodyImages.length === 0 && manuscriptType === 'pet' && productData.excludeLibrary.length > 0) {
-        log.info('product.fallback.ai.skip', {
-          keyword,
-          reason: 'pet_exclude_library_only',
-          excludeLib: productData.excludeLibrary.length,
-        });
-      } else if (productData.bodyImages.length === 0) {
+      if (productData.bodyImages.length === 0) {
         productData.bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
         log.info('product.fallback.ai', { count: productData.bodyImages.length });
       }
@@ -260,13 +254,6 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
 
     const bodyImages = productData ? productData.bodyImages : prepared.images;
     if (bodyImages.length === 0) {
-      if (productData && manuscriptType === 'pet' && productData.excludeLibrary.length > 0) {
-        log.info('fallback.body.skip', {
-          keyword,
-          reason: 'pet_exclude_library_only',
-          excludeLib: productData.excludeLibrary.length,
-        });
-      } else {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const fallbackImages = await fetchBodyImagesFromAI(keyword, 5, imagesDir);
       if (fallbackImages.length === 0) {
@@ -284,7 +271,6 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
           prepared.images = fallbackImages;
         }
         log.info('fallback.body.s3', { count: fallbackImages.length });
-      }
       }
     }
 
