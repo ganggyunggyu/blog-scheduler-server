@@ -44,7 +44,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
   return { dir, imagesDir };
 };
 
-export type ImageSource = 'ai' | 'google' | 'keyword' | 'product';
+export type ImageSource = 'ai' | 'google' | 'keyword' | 'product' | 'local';
 export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
 
 interface ManuscriptEndpoint {
@@ -330,6 +330,9 @@ export const generateImageUrls = async (
     const { getProductData } = await import('./product-image.service.js');
     const data = await getProductData({ keyword, category });
     return data.bodyImages;
+  }
+  if (imageSource === 'local') {
+    return [];
   }
   const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
   return urls.map((url) => ({ url }));

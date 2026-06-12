@@ -22,7 +22,7 @@ export const createScheduleSchema = z.object({
   scheduleDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   generateImages: z.boolean().default(true),
   imageCount: z.number().min(1).max(10).default(5),
-  imageSource: z.enum(['ai', 'google', 'keyword', 'product']).default('ai'),
+  imageSource: z.enum(['ai', 'google', 'keyword', 'product', 'local']).default('ai'),
   manuscriptType: z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default'),
   delayBetweenPostsSeconds: z.number().min(0).max(600).default(10),
   keywordCategory: z.string().optional(),

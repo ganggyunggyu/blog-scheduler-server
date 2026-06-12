@@ -1,6 +1,7 @@
 import { format, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { buildScheduleRequestFingerprint } from './schedule-idempotency.service.js';
+import type { MultiImageData } from '../lib/naver-editor/image.js';
 
 export type ScheduleMode = '1' | '2' | '3' | '2121';
 const DEFAULT_LEAD_TIME_MINUTES = 60;
@@ -79,9 +80,11 @@ export interface CreateScheduleInput {
   imageCount: number;
   delayBetweenPostsSeconds: number;
   keywords: string[];
-  imageSource?: 'ai' | 'google' | 'keyword' | 'product';
+  imageSource?: 'ai' | 'google' | 'keyword' | 'product' | 'local';
   manuscriptType?: string;
   keywordCategory?: string;
+  manuscripts?: Array<{ title: string; content: string }>;
+  providedMultiImages?: MultiImageData[];
 }
 
 const randomBetween = (min: number, max: number): number =>
@@ -234,6 +237,8 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     manuscriptType: input.manuscriptType,
     keywordCategory: input.keywordCategory,
     scheduleTimingKey: buildScheduleTimingKey(timingOptions),
+    manuscripts: input.manuscripts,
+    providedMultiImages: input.providedMultiImages,
   });
 
   const existingSchedule = await ScheduleModel.findOne({

@@ -7,7 +7,7 @@
 | 항목 | 값 |
 |------|-----|
 | manuscript_type | `default` |
-| image_source | `product` |
+| image_source | 일반 생성 예약은 `product`, 최종 로컬 패키지는 `local` |
 | keyword_category | **모드별 분기 (아래)** |
 
 ## 파이프라인 모드 (keyword_category 값)
@@ -31,6 +31,7 @@
 - 제거: `[IMG] ...` 자리표시자와 단독 URL 줄은 본문 텍스트로 쓰지 않음
 - 제외: 지도, 전화, 외부 링크, 라이브러리제외 이미지/링크는 넣지 않음
 - `keyword_category: "안과브랜드"`는 에디터 파이프라인 키이며, 발행 카테고리는 서버에서 기본 `에스앤비 안과`로 분리 처리함
+- 최종 로컬 패키지 작업은 원고와 slide 이미지가 이미 있으므로 외부 원고/API 이미지 요청을 보내지 않고, `manuscripts`와 `multi_images`를 직접 넘김
 
 ## 키워드 관리 규칙
 
@@ -77,6 +78,8 @@
 
 ### 3단계: curl 명령어 생성
 
+일반 생성 예약은 기존처럼 `product` 이미지를 요청합니다.
+
 ```bash
 curl -X POST http://localhost:8001/bot/auto-schedule \
   -H "Content-Type: application/json" \
@@ -105,6 +108,51 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
 - 브랜드(adplan3th): `"안과브랜드"`
 
 이미지 수는 브랜드(adplan3th) 6장, 그 외 기존 안과 계정은 5장을 사용합니다.
+
+최종 로컬 패키지(`/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종`)는 원고와 이미지가 이미 있으므로 아래 조합으로 작성만 진행합니다.
+
+```json
+{
+  "queues": [
+    {
+      "account": { "id": "adplan3th", "password": "<runtime-password>" },
+      "keywords": ["고도근시 라식 가능할까 각막 얇을 때 시력교정 방법"],
+      "manuscripts": [
+        {
+          "title": "고도근시 라식 가능할까 각막 얇을 때 시력교정 방법",
+          "content": "<[모바일발행] 원고 전문>"
+        }
+      ],
+      "multi_images": [
+        {
+          "slide": [
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_01.png",
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_02.png",
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_03.png",
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_04.png",
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_05.png",
+            "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/9월/.../slide_06.png"
+          ]
+        }
+      ]
+    }
+  ],
+  "schedule_date": "{날짜 또는 생략}",
+  "schedule_mode": "{모드}",
+  "generate_images": false,
+  "image_count": 6,
+  "image_source": "local",
+  "manuscript_type": "default",
+  "delay_between_posts": 10,
+  "keyword_category": "안과브랜드"
+}
+```
+
+로컬 패키지 payload 규칙:
+- `manuscripts` 개수는 `keywords` 개수와 같아야 함
+- `multi_images` 개수도 `keywords` 개수와 같아야 함
+- 각 `slide`는 절대경로 `slide_01.png`부터 `slide_06.png` 순서로 넣음
+- 이 모드에서는 `MANUSCRIPT_API_URL`, `IMAGE_API_URL`로 원고/이미지 생성 요청을 보내지 않음
 
 ### 4단계: 로그 모니터링 (필수)
 
@@ -138,7 +186,7 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
 | 계정 | 계정명(ID) × N개 |
 | 총 키워드 | N개 |
 | 원고 | default |
-| 이미지 | product |
+| 이미지 | product 또는 local 최종 패키지 |
 | 모드 | N (하루 N개) |
 | 예상 소요일 | 계정별 키워드수 ÷ 모드 |
 

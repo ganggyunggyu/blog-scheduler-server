@@ -147,6 +147,44 @@ test('buildScheduleRequestFingerprint: 수동 원고가 다르면 fingerprint도
   assert.notEqual(first, second);
 });
 
+test('buildScheduleRequestFingerprint: 로컬 multiImages가 다르면 fingerprint도 달라짐', () => {
+  const first = buildScheduleRequestFingerprint({
+    accountId: 'adplan3th',
+    service: 'manual-local',
+    ref: 'eye-brand-final',
+    scheduleDate: '2026-06-12',
+    scheduleMode: '2',
+    generateImages: false,
+    imageCount: 6,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['고도근시라식'],
+    manuscripts: [{ title: '고도근시 라식', content: '본문' }],
+    providedMultiImages: [{ slide: ['/tmp/a/slide_01.png'] }],
+    imageSource: 'local',
+    manuscriptType: 'default',
+    keywordCategory: '안과브랜드',
+  });
+
+  const second = buildScheduleRequestFingerprint({
+    accountId: 'adplan3th',
+    service: 'manual-local',
+    ref: 'eye-brand-final',
+    scheduleDate: '2026-06-12',
+    scheduleMode: '2',
+    generateImages: false,
+    imageCount: 6,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['고도근시라식'],
+    manuscripts: [{ title: '고도근시 라식', content: '본문' }],
+    providedMultiImages: [{ slide: ['/tmp/b/slide_01.png'] }],
+    imageSource: 'local',
+    manuscriptType: 'default',
+    keywordCategory: '안과브랜드',
+  });
+
+  assert.notEqual(first, second);
+});
+
 test('buildScheduleGenerateJobId/buildSchedulePublishJobId: scheduleJob 기준 고정 job id를 생성함', () => {
   const generateJobId = buildScheduleGenerateJobId('job_123');
   const publishJobId = buildSchedulePublishJobId('job_123');

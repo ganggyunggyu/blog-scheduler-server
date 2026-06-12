@@ -1,6 +1,6 @@
 import { Job, UnrecoverableError } from 'bullmq';
 import path from 'path';
-import { prepareJob, prepareProvidedJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData, type ProvidedManuscript } from '../services/manuscript.service.js';
+import { prepareJob, prepareProvidedJob, prepareProductImages, generateAndDownloadAIImages, fetchBodyImagesFromAI, getCategory, type ImageSource, type ManuscriptType, type PreparedProductData, type ProvidedManuscript, type MultiImageData } from '../services/manuscript.service.js';
 import { lookupBlogUtmUrl } from '../services/google-sheets.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { getPublishQueue, drainAccountQueues } from './queue-manager.js';
@@ -10,6 +10,7 @@ import { assessLoginFailure } from '../services/login-failure.service.js';
 import { buildSchedulePublishJobId } from '../services/schedule-idempotency.service.js';
 import { logger } from '../lib/logging/logger.js';
 import { getFallbackSlideImageCount } from '../services/naver-blog-pipeline.js';
+import { buildProvidedProductData, hasMultiImageData, needsBodyImageFallback } from '../services/local-publish-assets.service.js';
 
 export interface GenerateJobData {
   scheduleId: string;
@@ -30,6 +31,7 @@ export interface GenerateJobData {
   keywordCategory?: string;
   blogName?: string;
   providedManuscript?: ProvidedManuscript;
+  providedMultiImages?: MultiImageData;
   imageDateCode?: string;
 }
 
@@ -97,6 +99,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     keywordCategory: providedCategory,
     blogName,
     providedManuscript,
+    providedMultiImages,
     imageDateCode,
   } = job.data;
   const maskedAccount = account.id.slice(0, 3) + '***';
@@ -211,8 +214,17 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     });
 
     // product 이미지: 모든 상품 이미지 다운로드
-    let productData: PreparedProductData | null = null;
-    if (imageSource === 'product') {
+    const hasProvidedImages = hasMultiImageData(providedMultiImages);
+    let productData: PreparedProductData | null = buildProvidedProductData(providedMultiImages);
+    if (productData) {
+      log.info('local.images.prepared', {
+        individual: productData.multiImages.individual?.length ?? 0,
+        slide: productData.multiImages.slide?.length ?? 0,
+        collage: productData.multiImages.collage?.length ?? 0,
+      });
+    }
+
+    if (imageSource === 'product' && !hasProvidedImages) {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const blogId = account.blogId || account.id;
       const dateCodeForProduct = imageDateCode ?? scheduledAt.slice(5, 7) + scheduledAt.slice(8, 10);
@@ -246,7 +258,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     log.info('category.resolved', { keyword, keywordCategory, source: providedCategory ? 'provided' : 'api' });
 
     const fallbackSlideImageCount = getFallbackSlideImageCount(keywordCategory);
-    if (fallbackSlideImageCount && productData && (!productData.multiImages.slide || productData.multiImages.slide.length === 0)) {
+    if (!hasProvidedImages && fallbackSlideImageCount && productData && (!productData.multiImages.slide || productData.multiImages.slide.length === 0)) {
       const slideDir = path.join(prepared.jobDir, 'images', 'slide');
       const fs = await import('fs/promises');
       await fs.mkdir(slideDir, { recursive: true });
@@ -255,7 +267,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     }
 
     const bodyImages = productData ? productData.bodyImages : prepared.images;
-    if (bodyImages.length === 0) {
+    if (needsBodyImageFallback({ keywordCategory, bodyImages, multiImages: productData?.multiImages }) && imageSource !== 'local') {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const fallbackImages = await fetchBodyImagesFromAI(keyword, 5, imagesDir);
       if (fallbackImages.length === 0) {

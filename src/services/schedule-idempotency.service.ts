@@ -15,6 +15,11 @@ interface ScheduleRequestFingerprintInput {
   keywordCategory?: string;
   scheduleTimingKey?: string;
   manuscripts?: Array<{ title: string; content: string }>;
+  providedMultiImages?: Array<{
+    individual?: string[];
+    slide?: string[];
+    collage?: string[];
+  }>;
 }
 
 interface AdhocGenerateIdentityInput {
@@ -46,6 +51,15 @@ const normalizeManuscripts = (
     content: manuscript.content.trim(),
   }));
 
+const normalizeMultiImages = (
+  imageGroups: ScheduleRequestFingerprintInput['providedMultiImages'] = [],
+): NonNullable<ScheduleRequestFingerprintInput['providedMultiImages']> =>
+  imageGroups.map((group) => ({
+    individual: group.individual?.map((image) => image.trim()).filter(Boolean) ?? [],
+    slide: group.slide?.map((image) => image.trim()).filter(Boolean) ?? [],
+    collage: group.collage?.map((image) => image.trim()).filter(Boolean) ?? [],
+  }));
+
 const buildBullJobId = (...parts: string[]): string =>
   parts.map((part) => part.trim()).filter(Boolean).join('_');
 
@@ -67,6 +81,7 @@ export const buildScheduleRequestFingerprint = (
     keywordCategory: input.keywordCategory ?? '',
     scheduleTimingKey: input.scheduleTimingKey ?? '',
     manuscripts: normalizeManuscripts(input.manuscripts),
+    providedMultiImages: normalizeMultiImages(input.providedMultiImages),
   };
 
   return `schreq_${hashPayload(normalized)}`;

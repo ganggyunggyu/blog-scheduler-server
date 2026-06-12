@@ -24,8 +24,9 @@ import {
   buildAdhocGenerateIdentity,
   buildScheduleGenerateJobId,
 } from '../services/schedule-idempotency.service.js';
+import type { MultiImageData } from '../lib/naver-editor/image.js';
 
-const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product']).default('ai');
+const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product', 'local']).default('ai');
 const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
@@ -35,12 +36,23 @@ const scheduleItemSchema = z.object({
   scheduledAt: z.string(),
   slot: z.number().int().min(1),
 });
+const providedManuscriptSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+});
+const multiImageDataSchema = z.object({
+  individual: z.array(z.string().min(1)).optional(),
+  slide: z.array(z.string().min(1)).optional(),
+  collage: z.array(z.string().min(1)).optional(),
+});
 
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
       account: z.object({ id: z.string(), password: z.string().optional(), blogId: z.string().optional() }),
       keywords: z.array(z.string()),
+      manuscripts: z.array(providedManuscriptSchema).optional(),
+      multi_images: z.array(multiImageDataSchema).optional(),
       items: z.array(scheduleItemSchema).optional(),
       blog_name: z.string().optional(),
     })
@@ -109,11 +121,13 @@ interface EnqueueScheduleGenerateJobInput {
   ref: string;
   generateImages: boolean;
   imageCount: number;
-  imageSource?: 'ai' | 'google' | 'keyword' | 'product';
+  imageSource?: 'ai' | 'google' | 'keyword' | 'product' | 'local';
   manuscriptType?: string;
   delayBetweenPostsSeconds: number;
   keywordCategory?: string;
   blogName?: string;
+  providedManuscript?: { title: string; content: string };
+  providedMultiImages?: MultiImageData;
 }
 
 const enqueueScheduleGenerateJob = async ({
@@ -130,6 +144,8 @@ const enqueueScheduleGenerateJob = async ({
   delayBetweenPostsSeconds,
   keywordCategory,
   blogName,
+  providedManuscript,
+  providedMultiImages,
 }: EnqueueScheduleGenerateJobInput): Promise<void> => {
   if (jobItem.status !== 'pending') {
     return;
@@ -154,6 +170,8 @@ const enqueueScheduleGenerateJob = async ({
     delayBetweenPostsSeconds,
     scheduledAt: jobItem.scheduledAt,
     blogName,
+    providedManuscript,
+    providedMultiImages,
   }, {
     jobId: buildScheduleGenerateJobId(String(jobItem._id)),
   });
@@ -433,6 +451,13 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     }> = [];
 
     const preparedQueuesResult = await Promise.all(body.queues.map(async (queue) => {
+      if (queue.manuscripts && queue.manuscripts.length !== queue.keywords.length) {
+        throw new Error(`account=${queue.account.id} manuscripts(${queue.manuscripts.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`);
+      }
+      if (queue.multi_images && queue.multi_images.length !== queue.keywords.length) {
+        throw new Error(`account=${queue.account.id} multi_images(${queue.multi_images.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`);
+      }
+
       const resolved = await resolveQueueAccount(queue.account);
       const items = queue.items?.map((item) => ({
         keyword: item.keyword,
@@ -483,6 +508,8 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         delayBetweenPostsSeconds: body.delay_between_posts,
         keywordCategory: body.keyword_category,
         keywords: queue.keywords,
+        manuscripts: queue.manuscripts,
+        providedMultiImages: queue.multi_images,
       });
 
       if (body.manuscript_type === 'hanryeodamwon' && blogName && !reused) {
@@ -496,7 +523,8 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
       const accountGenerateQueue = getGenerateQueue(account.id);
 
-      for (const jobItem of jobs) {
+      for (let index = 0; index < jobs.length; index += 1) {
+        const jobItem = jobs[index];
         await enqueueScheduleGenerateJob({
           accountGenerateQueue,
           scheduleId: String(schedule._id),
@@ -518,6 +546,8 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           delayBetweenPostsSeconds: body.delay_between_posts,
           keywordCategory: body.keyword_category,
           blogName,
+          providedManuscript: queue.manuscripts?.[index],
+          providedMultiImages: queue.multi_images?.[index],
         });
       }
 
