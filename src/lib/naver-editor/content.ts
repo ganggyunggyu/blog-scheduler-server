@@ -2,6 +2,7 @@ import type { Frame, Page } from 'playwright';
 import { logger } from '../logging/logger.js';
 import { ProgressBar } from '../utils/progress.js';
 import { uploadImage } from './image.js';
+import { insertLink } from './link.js';
 import { focusLastParagraphEnd, forceResetTypingStyleToDefault } from './editor.js';
 
 const log = logger.child({ scope: 'Content' });
@@ -48,6 +49,9 @@ const isStandaloneUrlLine = (line: string): boolean =>
 
 export const shouldSkipEyeBrandLine = (line: string): boolean =>
   isEyeBrandImagePlaceholderLine(line) || isStandaloneUrlLine(line);
+
+const shouldInsertEyeBrandLink = (line: string, imagePlacement?: 'default' | 'eyeBrand'): boolean =>
+  imagePlacement === 'eyeBrand' && isStandaloneUrlLine(line);
 
 export const typeLineAvoidingAutoList = async (page: Page, line: string): Promise<void> => {
   const numberedMatch = line.match(/^(\d+)\.(\s?)([가-힣a-zA-Z].*)$/);
@@ -254,9 +258,13 @@ export const typeContentWithImages = async (
 
   for (let i = 0; i < paragraphs.length; i += 1) {
     const line = paragraphs[i].trim();
+    const shouldInsertLink = shouldInsertEyeBrandLink(line, imagePlacement);
     const shouldTypeLine = line.length > 0 && !(imagePlacement === 'eyeBrand' && shouldSkipEyeBrandLine(line));
 
-    if (shouldTypeLine) {
+    if (shouldInsertLink) {
+      const inserted = await insertLink(page, frame, line);
+      log.info('content.link.inserted', { success: inserted, url: line });
+    } else if (shouldTypeLine) {
       await typeLineAvoidingAutoList(page, line);
     }
 

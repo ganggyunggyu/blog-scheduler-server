@@ -61,6 +61,31 @@ const createMockFrame = (events: string[]) => {
     isVisible: mock.fn(async () => true),
   };
 
+  const linkButton = {
+    click: mock.fn(async () => {
+      events.push('click:link-button');
+    }),
+    isVisible: mock.fn(async () => true),
+  };
+
+  const linkInput = {
+    fill: mock.fn(async (url: string) => {
+      events.push(`fill:link:${url}`);
+    }),
+  };
+
+  const linkSearchButton = {
+    click: mock.fn(async () => {
+      events.push('click:link-search');
+    }),
+  };
+
+  const linkConfirmButton = {
+    click: mock.fn(async () => {
+      events.push('click:link-confirm');
+    }),
+  };
+
   const lastParagraph = {
     click: mock.fn(async () => {
       events.push('click:last-paragraph');
@@ -76,6 +101,10 @@ const createMockFrame = (events: string[]) => {
       if (selector === SELECTORS.editor.bold) return boldButton;
       if (selector === SELECTORS.editor.fontSizeDropdown) return fontSizeDropdown;
       if (selector === SELECTORS.editor.fontSize15) return fontSize15;
+      if (selector === 'button[data-name="oglink"]') return linkButton;
+      if (selector === 'input.se-popup-oglink-input') return linkInput;
+      if (selector === 'button.se-popup-oglink-button') return linkSearchButton;
+      if (selector === 'button.se-popup-button-confirm') return linkConfirmButton;
       return null;
     }),
     evaluate: mock.fn(async () => {
@@ -224,7 +253,7 @@ test('shouldSkipEyeBrandLine: IMG 자리표시자와 단독 URL은 본문 타이
   assert.equal(shouldSkipEyeBrandLine('정밀검사로 한 사람 한 사람 눈을 들여다보는 에스앤비안과입니다.'), false);
 });
 
-test('typeContentWithImages: 안과브랜드는 IMG 자리표시자와 단독 URL을 타이핑하지 않음', async () => {
+test('typeContentWithImages: 안과브랜드는 IMG 자리표시자는 건너뛰고 단독 URL은 링크 컴포넌트로 넣음', async () => {
   const page = createMockPage();
   const frame = createMockFrame(page.getEvents());
 
@@ -244,8 +273,11 @@ test('typeContentWithImages: 안과브랜드는 IMG 자리표시자와 단독 UR
   const events = page.getEvents();
   assert.ok(events.includes('type:고도근시 라식 가능할까 각막 얇을 때 시력교정 방법'));
   assert.ok(events.includes('type:본문 첫줄'));
+  assert.ok(events.includes('click:link-button'));
+  assert.ok(events.includes('fill:link:https://blog.naver.com/adplan3th/224094493829'));
+  assert.ok(events.includes('click:link-confirm'));
   assert.equal(events.some((event) => event.includes('[IMG]')), false);
-  assert.equal(events.some((event) => event.includes('https://blog.naver.com')), false);
+  assert.equal(events.some((event) => event === 'type:https://blog.naver.com/adplan3th/224094493829'), false);
 });
 
 test('buildEyeBrandImageParagraphMap: 소제목보다 이미지가 많으면 남은 문단에 추가 매핑함', () => {
