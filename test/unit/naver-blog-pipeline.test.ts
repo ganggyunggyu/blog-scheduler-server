@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ALIBABA_CONTENT_PIPELINE, getContentImagesForBlock, getContentPipeline, getMultiImagesForBlock } from '../../src/services/naver-blog-pipeline.js';
+import { ALIBABA_CONTENT_PIPELINE, getContentImagesForBlock, getContentPipeline, getContentTextForBlock, getMultiImagesForBlock } from '../../src/services/naver-blog-pipeline.js';
 
 test('getContentPipeline: 애견은 link 뒤에 spacing 후 content 순서 사용', () => {
   assert.deepEqual(getContentPipeline({ keywordCategory: '애견' }), [
@@ -147,5 +147,38 @@ test('getMultiImagesForBlock: 안과브랜드가 slide만 갖고 있으면 multi
       multiImages: { slide: ['slide_1.webp'] },
     }),
     undefined,
+  );
+});
+
+test('getContentTextForBlock: 안과브랜드는 본문 첫 줄에 제목이 없으면 한 번 추가함', () => {
+  assert.equal(
+    getContentTextForBlock({
+      keywordCategory: '안과브랜드',
+      title: '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+      content: '안녕하세요,\n\n정밀검사로 한 사람 한 사람 눈을 들여다보는 에스앤비안과입니다.',
+    }),
+    '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법\n\n안녕하세요,\n\n정밀검사로 한 사람 한 사람 눈을 들여다보는 에스앤비안과입니다.',
+  );
+});
+
+test('getContentTextForBlock: 안과브랜드 본문에 제목이 이미 있으면 중복 추가하지 않음', () => {
+  assert.equal(
+    getContentTextForBlock({
+      keywordCategory: '안과브랜드',
+      title: '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+      content: '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법\n\n안녕하세요,',
+    }),
+    '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법\n\n안녕하세요,',
+  );
+});
+
+test('getContentTextForBlock: 일반 파이프라인은 본문을 그대로 유지함', () => {
+  assert.equal(
+    getContentTextForBlock({
+      keywordCategory: '안과',
+      title: '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+      content: '안녕하세요,',
+    }),
+    '안녕하세요,',
   );
 });

@@ -4,6 +4,7 @@ import { SELECTORS } from '../../src/constants/selectors.js';
 import {
   buildEyeBrandImageParagraphMap,
   buildImageParagraphMap,
+  shouldSkipEyeBrandLine,
   typeContentWithImages,
 } from '../../src/lib/naver-editor/content.js';
 
@@ -190,6 +191,61 @@ test('buildEyeBrandImageParagraphMap: 첫 이미지는 도입부 뒤, 이후 이
     [8, 'slide_3.webp'],
     [11, 'slide_4.webp'],
   ]);
+});
+
+test('buildEyeBrandImageParagraphMap: 정밀검사 인사말이 있으면 첫 이미지는 해당 줄 직후로 매핑함', () => {
+  const imageMap = buildEyeBrandImageParagraphMap(
+    [
+      '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+      '',
+      '안녕하세요,',
+      '',
+      '정밀검사로 한 사람 한 사람 눈을 들여다보는 에스앤비안과입니다.',
+      'https://blog.naver.com/adplan3th/224094493829',
+      '',
+      '오늘은 기준을 정리하겠습니다.',
+      '',
+      '1. 첫 번째 확인 기준',
+      '[IMG] 통유리 수술실과 정밀 진료 환경 전경',
+      '첫 번째 본문',
+    ],
+    ['slide_1.webp', 'slide_2.webp'],
+  );
+
+  assert.deepEqual([...imageMap.entries()], [
+    [4, 'slide_1.webp'],
+    [10, 'slide_2.webp'],
+  ]);
+});
+
+test('shouldSkipEyeBrandLine: IMG 자리표시자와 단독 URL은 본문 타이핑에서 제외함', () => {
+  assert.equal(shouldSkipEyeBrandLine('[IMG] 통유리 수술실과 정밀 진료 환경 전경'), true);
+  assert.equal(shouldSkipEyeBrandLine('https://blog.naver.com/adplan3th/224094493829'), true);
+  assert.equal(shouldSkipEyeBrandLine('정밀검사로 한 사람 한 사람 눈을 들여다보는 에스앤비안과입니다.'), false);
+});
+
+test('typeContentWithImages: 안과브랜드는 IMG 자리표시자와 단독 URL을 타이핑하지 않음', async () => {
+  const page = createMockPage();
+  const frame = createMockFrame(page.getEvents());
+
+  await typeContentWithImages(
+    page as never,
+    frame as never,
+    [
+      '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+      'https://blog.naver.com/adplan3th/224094493829',
+      '[IMG] 통유리 수술실과 정밀 진료 환경 전경',
+      '본문 첫줄',
+    ].join('\n'),
+    [],
+    { imagePlacement: 'eyeBrand' },
+  );
+
+  const events = page.getEvents();
+  assert.ok(events.includes('type:고도근시 라식 가능할까 각막 얇을 때 시력교정 방법'));
+  assert.ok(events.includes('type:본문 첫줄'));
+  assert.equal(events.some((event) => event.includes('[IMG]')), false);
+  assert.equal(events.some((event) => event.includes('https://blog.naver.com')), false);
 });
 
 test('buildEyeBrandImageParagraphMap: 소제목보다 이미지가 많으면 남은 문단에 추가 매핑함', () => {

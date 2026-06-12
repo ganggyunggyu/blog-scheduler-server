@@ -40,6 +40,15 @@ export const isSubheading = (line: string): boolean => {
   return patterns.some((pattern) => pattern.test(trimmed));
 };
 
+const isEyeBrandImagePlaceholderLine = (line: string): boolean =>
+  /^\[IMG\](?:\s|$)/.test(line.trim());
+
+const isStandaloneUrlLine = (line: string): boolean =>
+  /^https?:\/\/\S+$/.test(line.trim());
+
+export const shouldSkipEyeBrandLine = (line: string): boolean =>
+  isEyeBrandImagePlaceholderLine(line) || isStandaloneUrlLine(line);
+
 export const typeLineAvoidingAutoList = async (page: Page, line: string): Promise<void> => {
   const numberedMatch = line.match(/^(\d+)\.(\s?)([가-힣a-zA-Z].*)$/);
   if (numberedMatch) {
@@ -124,6 +133,11 @@ const isEyeBrandSubheading = (line: string): boolean => {
   return /^#소제목#/.test(trimmed) || isSubheading(trimmed);
 };
 
+const isEyeBrandIntroLine = (line: string): boolean => {
+  const trimmed = line.trim();
+  return trimmed.includes('정밀검사로') && trimmed.includes('에스앤비안과');
+};
+
 const findPreviousNonEmptyParagraphIndex = (
   paragraphs: string[],
   startIndex: number,
@@ -149,15 +163,36 @@ export const buildEyeBrandImageParagraphMap = (
   const subheadingIndices = paragraphs
     .map((paragraph, index) => (isEyeBrandSubheading(paragraph) ? index : -1))
     .filter((index) => index >= 0);
+  const placeholderIndices = paragraphs
+    .map((paragraph, index) => (isEyeBrandImagePlaceholderLine(paragraph) ? index : -1))
+    .filter((index) => index >= 0);
 
   if (subheadingIndices.length === 0) {
     return buildImageParagraphMap(paragraphs, images);
   }
 
   let imageIndex = 0;
-  const introTargetIndex = findPreviousNonEmptyParagraphIndex(paragraphs, subheadingIndices[0]);
+  const introLineIndex = paragraphs.findIndex(isEyeBrandIntroLine);
+  const firstSubheadingIndex = subheadingIndices[0];
+  const introPlaceholderIndex = introLineIndex >= 0
+    ? placeholderIndices.find((index) => index > introLineIndex && index < firstSubheadingIndex)
+    : undefined;
+  const introTargetIndex = introPlaceholderIndex
+    ?? (introLineIndex >= 0 ? introLineIndex : findPreviousNonEmptyParagraphIndex(paragraphs, firstSubheadingIndex));
   if (introTargetIndex !== undefined) {
     result.set(introTargetIndex, images[imageIndex]);
+    imageIndex += 1;
+  }
+
+  for (const placeholderIndex of placeholderIndices) {
+    if (imageIndex >= images.length) {
+      break;
+    }
+    if (result.has(placeholderIndex)) {
+      continue;
+    }
+
+    result.set(placeholderIndex, images[imageIndex]);
     imageIndex += 1;
   }
 
@@ -165,13 +200,16 @@ export const buildEyeBrandImageParagraphMap = (
     if (imageIndex >= images.length) {
       break;
     }
+    if (result.has(subheadingIndex)) {
+      continue;
+    }
 
     result.set(subheadingIndex, images[imageIndex]);
     imageIndex += 1;
   }
 
   const remainingParagraphIndices = getNonEmptyParagraphIndices(paragraphs)
-    .filter((index) => !result.has(index));
+    .filter((index) => !result.has(index) && !shouldSkipEyeBrandLine(paragraphs[index]));
   const remainingImageCount = Math.min(images.length - imageIndex, remainingParagraphIndices.length);
   for (let offset = 0; offset < remainingImageCount; offset += 1) {
     const paragraphOrder = Math.min(
@@ -192,10 +230,10 @@ export const typeContentWithImages = async (
   images?: string[],
   options: ContentTypingOptions = {}
 ): Promise<void> => {
-  const { keywordCategory } = options;
+  const { imagePlacement, keywordCategory } = options;
   const paragraphs = content.split('\n');
   const imageMap = images?.length
-    ? options.imagePlacement === 'eyeBrand'
+    ? imagePlacement === 'eyeBrand'
       ? buildEyeBrandImageParagraphMap(paragraphs, images)
       : buildImageParagraphMap(paragraphs, images)
     : new Map();
@@ -216,8 +254,9 @@ export const typeContentWithImages = async (
 
   for (let i = 0; i < paragraphs.length; i += 1) {
     const line = paragraphs[i].trim();
+    const shouldTypeLine = line.length > 0 && !(imagePlacement === 'eyeBrand' && shouldSkipEyeBrandLine(line));
 
-    if (line.length > 0) {
+    if (shouldTypeLine) {
       await typeLineAvoidingAutoList(page, line);
     }
 

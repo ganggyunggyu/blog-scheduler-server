@@ -138,3 +138,27 @@ export const getMultiImagesForBlock = ({
     ? remaining
     : undefined;
 };
+
+interface ContentTextForBlockOptions {
+  keywordCategory?: string;
+  title?: string;
+  content: string;
+}
+
+export const getContentTextForBlock = ({
+  keywordCategory,
+  title,
+  content,
+}: ContentTextForBlockOptions): string => {
+  const trimmedTitle = title?.trim();
+  if (!isEyeBrandPipelineCategory(keywordCategory) || !trimmedTitle) {
+    return content;
+  }
+
+  const trimmedStartContent = content.trimStart();
+  if (trimmedStartContent.startsWith(trimmedTitle)) {
+    return content;
+  }
+
+  return `${trimmedTitle}\n\n${trimmedStartContent}`;
+};

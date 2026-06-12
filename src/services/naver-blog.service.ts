@@ -36,7 +36,7 @@ import {
   type WriteResult,
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
-import { getContentImagesForBlock, getContentPipeline, getMultiImagesForBlock, isEyeBrandPipelineCategory, type ContentBlock } from './naver-blog-pipeline.js';
+import { getContentImagesForBlock, getContentPipeline, getContentTextForBlock, getMultiImagesForBlock, isEyeBrandPipelineCategory, type ContentBlock } from './naver-blog-pipeline.js';
 import type { ManuscriptType } from './manuscript.service.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
@@ -163,6 +163,7 @@ const handlePublishDialog = async (
 interface ContentBlockContext {
   page: Page;
   frame: Frame;
+  title: string;
   content: string;
   keywordCategory?: string;
   manuscriptType?: ManuscriptType;
@@ -199,7 +200,7 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.2.uploaded');
   },
-  content: async ({ page, frame, content, normalImages, keywordCategory, manuscriptType, multiImages }) => {
+  content: async ({ page, frame, title, content, normalImages, keywordCategory, manuscriptType, multiImages }) => {
     const contentImages = getContentImagesForBlock({
       keywordCategory,
       manuscriptType,
@@ -207,7 +208,12 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
       normalImages,
       multiImages,
     });
-    await typeContentWithImages(page, frame, content, contentImages, {
+    const contentText = getContentTextForBlock({
+      keywordCategory,
+      title,
+      content,
+    });
+    await typeContentWithImages(page, frame, contentText, contentImages, {
       keywordCategory,
       imagePlacement: isEyeBrandPipelineCategory(keywordCategory) ? 'eyeBrand' : 'default',
     });
@@ -335,6 +341,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
       {
         page,
         frame,
+        title,
         content,
         keywordCategory,
         manuscriptType,
@@ -419,6 +426,7 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
       {
         page,
         frame,
+        title,
         content,
         keywordCategory,
         manuscriptType,
