@@ -16,8 +16,19 @@
 |------|------------------|-----------|----------|
 | **기본** | `안과기본` | maps → content → multiImages | 라이브러리제외 이미지/링크 없이 발행 |
 | **풀패키지** | `안과` | allExcluded → excludeLibraryLinks → maps → content → multiImages | 라이브러리제외 이미지 + 링크 삽입까지 포함 |
+| **브랜드** | `안과브랜드` | content(슬라이드 일반 이미지 교차 삽입) → multiImages(남은 개별/콜라주만) | `adplan3th` 에스앤비 브랜드 글 패턴 |
 
-모드 선택은 1단계에서 사용자에게 묻습니다. 생략 시 **풀패키지** 기본값.
+모드 선택은 1단계에서 사용자에게 묻습니다. 생략 시 일반 안과 계정은 **풀패키지**, `adplan3th` 브랜드 계정은 **브랜드** 기본값.
+
+### 브랜드 계정 패턴
+
+기준 글: `https://blog.naver.com/adplan3th/224312025673`
+
+- 네이버 카테고리: `에스앤비 안과`
+- 이미지: 세로형 slide 이미지 6장
+- 배치: 도입부 뒤 1장, 이후 소제목 뒤에 slide 이미지를 일반 이미지로 삽입
+- 제외: 지도, 전화, 외부 링크, 라이브러리제외 이미지/링크는 넣지 않음
+- `keyword_category: "안과브랜드"`는 에디터 파이프라인 키이며, 발행 카테고리는 서버에서 기본 `에스앤비 안과`로 분리 처리함
 
 ## 키워드 관리 규칙
 
@@ -46,18 +57,20 @@
 
 2. **날짜** (YYYY-MM-DD, 생략 시 오늘)
 3. **모드** (1/2/3/2121, 생략 시 2)
-4. **파이프라인** (기본 / 풀패키지, 생략 시 풀패키지)
+4. **파이프라인** (브랜드 / 기본 / 풀패키지, 생략 시 adplan3th는 브랜드, 그 외는 풀패키지)
+   - 브랜드: adplan3th 기준 글 패턴, 슬라이드 6장을 본문에 교차 삽입
    - 기본: 라이브러리제외 이미지·링크 없이 지도/본문/다중이미지만
    - 풀패키지: 라이브러리제외 이미지 + 라이브러리제외 링크까지 풀 삽입
 ```
 
 ### 2단계: 계정 매칭
 
-계정 정보는 **MongoDB `cafe-bot.accounts` 컬렉션을 source of truth**로 사용해서 조회합니다.
+계정 정보는 **scheduler-server Atlas MongoDB `blogaccounts` 컬렉션을 source of truth**로 사용해서 조회합니다.
 
-- 사용자가 입력한 계정이름은 DB의 `nickname` 우선, 없으면 `accountId`로 매칭
-- 조회 결과에서 `accountId`, `password`를 사용
-- DB 매칭 실패 시 사용자에게 알려주고 DB 레코드 확인 또는 올바른 계정이름을 다시 요청
+- 사용자가 입력한 계정이름은 DB의 `nickname` 우선, 없으면 `accountId`/`blogId`로 매칭
+- 조회 결과에서 `accountId`, `blogId`, `nickname`, `category`, `isEnabled`를 확인
+- 비밀번호는 DB에 저장하지 않고 실행 payload에만 일회성으로 사용
+- DB 매칭 실패 시 명시 계정이 있으면 해당 ID로 진행 가능 여부를 보고하고, 없으면 올바른 계정이름을 다시 요청
 - `src/constants/account-presets.ts` 같은 로컬 preset 파일은 더 이상 계정 source of truth로 사용하지 않음
 
 ### 3단계: curl 명령어 생성
@@ -75,7 +88,7 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
   "schedule_date": "{날짜 또는 생략}",
   "schedule_mode": "{모드}",
   "generate_images": true,
-  "image_count": 5,
+  "image_count": 6,
   "image_source": "product",
   "manuscript_type": "default",
   "delay_between_posts": 10,
@@ -83,10 +96,13 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
 }'
 ```
 
-`{파이프라인값}`은 사용자 선택에 따라 아래 둘 중 하나:
+`{파이프라인값}`은 사용자 선택에 따라 아래 값 중 하나:
 
 - 풀패키지(기본): `"안과"`
 - 기본: `"안과기본"`
+- 브랜드(adplan3th): `"안과브랜드"`
+
+이미지 수는 브랜드(adplan3th) 6장, 그 외 기존 안과 계정은 5장을 사용합니다.
 
 ### 4단계: 로그 모니터링 (필수)
 

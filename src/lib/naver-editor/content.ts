@@ -8,6 +8,7 @@ const log = logger.child({ scope: 'Content' });
 
 interface ContentTypingOptions {
   keywordCategory?: string;
+  imagePlacement?: 'default' | 'eyeBrand';
 }
 
 const resetPetContentTypingStyle = async (
@@ -118,6 +119,72 @@ export const buildImageParagraphMap = (
   return result;
 };
 
+const isEyeBrandSubheading = (line: string): boolean => {
+  const trimmed = line.trim();
+  return /^#소제목#/.test(trimmed) || isSubheading(trimmed);
+};
+
+const findPreviousNonEmptyParagraphIndex = (
+  paragraphs: string[],
+  startIndex: number,
+): number | undefined => {
+  for (let index = startIndex - 1; index >= 0; index -= 1) {
+    if (paragraphs[index].trim().length > 0) {
+      return index;
+    }
+  }
+
+  return undefined;
+};
+
+export const buildEyeBrandImageParagraphMap = (
+  paragraphs: string[],
+  images: string[],
+): Map<number, string> => {
+  const result = new Map<number, string>();
+  if (images.length === 0) {
+    return result;
+  }
+
+  const subheadingIndices = paragraphs
+    .map((paragraph, index) => (isEyeBrandSubheading(paragraph) ? index : -1))
+    .filter((index) => index >= 0);
+
+  if (subheadingIndices.length === 0) {
+    return buildImageParagraphMap(paragraphs, images);
+  }
+
+  let imageIndex = 0;
+  const introTargetIndex = findPreviousNonEmptyParagraphIndex(paragraphs, subheadingIndices[0]);
+  if (introTargetIndex !== undefined) {
+    result.set(introTargetIndex, images[imageIndex]);
+    imageIndex += 1;
+  }
+
+  for (const subheadingIndex of subheadingIndices) {
+    if (imageIndex >= images.length) {
+      break;
+    }
+
+    result.set(subheadingIndex, images[imageIndex]);
+    imageIndex += 1;
+  }
+
+  const remainingParagraphIndices = getNonEmptyParagraphIndices(paragraphs)
+    .filter((index) => !result.has(index));
+  const remainingImageCount = Math.min(images.length - imageIndex, remainingParagraphIndices.length);
+  for (let offset = 0; offset < remainingImageCount; offset += 1) {
+    const paragraphOrder = Math.min(
+      remainingParagraphIndices.length - 1,
+      Math.floor(((offset + 1) * remainingParagraphIndices.length) / (remainingImageCount + 1)),
+    );
+    result.set(remainingParagraphIndices[paragraphOrder], images[imageIndex]);
+    imageIndex += 1;
+  }
+
+  return new Map([...result.entries()].sort(([left], [right]) => left - right));
+};
+
 export const typeContentWithImages = async (
   page: Page,
   frame: Frame,
@@ -127,7 +194,11 @@ export const typeContentWithImages = async (
 ): Promise<void> => {
   const { keywordCategory } = options;
   const paragraphs = content.split('\n');
-  const imageMap = images?.length ? buildImageParagraphMap(paragraphs, images) : new Map();
+  const imageMap = images?.length
+    ? options.imagePlacement === 'eyeBrand'
+      ? buildEyeBrandImageParagraphMap(paragraphs, images)
+      : buildImageParagraphMap(paragraphs, images)
+    : new Map();
   const uploadTotal = imageMap.size;
   const uploadProgress =
     uploadTotal > 0

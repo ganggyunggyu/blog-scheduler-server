@@ -9,6 +9,7 @@ import { failAccountSchedules } from '../services/schedule-failure.service.js';
 import { assessLoginFailure } from '../services/login-failure.service.js';
 import { buildSchedulePublishJobId } from '../services/schedule-idempotency.service.js';
 import { logger } from '../lib/logging/logger.js';
+import { getFallbackSlideImageCount } from '../services/naver-blog-pipeline.js';
 
 export interface GenerateJobData {
   scheduleId: string;
@@ -244,11 +245,12 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     const keywordCategory = providedCategory || await getCategory(keyword);
     log.info('category.resolved', { keyword, keywordCategory, source: providedCategory ? 'provided' : 'api' });
 
-    if (keywordCategory === '안과' && productData && (!productData.multiImages.slide || productData.multiImages.slide.length === 0)) {
+    const fallbackSlideImageCount = getFallbackSlideImageCount(keywordCategory);
+    if (fallbackSlideImageCount && productData && (!productData.multiImages.slide || productData.multiImages.slide.length === 0)) {
       const slideDir = path.join(prepared.jobDir, 'images', 'slide');
       const fs = await import('fs/promises');
       await fs.mkdir(slideDir, { recursive: true });
-      productData.multiImages.slide = await generateAndDownloadAIImages(keyword, 5, slideDir, category);
+      productData.multiImages.slide = await generateAndDownloadAIImages(keyword, fallbackSlideImageCount, slideDir, category);
       log.info('product.fallback.slide.ai', { count: productData.multiImages.slide.length });
     }
 

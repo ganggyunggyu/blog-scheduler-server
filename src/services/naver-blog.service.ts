@@ -36,7 +36,7 @@ import {
   type WriteResult,
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
-import { getContentImagesForBlock, getContentPipeline, type ContentBlock } from './naver-blog-pipeline.js';
+import { getContentImagesForBlock, getContentPipeline, getMultiImagesForBlock, isEyeBrandPipelineCategory, type ContentBlock } from './naver-blog-pipeline.js';
 import type { ManuscriptType } from './manuscript.service.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
@@ -199,13 +199,18 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.2.uploaded');
   },
-  content: async ({ page, frame, content, normalImages, keywordCategory, manuscriptType }) => {
+  content: async ({ page, frame, content, normalImages, keywordCategory, manuscriptType, multiImages }) => {
     const contentImages = getContentImagesForBlock({
+      keywordCategory,
       manuscriptType,
       block: 'content',
       normalImages,
+      multiImages,
     });
-    await typeContentWithImages(page, frame, content, contentImages, { keywordCategory });
+    await typeContentWithImages(page, frame, content, contentImages, {
+      keywordCategory,
+      imagePlacement: isEyeBrandPipelineCategory(keywordCategory) ? 'eyeBrand' : 'default',
+    });
     log.info('content.entered');
   },
   excluded3: async ({ page, excluded3 }) => {
@@ -249,9 +254,10 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     const result = await insertLink(page, frame, metadata.url);
     log.info('link.inserted', { success: result, url: metadata.url });
   },
-  multiImages: async ({ page, frame, multiImages }) => {
-    if (!multiImages) return;
-    const result = await uploadFromMultiImageData(page, frame, multiImages);
+  multiImages: async ({ page, frame, keywordCategory, multiImages }) => {
+    const uploadData = getMultiImagesForBlock({ keywordCategory, multiImages });
+    if (!uploadData) return;
+    const result = await uploadFromMultiImageData(page, frame, uploadData);
     log.info('multiImages.uploaded', { total: result.total, success: result.success, failed: result.failed });
   },
   whiteText: async ({ page, frame }) => {

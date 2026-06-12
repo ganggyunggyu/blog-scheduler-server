@@ -19,6 +19,7 @@ import { getPostList, getPostsByRange } from '../services/naver-blog.service.js'
 import { getValidCookies } from '../services/naver-auth.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { findAccountById } from '../services/account-directory.service.js';
+import { resolvePublishCategory } from '../services/publish-category.service.js';
 import {
   buildAdhocGenerateIdentity,
   buildScheduleGenerateJobId,
@@ -138,7 +139,10 @@ const enqueueScheduleGenerateJob = async ({
     scheduleId,
     scheduleJobId: jobItem._id,
     keyword: jobItem.keyword,
-    category: keywordCategory || jobItem.category,
+    category: resolvePublishCategory({
+      jobCategory: jobItem.category,
+      keywordCategory,
+    }),
     keywordCategory,
     account,
     service,

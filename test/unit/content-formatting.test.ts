@@ -2,6 +2,7 @@ import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { SELECTORS } from '../../src/constants/selectors.js';
 import {
+  buildEyeBrandImageParagraphMap,
   buildImageParagraphMap,
   typeContentWithImages,
 } from '../../src/lib/naver-editor/content.js';
@@ -161,4 +162,51 @@ test('buildImageParagraphMap: 소제목이 없으면 일반 문단에 이미지�
     [1, 'img-1'],
     [3, 'img-2'],
   ]);
+});
+
+test('buildEyeBrandImageParagraphMap: 첫 이미지는 도입부 뒤, 이후 이미지는 소제목 뒤에 매핑함', () => {
+  const imageMap = buildEyeBrandImageParagraphMap(
+    [
+      '본문 제목',
+      '',
+      '안녕하세요,',
+      '에스앤비안과입니다.',
+      '',
+      '#소제목# 첫 번째 확인 기준',
+      '첫 번째 본문',
+      '',
+      '#소제목# 두 번째 확인 기준',
+      '두 번째 본문',
+      '',
+      '#소제목# 정리하면',
+      '마무리 본문',
+    ],
+    ['slide_1.webp', 'slide_2.webp', 'slide_3.webp', 'slide_4.webp'],
+  );
+
+  assert.deepEqual([...imageMap.entries()], [
+    [3, 'slide_1.webp'],
+    [5, 'slide_2.webp'],
+    [8, 'slide_3.webp'],
+    [11, 'slide_4.webp'],
+  ]);
+});
+
+test('buildEyeBrandImageParagraphMap: 소제목보다 이미지가 많으면 남은 문단에 추가 매핑함', () => {
+  const imageMap = buildEyeBrandImageParagraphMap(
+    [
+      '본문 제목',
+      '도입 문단',
+      '#소제목# 첫 번째 확인 기준',
+      '첫 번째 본문',
+      '두 번째 본문',
+      '마무리 본문',
+    ],
+    ['slide_1.webp', 'slide_2.webp', 'slide_3.webp'],
+  );
+
+  assert.equal(imageMap.size, 3);
+  assert.equal(imageMap.get(1), 'slide_1.webp');
+  assert.equal(imageMap.get(2), 'slide_2.webp');
+  assert.ok([...imageMap.values()].includes('slide_3.webp'));
 });
