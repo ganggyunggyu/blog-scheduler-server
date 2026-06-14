@@ -13,7 +13,7 @@ const BRAND_ACCOUNT_ID = 'adplan3th';
 const BRAND_ACCOUNT_BLOG_ID = 'adplan3th';
 const BRAND_PASSWORD_ENV = 'NAVER_BRAND_PASSWORD';
 const DEFAULT_MODE: ScheduleMode = '3';
-const ACCOUNT_STAGGER_MINUTES = 5;
+const ACCOUNT_STAGGER_MINUTES = 10;
 const DEFAULT_SLOT_TIMES: Record<ScheduleMode, string[]> = {
   '1': ['11:00'],
   '2': ['10:00', '15:00'],
