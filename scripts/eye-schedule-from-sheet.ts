@@ -9,6 +9,7 @@ const EYE_SHEET_GID = '633450920';
 const EYE_SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${EYE_SHEET_GID}`;
 const SCHEDULER_API_URL = process.env.SCHEDULER_API_URL ?? 'http://localhost:8001';
 const FINAL_BRAND_ROOT = '/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종';
+const USED_KEYWORD_LOG_PATH = path.resolve('memory/project_used_keywords.md');
 const BRAND_ACCOUNT_ID = 'adplan3th';
 const BRAND_ACCOUNT_BLOG_ID = 'adplan3th';
 const BRAND_PASSWORD_ENV = 'NAVER_BRAND_PASSWORD';
@@ -92,6 +93,12 @@ interface QueueItem {
   keyword: string;
   scheduledAt: string;
   slot: number;
+}
+
+interface EyeKeywordPools {
+  preferred: string[];
+  fallback: string[];
+  all: string[];
 }
 
 interface ScheduleQueue {
@@ -251,7 +258,7 @@ const getEyeRoot = (keyword: string): string => {
   return explicitRoot ?? normalized;
 };
 
-const fetchEyeSheetKeywords = async (): Promise<string[]> => {
+const fetchEyeSheetKeywordPools = async (): Promise<EyeKeywordPools> => {
   const response = await fetch(EYE_SHEET_CSV_URL, {
     headers: {
       'User-Agent': 'Mozilla/5.0',
@@ -263,7 +270,8 @@ const fetchEyeSheetKeywords = async (): Promise<string[]> => {
   }
 
   const rows = parseCsv(await response.text());
-  const keywords: string[] = [];
+  const preferred: string[] = [];
+  const fallback: string[] = [];
   const seen = new Set<string>();
   for (const [index, row] of rows.entries()) {
     if (index === 0) {
@@ -275,13 +283,101 @@ const fetchEyeSheetKeywords = async (): Promise<string[]> => {
     if (!keyword || keyword.startsWith('키워드 ')) {
       continue;
     }
-    if (exposed || newLogic !== 'o' || seen.has(keyword)) {
+    if (seen.has(keyword)) {
       continue;
     }
     seen.add(keyword);
-    keywords.push(keyword);
+    if (!exposed && newLogic === 'o') {
+      preferred.push(keyword);
+      continue;
+    }
+    fallback.push(keyword);
   }
-  return keywords;
+  return {
+    preferred,
+    fallback,
+    all: [...preferred, ...fallback],
+  };
+};
+
+const loadUsedEyeKeywords = async (): Promise<Set<string>> => {
+  try {
+    const content = await fs.readFile(USED_KEYWORD_LOG_PATH, 'utf8');
+    const used = new Set<string>();
+    for (const line of content.split(/\r?\n/u)) {
+      const parts = line.split('|').map((value) => value.trim());
+      if (parts.length < 3 || parts[0] === 'date') {
+        continue;
+      }
+      const keyword = parts[2];
+      if (keyword) {
+        used.add(keyword);
+      }
+    }
+    return used;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return new Set<string>();
+    }
+    throw error;
+  }
+};
+
+const selectEyeSheetKeywords = (
+  pools: EyeKeywordPools,
+  usedKeywords: Set<string>,
+  needed: number,
+): { selected: string[]; resetApplied: boolean } => {
+  const dedupe = (items: string[]): string[] => {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+      if (seen.has(item)) {
+        return false;
+      }
+      seen.add(item);
+      return true;
+    });
+  };
+
+  const buildSelection = (allowUsed: boolean): string[] => {
+    const preferred = pools.preferred.filter((keyword) => allowUsed || !usedKeywords.has(keyword));
+    const fallback = pools.fallback.filter((keyword) => allowUsed || !usedKeywords.has(keyword));
+    return dedupe([...preferred, ...fallback]);
+  };
+
+  const selected = buildSelection(false);
+  if (selected.length >= needed) {
+    return { selected, resetApplied: false };
+  }
+
+  const resetSelected = buildSelection(true);
+  if (resetSelected.length < needed) {
+    throw new Error(`안과 키워드 부족: ${resetSelected.length} < ${needed}`);
+  }
+
+  return { selected: resetSelected, resetApplied: true };
+};
+
+const recordUsedEyeKeywords = async (
+  scheduleDate: string,
+  items: Array<{ accountId: string; keyword: string }>,
+): Promise<void> => {
+  if (items.length === 0) {
+    return;
+  }
+
+  await fs.mkdir(path.dirname(USED_KEYWORD_LOG_PATH), { recursive: true });
+  try {
+    await fs.access(USED_KEYWORD_LOG_PATH);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+    await fs.writeFile(USED_KEYWORD_LOG_PATH, 'date | accountId | keyword\n', 'utf8');
+  }
+
+  const lines = items.map(({ accountId, keyword }) => `${scheduleDate} | ${accountId} | ${keyword}`);
+  await fs.appendFile(USED_KEYWORD_LOG_PATH, `${lines.join('\n')}\n`, 'utf8');
 };
 
 const normalizeDisplayName = (nickname: string | undefined, accountId: string): string =>
@@ -712,19 +808,22 @@ const main = async (): Promise<void> => {
     if (options.includeGeneral) {
       const { accounts, missing } = await loadGeneralAccounts(options.strictCredentials);
       missingGeneralCredentials = missing;
-      const sheetKeywords = await fetchEyeSheetKeywords();
-      const shuffled = shuffle(
-        sheetKeywords,
-        `eye:${options.scheduleDate}:${options.scheduleMode}:${EYE_SHEET_GID}:${accounts.length}`,
-      );
+      const [keywordPools, usedKeywords] = await Promise.all([
+        fetchEyeSheetKeywordPools(),
+        loadUsedEyeKeywords(),
+      ]);
       const perAccount = options.scheduleMode === '3' ? 3 : 2;
       const needed = accounts.length * perAccount;
-      if (shuffled.length < needed) {
-        throw new Error(`안과 키워드 부족: ${shuffled.length} < ${needed}`);
-      }
+      const { selected, resetApplied } = selectEyeSheetKeywords(keywordPools, usedKeywords, needed);
+      const shuffled = shuffle(
+        selected,
+        `eye:${options.scheduleDate}:${options.scheduleMode}:${EYE_SHEET_GID}:${accounts.length}`,
+      );
       const assigned = assignDiversifiedKeywords(accounts, shuffled, perAccount);
       generalQueues.push(...buildGeneralQueues(accounts, assigned, options.scheduleDate, options.scheduleMode));
-      console.log(`sheet_gid=${EYE_SHEET_GID} candidates=${sheetKeywords.length}`);
+      console.log(
+        `sheet_gid=${EYE_SHEET_GID} preferred=${keywordPools.preferred.length} total=${keywordPools.all.length} selected=${selected.length} resetApplied=${resetApplied}`,
+      );
       if (missingGeneralCredentials.length > 0) {
         console.log(`missing_credentials=${missingGeneralCredentials.map((account) => account.accountId).join(',')}`);
       }
@@ -765,6 +864,13 @@ const main = async (): Promise<void> => {
         delay_between_posts: 10,
         keyword_category: '안과',
       });
+      await recordUsedEyeKeywords(
+        options.scheduleDate,
+        generalQueues.flatMap((queue) => queue.keywords.map((keyword) => ({
+          accountId: queue.account.id,
+          keyword,
+        }))),
+      );
     }
 
     if (brandQueues.length > 0) {
