@@ -1,0 +1,191 @@
+{
+  "generatedAt": "2026-06-16T13:37:56.443Z",
+  "execute": false,
+  "scheduleDate": "2026-06-16",
+  "slots": [
+    "23:30",
+    "23:40",
+    "23:50"
+  ],
+  "perAccount": 3,
+  "domains": {
+    "eye": [
+      {
+        "accountId": "nes1p2kx",
+        "blogId": "nes1p2kx",
+        "blogName": "에스앤비안과 1 (노출)",
+        "keywords": [
+          "라섹비용",
+          "백내장초기증상",
+          "라섹"
+        ],
+        "items": [
+          {
+            "keyword": "라섹비용",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장초기증상",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라섹",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "mh8j62wm",
+        "blogId": "mh8j62wm",
+        "blogName": "에스앤비안과 2 (노출)",
+        "keywords": [
+          "렌즈삽입술가격",
+          "라식과라섹차이"
+        ],
+        "items": [
+          {
+            "keyword": "렌즈삽입술가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식과라섹차이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 21,
+          "productFolderHits": 1
+        }
+      }
+    ],
+    "pet": []
+  },
+  "blocked": {
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "displayName": "탐험기 - 교체",
+        "category": "에스앤비안과-백업",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "mh8j62wm",
+        "displayName": "에스앤비안과 2 (노출)",
+        "needed": 3,
+        "selected": 2
+      },
+      {
+        "accountId": "h9ag469z",
+        "displayName": "에스앤비안과 정보",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "dq1h3bjy",
+        "displayName": "에스앤비안과, 29년 경력 (노출)",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "hagyga",
+        "displayName": "에스앤비안과의원 - 교체",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "geenl",
+        "displayName": "모험 - 교체",
+        "needed": 3,
+        "selected": 0
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "displayName": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "loand3324",
+        "displayName": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error"
+      },
+      {
+        "accountId": "8ua1womn",
+        "displayName": "8ua1womn",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "displayName": "고양이밥 1",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "k7d9x2m4",
+        "displayName": "강아지강하지 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "fail5644",
+        "displayName": "고구마스틱2 (10개) 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "compare14310",
+        "displayName": "룰루랄라 2 (12개) 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ghostrush7",
+        "displayName": "실눈캐",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "respawnking9",
+        "displayName": "리스팩식스팩 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "displayName": "바삭바삭해 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "displayName": "쉽고간단하게",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahfflwl123",
+        "displayName": "햄부기",
+        "needed": 3,
+        "selected": 0
+      }
+    ]
+  },
+  "submissions": {}
+}

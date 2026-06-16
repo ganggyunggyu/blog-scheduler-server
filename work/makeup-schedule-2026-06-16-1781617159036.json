@@ -1,0 +1,955 @@
+{
+  "generatedAt": "2026-06-16T13:39:10.367Z",
+  "execute": true,
+  "scheduleDate": "2026-06-16",
+  "slots": [
+    "23:30",
+    "23:40",
+    "23:50"
+  ],
+  "perAccount": 3,
+  "domains": {
+    "eye": [
+      {
+        "accountId": "nes1p2kx",
+        "blogId": "nes1p2kx",
+        "blogName": "에스앤비안과 1 (노출)",
+        "keywords": [
+          "노안치료",
+          "백내장초기증상",
+          "난시교정술"
+        ],
+        "items": [
+          {
+            "keyword": "노안치료",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장초기증상",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "난시교정술",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "mh8j62wm",
+        "blogId": "mh8j62wm",
+        "blogName": "에스앤비안과 2 (노출)",
+        "keywords": [
+          "노안렌즈삽입술",
+          "백내장수술시간",
+          "렌즈삽입술"
+        ],
+        "items": [
+          {
+            "keyword": "노안렌즈삽입술",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술시간",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "렌즈삽입술",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "h9ag469z",
+        "blogId": "h9ag469z",
+        "blogName": "에스앤비안과 정보",
+        "keywords": [
+          "스마일프로가격",
+          "백내장증상",
+          "백내장수술비용"
+        ],
+        "items": [
+          {
+            "keyword": "스마일프로가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장증상",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "백내장수술비용",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "dq1h3bjy",
+        "blogId": "dq1h3bjy",
+        "blogName": "에스앤비안과, 29년 경력 (노출)",
+        "keywords": [
+          "백내장수술가격",
+          "백내장수술",
+          "라식비용"
+        ],
+        "items": [
+          {
+            "keyword": "백내장수술가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라식비용",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "hagyga",
+        "blogId": "hagyga",
+        "blogName": "에스앤비안과의원 - 교체",
+        "keywords": [
+          "난시교정",
+          "라식나이",
+          "라식라섹차이"
+        ],
+        "items": [
+          {
+            "keyword": "난시교정",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식나이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라식라섹차이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "geenl",
+        "blogId": "geenl",
+        "blogName": "모험 - 교체",
+        "keywords": [
+          "녹내장증상",
+          "라식재수술",
+          "노안"
+        ],
+        "items": [
+          {
+            "keyword": "녹내장증상",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식재수술",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "노안",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과-백업",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "k7d9x2m4",
+        "blogId": "k7d9x2m4",
+        "blogName": "강아지강하지 1",
+        "keywords": [
+          "강아지키우기",
+          "말티즈분양",
+          "푸들종류"
+        ],
+        "items": [
+          {
+            "keyword": "강아지키우기",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "말티즈분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "푸들종류",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 72,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "fail5644",
+        "blogId": "fail5644",
+        "blogName": "고구마스틱2 (10개) 1",
+        "keywords": [
+          "장모치와와",
+          "고양이품종",
+          "고양이종류"
+        ],
+        "items": [
+          {
+            "keyword": "장모치와와",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "고양이품종",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "고양이종류",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 111,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "compare14310",
+        "blogId": "compare14310",
+        "blogName": "룰루랄라 2 (12개) 1",
+        "keywords": [
+          "스핑크스",
+          "렉돌고양이",
+          "스핑크스고양이"
+        ],
+        "items": [
+          {
+            "keyword": "스핑크스",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "렉돌고양이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "스핑크스고양이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 105,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ghostrush7",
+        "blogId": "ghostrush7",
+        "blogName": "실눈캐",
+        "keywords": [
+          "새끼고양이",
+          "토이푸들분양",
+          "폼피츠"
+        ],
+        "items": [
+          {
+            "keyword": "새끼고양이",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "토이푸들분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "폼피츠",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 75,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "respawnking9",
+        "blogId": "respawnking9",
+        "blogName": "리스팩식스팩 1",
+        "keywords": [
+          "요크셔테리어분양",
+          "검은고양이",
+          "페르시안고양이"
+        ],
+        "items": [
+          {
+            "keyword": "요크셔테리어분양",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "검은고양이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "페르시안고양이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 62,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "blogId": "ahffkdlek12",
+        "blogName": "바삭바삭해 1",
+        "keywords": [
+          "포메라니안분양",
+          "푸들분양",
+          "래브라도리트리버"
+        ],
+        "items": [
+          {
+            "keyword": "포메라니안분양",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "푸들분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "래브라도리트리버",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 61,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "blogId": "ahsxkfldk12",
+        "blogName": "쉽고간단하게",
+        "keywords": [
+          "고양이키우기",
+          "랙돌",
+          "도베르만"
+        ],
+        "items": [
+          {
+            "keyword": "고양이키우기",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "랙돌",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "도베르만",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 59,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahfflwl123",
+        "blogId": "ahfflwl123",
+        "blogName": "햄부기",
+        "keywords": [
+          "요크셔테리어",
+          "비숑프리제분양",
+          "코리안쇼트헤어"
+        ],
+        "items": [
+          {
+            "keyword": "요크셔테리어",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "비숑프리제분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "코리안쇼트헤어",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 61,
+          "productFolderHits": 2
+        }
+      }
+    ],
+    "brand": [
+      {
+        "accountId": "adplan3th",
+        "blogId": "adplan3th",
+        "blogName": "에스앤비안과 브랜드",
+        "keywords": [
+          "스마일프로가격",
+          "비쥬맥스800",
+          "자이스스마일프로"
+        ],
+        "items": [
+          {
+            "keyword": "스마일프로가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "비쥬맥스800",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "자이스스마일프로",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ]
+      }
+    ]
+  },
+  "blocked": {
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "displayName": "탐험기 - 교체",
+        "category": "에스앤비안과-백업",
+        "reason": "missing_password"
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "displayName": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "loand3324",
+        "displayName": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error"
+      },
+      {
+        "accountId": "8ua1womn",
+        "displayName": "8ua1womn",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "displayName": "고양이밥 1",
+        "category": "서리펫",
+        "reason": "missing_password"
+      }
+    ],
+    "brand": []
+  },
+  "submissions": {
+    "eye": {
+      "success": true,
+      "totalJobs": 18,
+      "schedules": [
+        {
+          "scheduleId": "sch_d0da611d-47ac-47fc-90e6-61a184440717",
+          "account": "nes***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_cd0ae9a8-d0c7-4ff8-b030-bea3d76403c1",
+              "keyword": "노안치료",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_f33676bb-32f6-40b6-b357-98a8f8eefb5b",
+              "keyword": "백내장초기증상",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_fefb956b-e66b-43f9-91a6-d1ff7e946cc0",
+              "keyword": "난시교정술",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_50791424-2c8c-4e3b-94f9-966d1839c38f",
+          "account": "mh8***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_54c51661-d779-40c8-bc97-aa4a7d0b750d",
+              "keyword": "노안렌즈삽입술",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_08bb2e3b-3001-40f1-941a-f182b1e11cea",
+              "keyword": "백내장수술시간",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_3aea9d42-542c-4685-a89b-0881f2f481c7",
+              "keyword": "렌즈삽입술",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_b334123b-f08d-406a-b225-697d97e93095",
+          "account": "h9a***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_a9da1106-61fd-4ae0-97be-dc32e1bb12ca",
+              "keyword": "스마일프로가격",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_5b7f0125-e498-408c-9bb4-990086fb75d6",
+              "keyword": "백내장증상",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_5eec9876-38a0-4731-b4e5-85f031742223",
+              "keyword": "백내장수술비용",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_f4561abe-b5fb-430c-b5b0-63a45ebb6345",
+          "account": "dq1***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_e4603302-54bb-4507-83f4-3ada3c50b46b",
+              "keyword": "백내장수술가격",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_914a8db4-9d1a-419b-beb9-004192898c9d",
+              "keyword": "백내장수술",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_f35ecc61-7939-40f5-a000-77151254d601",
+              "keyword": "라식비용",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_0a311097-591f-440d-8d0c-322a333a68a2",
+          "account": "hag***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_4f1a745b-360a-4cd1-8b1c-6114d1fc5b36",
+              "keyword": "난시교정",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_f48c06ad-2515-47bf-b802-556a0d05165d",
+              "keyword": "라식나이",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_2f4426d6-d488-4c23-8bc8-e238e5a42882",
+              "keyword": "라식라섹차이",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_55cdf7eb-1ba6-4246-9334-4501fae46a85",
+          "account": "gee***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_35d91802-4831-4f09-a3e7-b58d634eb667",
+              "keyword": "녹내장증상",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_c6a967bf-30ca-467d-8322-f5c7a79088c3",
+              "keyword": "라식재수술",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_4ce1ff51-531b-4c9e-85b5-2070e3e3daef",
+              "keyword": "노안",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    },
+    "pet": {
+      "success": true,
+      "totalJobs": 24,
+      "schedules": [
+        {
+          "scheduleId": "sch_6483a8cf-fbc1-4baa-bdbf-f45c00719281",
+          "account": "k7d***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_b344e34b-3810-48bf-9bd4-a6669fcc4eb6",
+              "keyword": "강아지키우기",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_df40021b-8950-4f35-ace1-e8e69e037813",
+              "keyword": "말티즈분양",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_22487d65-f3e3-4fd6-9a39-58a923b55cb7",
+              "keyword": "푸들종류",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_4490aabd-60e6-4f5b-8d65-0489dd76c98e",
+          "account": "fai***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_00cad334-dc1e-40a9-affa-f5ea6f8f1753",
+              "keyword": "장모치와와",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_511a860b-c51c-480c-a37c-ecd11eac8c1b",
+              "keyword": "고양이품종",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_fa3fc859-7f22-4b6e-8d67-96260a404a58",
+              "keyword": "고양이종류",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_a766d4ce-7ad6-4ba6-bc87-26a72a145357",
+          "account": "com***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_2facc29a-3e77-45b2-9afb-9a11eaeeb5dd",
+              "keyword": "스핑크스",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_96ce84b0-3b86-4ddd-95b7-e560dcdaf5c8",
+              "keyword": "렉돌고양이",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_9ba19de2-2d10-434b-8cd6-b2f77bd46280",
+              "keyword": "스핑크스고양이",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_8da2c3ee-4859-40d7-81a6-bf90c7b2003a",
+          "account": "gho***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_2a4ecc56-7068-41ee-b071-c08ee680dbc6",
+              "keyword": "새끼고양이",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_be26c38d-216c-4927-a06c-22caa4f540fb",
+              "keyword": "토이푸들분양",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_ff866626-ed4b-47f4-b3a8-590403670716",
+              "keyword": "폼피츠",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_222369f0-4560-4e09-935b-7dc29e006ce0",
+          "account": "res***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_d8b0e5dc-55fe-4281-9407-3122e875d114",
+              "keyword": "요크셔테리어분양",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_ca012fc9-84a6-4243-bcd7-cc42c3f6bea5",
+              "keyword": "검은고양이",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_2f637e63-b785-43b1-90f0-feedf56a6768",
+              "keyword": "페르시안고양이",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_376d3c86-d609-4522-a3f8-967c38320607",
+          "account": "ahf***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_aa540d82-066e-46b0-b7ad-4baa7945d778",
+              "keyword": "포메라니안분양",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_c570e72b-9de4-4535-b9e2-abcc6eee17a5",
+              "keyword": "푸들분양",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_aa8e3bd6-29cc-4f47-be12-a762cd6d16f2",
+              "keyword": "래브라도리트리버",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_0775d147-69bc-447d-babf-10ee72656313",
+          "account": "ahs***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_a148a039-a93d-4092-979a-2f3890689d36",
+              "keyword": "고양이키우기",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_ce68d3d6-c46a-4065-9ef8-432d845c2ffa",
+              "keyword": "랙돌",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_4c3d6da3-cf3f-4e9d-ae31-b5560ec93fea",
+              "keyword": "도베르만",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_d4b6eec5-919d-4d5e-b8ea-f6f9f97419f1",
+          "account": "ahf***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_85358224-d9b7-4ce1-87a4-94ac74933b85",
+              "keyword": "요크셔테리어",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_3291ca6e-eb52-4fb4-97e7-47f96ace50b3",
+              "keyword": "비숑프리제분양",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_12cb40b0-b6b7-4fdd-86eb-121b6038207e",
+              "keyword": "코리안쇼트헤어",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    },
+    "brand": {
+      "success": true,
+      "totalJobs": 3,
+      "schedules": [
+        {
+          "scheduleId": "sch_b597e583-2361-43ef-b1ac-5ae8d202c9a9",
+          "account": "adp***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_890b78cb-dee0-4bfb-805e-97d3e30b55e2",
+              "keyword": "스마일프로가격",
+              "scheduledAt": "2026-06-16T23:30:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_7ae31ae5-4fe7-4b60-841c-f5cebd269127",
+              "keyword": "비쥬맥스800",
+              "scheduledAt": "2026-06-16T23:40:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_4b78545e-708e-4263-992d-4b6e33d6ab55",
+              "keyword": "자이스스마일프로",
+              "scheduledAt": "2026-06-16T23:50:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

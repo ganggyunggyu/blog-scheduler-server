@@ -1,0 +1,516 @@
+{
+  "generatedAt": "2026-06-16T13:38:51.099Z",
+  "execute": false,
+  "scheduleDate": "2026-06-16",
+  "slots": [
+    "23:30",
+    "23:40",
+    "23:50"
+  ],
+  "perAccount": 3,
+  "domains": {
+    "eye": [
+      {
+        "accountId": "nes1p2kx",
+        "blogId": "nes1p2kx",
+        "blogName": "에스앤비안과 1 (노출)",
+        "keywords": [
+          "노안치료",
+          "백내장초기증상",
+          "난시교정술"
+        ],
+        "items": [
+          {
+            "keyword": "노안치료",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장초기증상",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "난시교정술",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "mh8j62wm",
+        "blogId": "mh8j62wm",
+        "blogName": "에스앤비안과 2 (노출)",
+        "keywords": [
+          "노안렌즈삽입술",
+          "백내장수술시간",
+          "렌즈삽입술"
+        ],
+        "items": [
+          {
+            "keyword": "노안렌즈삽입술",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술시간",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "렌즈삽입술",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "h9ag469z",
+        "blogId": "h9ag469z",
+        "blogName": "에스앤비안과 정보",
+        "keywords": [
+          "스마일프로가격",
+          "백내장증상",
+          "백내장수술비용"
+        ],
+        "items": [
+          {
+            "keyword": "스마일프로가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장증상",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "백내장수술비용",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "dq1h3bjy",
+        "blogId": "dq1h3bjy",
+        "blogName": "에스앤비안과, 29년 경력 (노출)",
+        "keywords": [
+          "백내장수술가격",
+          "백내장수술",
+          "라식비용"
+        ],
+        "items": [
+          {
+            "keyword": "백내장수술가격",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라식비용",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "hagyga",
+        "blogId": "hagyga",
+        "blogName": "에스앤비안과의원 - 교체",
+        "keywords": [
+          "난시교정",
+          "라식나이",
+          "라식라섹차이"
+        ],
+        "items": [
+          {
+            "keyword": "난시교정",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식나이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라식라섹차이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "geenl",
+        "blogId": "geenl",
+        "blogName": "모험 - 교체",
+        "keywords": [
+          "녹내장증상",
+          "라식재수술",
+          "노안"
+        ],
+        "items": [
+          {
+            "keyword": "녹내장증상",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식재수술",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "노안",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과-백업",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "k7d9x2m4",
+        "blogId": "k7d9x2m4",
+        "blogName": "강아지강하지 1",
+        "keywords": [
+          "강아지키우기",
+          "말티즈분양",
+          "푸들종류"
+        ],
+        "items": [
+          {
+            "keyword": "강아지키우기",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "말티즈분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "푸들종류",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 72,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "fail5644",
+        "blogId": "fail5644",
+        "blogName": "고구마스틱2 (10개) 1",
+        "keywords": [
+          "장모치와와",
+          "고양이품종",
+          "고양이종류"
+        ],
+        "items": [
+          {
+            "keyword": "장모치와와",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "고양이품종",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "고양이종류",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 111,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "compare14310",
+        "blogId": "compare14310",
+        "blogName": "룰루랄라 2 (12개) 1",
+        "keywords": [
+          "스핑크스",
+          "렉돌고양이",
+          "스핑크스고양이"
+        ],
+        "items": [
+          {
+            "keyword": "스핑크스",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "렉돌고양이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "스핑크스고양이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 105,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ghostrush7",
+        "blogId": "ghostrush7",
+        "blogName": "실눈캐",
+        "keywords": [
+          "새끼고양이",
+          "토이푸들분양",
+          "폼피츠"
+        ],
+        "items": [
+          {
+            "keyword": "새끼고양이",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "토이푸들분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "폼피츠",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 75,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "respawnking9",
+        "blogId": "respawnking9",
+        "blogName": "리스팩식스팩 1",
+        "keywords": [
+          "요크셔테리어분양",
+          "검은고양이",
+          "페르시안고양이"
+        ],
+        "items": [
+          {
+            "keyword": "요크셔테리어분양",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "검은고양이",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "페르시안고양이",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 62,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "blogId": "ahffkdlek12",
+        "blogName": "바삭바삭해 1",
+        "keywords": [
+          "포메라니안분양",
+          "푸들분양",
+          "래브라도리트리버"
+        ],
+        "items": [
+          {
+            "keyword": "포메라니안분양",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "푸들분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "래브라도리트리버",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 61,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "blogId": "ahsxkfldk12",
+        "blogName": "쉽고간단하게",
+        "keywords": [
+          "고양이키우기",
+          "랙돌",
+          "도베르만"
+        ],
+        "items": [
+          {
+            "keyword": "고양이키우기",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "랙돌",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "도베르만",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 59,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "ahfflwl123",
+        "blogId": "ahfflwl123",
+        "blogName": "햄부기",
+        "keywords": [
+          "요크셔테리어",
+          "비숑프리제분양",
+          "코리안쇼트헤어"
+        ],
+        "items": [
+          {
+            "keyword": "요크셔테리어",
+            "scheduledAt": "2026-06-16T23:30:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "비숑프리제분양",
+            "scheduledAt": "2026-06-16T23:40:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "코리안쇼트헤어",
+            "scheduledAt": "2026-06-16T23:50:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "서리펫",
+          "productFolders": 61,
+          "productFolderHits": 2
+        }
+      }
+    ]
+  },
+  "blocked": {
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "displayName": "탐험기 - 교체",
+        "category": "에스앤비안과-백업",
+        "reason": "missing_password"
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "displayName": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "loand3324",
+        "displayName": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error"
+      },
+      {
+        "accountId": "8ua1womn",
+        "displayName": "8ua1womn",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "displayName": "고양이밥 1",
+        "category": "서리펫",
+        "reason": "missing_password"
+      }
+    ]
+  },
+  "submissions": {}
+}
