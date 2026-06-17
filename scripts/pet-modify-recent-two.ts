@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { format } from 'date-fns';
+import path from 'path';
+import { readdir } from 'fs/promises';
 import type { Queue } from 'bullmq';
 import { ScheduleJobModel, ScheduleModel } from '../src/schemas/schedule.schema.js';
 import { formatKst } from '../src/services/schedule.service.js';
@@ -9,11 +11,12 @@ import { getGenerateQueue, getPublishQueue, closeAllQueues } from '../src/queues
 import { closeBrowser } from '../src/lib/browser/playwright.js';
 import { redis } from '../src/config/redis.js';
 
-const SERVICE = 'pet-modify-recent2';
-const REF = '2026-05-21';
+const SERVICE = process.env.PET_MODIFY_SERVICE ?? 'pet-modify-nas-recent2';
+const NAS_DATE_CODE = process.env.PET_NAS_DATE_CODE ?? '0616';
+const REF = process.env.PET_MODIFY_REF ?? `2026-${NAS_DATE_CODE.slice(0, 2)}-${NAS_DATE_CODE.slice(2)}-nas-recent2`;
 const CATEGORY = '애견';
 const KEYWORD_CATEGORY = '애견';
-const MANUSCRIPT_TYPE = 'default';
+const MANUSCRIPT_TYPE = 'pet';
 const IMAGE_SOURCE = 'product';
 const IMAGE_COUNT = 5;
 const DELAY_BETWEEN_POSTS_SECONDS = 10;
@@ -21,18 +24,21 @@ const RECENT_POST_COUNT = 2;
 const MONITOR_INTERVAL_MS = 30_000;
 const MONITOR_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 const ACTIVE_JOB_RECOVERY_MS = 60_000;
-
-const REQUESTED_KEYWORDS = new Map<string, string[]>([
-  ['k7d9x2m4', ['강아지품종', '닥스훈트']],
-  ['fail5644', ['검은고양이', '도베르만']],
-  ['n7c3w8z2', ['고양이', '애견']],
-  ['compare14310', ['고양이키우기', '랙돌분양가']],
-  ['respawnking9', ['말티푸', '포메라니안분양']],
-  ['ahffkdlek12', ['강아지종류', '코숏']],
-  ['ahsxkfldk12', ['러시안블루분양', '말티즈']],
-  ['ghostrush7', ['골든두들', '말티푸분양가']],
-  ['ahfflwl123', ['고양이분양가', '고양이종류']],
-]);
+const DRY_RUN = process.env.PET_DRY_RUN === '1';
+const DEFAULT_NAS_BASE_DIR = '/Volumes/21lab_데이터관리/0_자동발행/0_애견자동발행';
+const NAS_OUTPUT_DIR = process.env.PET_NAS_OUTPUT_DIR
+  ? path.resolve(process.env.PET_NAS_OUTPUT_DIR)
+  : path.join(DEFAULT_NAS_BASE_DIR, `애견_${NAS_DATE_CODE}_출력`);
+const TARGET_ACCOUNT_IDS = [
+  'k7d9x2m4',
+  'fail5644',
+  'compare14310',
+  'ghostrush7',
+  'respawnking9',
+  'ahffkdlek12',
+  'ahsxkfldk12',
+  'ahfflwl123',
+];
 
 const ACCOUNT_FILTER = new Set(
   (process.env.PET_ACCOUNTS ?? '')
@@ -41,13 +47,15 @@ const ACCOUNT_FILTER = new Set(
     .filter(Boolean),
 );
 
-const requestedEntries = (): Array<[string, string[]]> => {
-  const entries = [...REQUESTED_KEYWORDS.entries()];
+let requestedKeywords = new Map<string, string[]>();
+
+const targetAccountIds = (): string[] => {
+  const entries = [...TARGET_ACCOUNT_IDS];
   if (ACCOUNT_FILTER.size === 0) {
     return entries;
   }
 
-  return entries.filter(([accountId]) => ACCOUNT_FILTER.has(accountId));
+  return entries.filter((accountId) => ACCOUNT_FILTER.has(accountId));
 };
 
 interface AccountDoc {
@@ -106,6 +114,57 @@ const decodeTitle = (raw: string): string => {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .trim();
+};
+
+const normalizeBlogName = (value: string): string =>
+  value
+    .normalize('NFC')
+    .replace(/\([^)]*\)/g, '')
+    .replace(/[0-9]+개/g, '')
+    .replace(/[0-9]+/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+
+const loadNasKeywords = async (accounts: AccountDoc[]): Promise<Map<string, string[]>> => {
+  const blogFolders = await readdir(NAS_OUTPUT_DIR, { withFileTypes: true });
+  const byBlogName = new Map(
+    blogFolders
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => [normalizeBlogName(entry.name), entry.name]),
+  );
+
+  const loaded = new Map<string, string[]>();
+  for (const account of accounts) {
+    const candidates = [
+      account.nickname,
+      account.blogId,
+      account.accountId,
+    ].filter((value): value is string => Boolean(value));
+
+    const blogFolder = candidates
+      .map((candidate) => byBlogName.get(normalizeBlogName(candidate)))
+      .find((candidate): candidate is string => Boolean(candidate));
+
+    if (!blogFolder) {
+      throw new Error(`NAS 출력 폴더 매칭 실패: ${account.accountId} (${account.nickname ?? '-'})`);
+    }
+
+    const keywordFolders = await readdir(path.join(NAS_OUTPUT_DIR, blogFolder), { withFileTypes: true });
+    const keywords = keywordFolders
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('_used_'))
+      .map((entry) => entry.name.normalize('NFC'))
+      .sort((a, b) => a.localeCompare(b, 'ko', { numeric: true }))
+      .slice(0, RECENT_POST_COUNT);
+
+    if (keywords.length < RECENT_POST_COUNT) {
+      throw new Error(`NAS 키워드 부족: ${account.accountId} ${keywords.length}/${RECENT_POST_COUNT}`);
+    }
+
+    loaded.set(account.accountId, keywords);
+    console.log(`[nas] ${account.nickname || account.accountId} -> ${keywords.join(', ')}`);
+  }
+
+  return loaded;
 };
 
 const extractJsonArray = (text: string): unknown[] => {
@@ -194,7 +253,7 @@ const fetchLatestPosts = async (blogId: string): Promise<PostItem[]> => {
 
 const resolveAccounts = async (): Promise<AccountDoc[]> => {
   const cafeDb = mongoose.connection.useDb('cafe-bot');
-  const ids = requestedEntries().map(([accountId]) => accountId);
+  const ids = targetAccountIds();
   if (ids.length === 0) {
     throw new Error(`처리할 계정 없음: ${[...ACCOUNT_FILTER].join(', ')}`);
   }
@@ -262,6 +321,7 @@ const addGenerateJob = async (
     logNo: post.logNo,
     keywordCategory: KEYWORD_CATEGORY,
     blogName: account.nickname || accountId,
+    imageDateCode: NAS_DATE_CODE,
   }, {
     jobId,
   });
@@ -381,7 +441,7 @@ const createOrRecoverAccountSchedule = async (
   posts: PostItem[],
 ): Promise<string | null> => {
   const accountId = account.accountId;
-  const keywords = REQUESTED_KEYWORDS.get(accountId) ?? [];
+  const keywords = requestedKeywords.get(accountId) ?? [];
   const scheduleDate = format(new Date(), 'yyyy-MM-dd');
   const queue = getGenerateQueue(accountId);
   const publishQueue = getPublishQueue(accountId);
@@ -548,6 +608,7 @@ const main = async (): Promise<void> => {
   await mongoose.connect(process.env.MONGO_URI!);
 
   const accounts = await resolveAccounts();
+  requestedKeywords = await loadNasKeywords(accounts);
   const scheduleIds: string[] = [];
 
   for (const account of accounts) {
@@ -557,10 +618,22 @@ const main = async (): Promise<void> => {
       console.log(`[warn] ${account.accountId} latest posts=${posts.length}`);
     }
 
+    if (DRY_RUN) {
+      const keywords = requestedKeywords.get(account.accountId) ?? [];
+      posts.forEach((post, index) => {
+        console.log(`[dry] ${account.nickname || account.accountId} ${index + 1}/${posts.length} logNo=${post.logNo} old="${post.title.slice(0, 48)}" -> kw=${keywords[index] ?? '-'}`);
+      });
+      continue;
+    }
+
     const scheduleId = await createOrRecoverAccountSchedule(account, posts);
     if (scheduleId) {
       scheduleIds.push(scheduleId);
     }
+  }
+
+  if (DRY_RUN) {
+    return;
   }
 
   await waitForCompletion(scheduleIds);
