@@ -1,6 +1,6 @@
 {
   "targetDate": "2026-06-17",
-  "generatedAt": "2026-06-17T14:37:31.886Z",
+  "generatedAt": "2026-06-17T15:32:43.279Z",
   "accounts": [
     {
       "accountId": "crvfwy7062",
@@ -118,177 +118,33 @@
       }
     },
     "추상의구체화": {
-      "total": 4,
+      "total": 3,
       "byStatus": {
-        "published": 4
+        "published": 3
       },
       "accounts": {
-        "orangeswan630": 2,
+        "orangeswan630": 1,
         "bigfish773": 2
       }
     },
     "흑염소": {
-      "total": 28,
+      "total": 17,
       "byStatus": {
-        "published": 25,
-        "failed": 3
+        "failed": 3,
+        "published": 14
       },
       "accounts": {
-        "regular14631": 4,
-        "dhtksk1p": 4,
-        "ahffkekd12": 4,
-        "q9v3m7a2": 4,
-        "laghunter8": 4,
-        "eghfsa5478": 4,
-        "pixelninja3": 4
+        "pixelninja3": 3,
+        "regular14631": 3,
+        "laghunter8": 3,
+        "dhtksk1p": 2,
+        "ahffkekd12": 2,
+        "q9v3m7a2": 2,
+        "eghfsa5478": 2
       }
     }
   },
   "duplicates": [
-    {
-      "category": "흑염소",
-      "keyword": "임산부독감",
-      "normalizedKeyword": "임산부독감",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_3ca1b046-3d57-4f65-858d-fd4be142a115",
-          "accountId": "regular14631",
-          "nickname": "소원 1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/regular14631/224318617847"
-        },
-        {
-          "id": "job_79e9368e-6b1d-4cec-90a4-f44d9f859568",
-          "accountId": "regular14631",
-          "nickname": "소원 1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/regular14631"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "근감소증",
-      "normalizedKeyword": "근감소증",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_1ac94666-b542-41ed-86e8-25309d78a99e",
-          "accountId": "dhtksk1p",
-          "nickname": "빨간모자앤  1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/dhtksk1p/224318575373"
-        },
-        {
-          "id": "job_3916fd3a-cc86-4e60-8d51-88713567826a",
-          "accountId": "dhtksk1p",
-          "nickname": "빨간모자앤  1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/dhtksk1p"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "만성피로해결",
-      "normalizedKeyword": "만성피로해결",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_2ac50fab-4e12-4fde-b2d7-197236a75097",
-          "accountId": "ahffkekd12",
-          "nickname": "긍정이백퍼  1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/ahffkekd12/224318560752"
-        },
-        {
-          "id": "job_d3cfa742-bc33-4148-aa51-f9bb7efd936d",
-          "accountId": "ahffkekd12",
-          "nickname": "긍정이백퍼  1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/ahffkekd12"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "칼슘",
-      "normalizedKeyword": "칼슘",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_00776895-d12a-4209-8b3d-354080c3206f",
-          "accountId": "q9v3m7a2",
-          "nickname": "포비 1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/q9v3m7a2/224318508262"
-        },
-        {
-          "id": "job_f8739e42-3338-410d-abb9-8db08c8779a9",
-          "accountId": "q9v3m7a2",
-          "nickname": "포비 1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/q9v3m7a2"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "임산부음식추천",
-      "normalizedKeyword": "임산부음식추천",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_6ded3d85-047b-4370-b60b-97bae4376ba3",
-          "accountId": "laghunter8",
-          "nickname": "도도 1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/laghunter8/224318594561"
-        },
-        {
-          "id": "job_93b41fbe-d4fb-4629-b32c-9e0cfbecddcd",
-          "accountId": "laghunter8",
-          "nickname": "도도 1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/laghunter8"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "흑염소중탕",
-      "normalizedKeyword": "흑염소중탕",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_af7d0f44-dfa9-438f-a6cc-7c9154b86c98",
-          "accountId": "eghfsa5478",
-          "nickname": "오세아니야 1",
-          "scheduledAt": "2026-06-17T10:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/eghfsa5478/224318617132"
-        },
-        {
-          "id": "job_7267fa7f-df51-4895-9778-68bb1efc6d81",
-          "accountId": "eghfsa5478",
-          "nickname": "오세아니야 1",
-          "scheduledAt": "2026-06-17T17:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/eghfsa5478"
-        }
-      ]
-    },
     {
       "category": "흑염소",
       "keyword": "레이노증후군",
@@ -387,78 +243,6 @@
     },
     {
       "category": "흑염소",
-      "keyword": "고콜레스테롤혈증의심",
-      "normalizedKeyword": "고콜레스테롤혈증의심",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_cd19a45b-a204-48be-ade4-4397ff1e5cf7",
-          "accountId": "dhtksk1p",
-          "nickname": "빨간모자앤  1",
-          "scheduledAt": "2026-06-17T11:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/dhtksk1p/224318581067"
-        },
-        {
-          "id": "job_372eb54d-6a58-4218-92ed-cf71a4f9ffcf",
-          "accountId": "dhtksk1p",
-          "nickname": "빨간모자앤  1",
-          "scheduledAt": "2026-06-17T18:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/dhtksk1p"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "소화불량",
-      "normalizedKeyword": "소화불량",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_936c39b1-b459-4a69-bd02-31b657a7fdcc",
-          "accountId": "ahffkekd12",
-          "nickname": "긍정이백퍼  1",
-          "scheduledAt": "2026-06-17T11:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/ahffkekd12"
-        },
-        {
-          "id": "job_637b58a5-d20e-4c96-9c95-9ca9d3e478bb",
-          "accountId": "ahffkekd12",
-          "nickname": "긍정이백퍼  1",
-          "scheduledAt": "2026-06-17T18:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/ahffkekd12"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "기력회복",
-      "normalizedKeyword": "기력회복",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_a7c9c40c-832e-4395-8b86-f433a503ccc3",
-          "accountId": "q9v3m7a2",
-          "nickname": "포비 1",
-          "scheduledAt": "2026-06-17T11:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/q9v3m7a2"
-        },
-        {
-          "id": "job_dc513795-8e63-4ad3-bccd-56a566f6b912",
-          "accountId": "q9v3m7a2",
-          "nickname": "포비 1",
-          "scheduledAt": "2026-06-17T18:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/q9v3m7a2"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
       "keyword": "임산부과일",
       "normalizedKeyword": "임산부과일",
       "count": 2,
@@ -478,54 +262,6 @@
           "scheduledAt": "2026-06-17T18:01:57+09:00",
           "status": "published",
           "postUrl": "https://blog.naver.com/laghunter8"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "흑염소효능남성",
-      "normalizedKeyword": "흑염소효능남성",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_40ee81e2-06eb-476a-8ae1-26d3498fc600",
-          "accountId": "eghfsa5478",
-          "nickname": "오세아니야 1",
-          "scheduledAt": "2026-06-17T11:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/eghfsa5478/224318613558"
-        },
-        {
-          "id": "job_447b10af-8da1-4547-974d-8ac0f4765153",
-          "accountId": "eghfsa5478",
-          "nickname": "오세아니야 1",
-          "scheduledAt": "2026-06-17T18:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/eghfsa5478"
-        }
-      ]
-    },
-    {
-      "category": "흑염소",
-      "keyword": "임산부식단",
-      "normalizedKeyword": "임산부식단",
-      "count": 2,
-      "rows": [
-        {
-          "id": "job_1251d734-f0ca-4be9-a9b4-cd42a59e6c90",
-          "accountId": "pixelninja3",
-          "nickname": "건강박사석사 1",
-          "scheduledAt": "2026-06-17T11:28:33+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/pixelninja3"
-        },
-        {
-          "id": "job_e17e425a-d8cd-4fcd-bac9-d0496a6987b1",
-          "accountId": "pixelninja3",
-          "nickname": "건강박사석사 1",
-          "scheduledAt": "2026-06-17T18:01:57+09:00",
-          "status": "published",
-          "postUrl": "https://blog.naver.com/pixelninja3"
         }
       ]
     },
@@ -627,150 +363,6 @@
     }
   ],
   "jobs": [
-    {
-      "id": "job_3ca1b046-3d57-4f65-858d-fd4be142a115",
-      "scheduleId": "sch_d2841f82-285f-406e-a019-2385a8b97775",
-      "accountId": "regular14631",
-      "blogId": "regular14631",
-      "nickname": "소원 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "failed",
-      "keyword": "임산부독감",
-      "normalizedKeyword": "임산부독감",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_3ca1b046-3d57-4f65-858d-fd4be142a115",
-      "publishJobId": "publish_job_3ca1b046-3d57-4f65-858d-fd4be142a115",
-      "postUrl": "https://blog.naver.com/regular14631/224318617847",
-      "completedAt": "2026-06-17T03:12:24.981Z",
-      "createdAt": "2026-06-17T00:28:37.546Z",
-      "updatedAt": "2026-06-17T03:12:24.981Z"
-    },
-    {
-      "id": "job_1ac94666-b542-41ed-86e8-25309d78a99e",
-      "scheduleId": "sch_686ed0f4-f567-4126-828e-221e54a3dce1",
-      "accountId": "dhtksk1p",
-      "blogId": "dhtksk1p",
-      "nickname": "빨간모자앤  1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "근감소증",
-      "normalizedKeyword": "근감소증",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_1ac94666-b542-41ed-86e8-25309d78a99e",
-      "publishJobId": "publish_job_1ac94666-b542-41ed-86e8-25309d78a99e",
-      "postUrl": "https://blog.naver.com/dhtksk1p/224318575373",
-      "completedAt": "2026-06-17T02:31:04.809Z",
-      "createdAt": "2026-06-17T00:28:49.204Z",
-      "updatedAt": "2026-06-17T02:31:04.812Z"
-    },
-    {
-      "id": "job_2ac50fab-4e12-4fde-b2d7-197236a75097",
-      "scheduleId": "sch_8a289001-736d-4bf0-b7bb-9aaa163346ad",
-      "accountId": "ahffkekd12",
-      "blogId": "ahffkekd12",
-      "nickname": "긍정이백퍼  1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "만성피로해결",
-      "normalizedKeyword": "만성피로해결",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_2ac50fab-4e12-4fde-b2d7-197236a75097",
-      "publishJobId": "publish_job_2ac50fab-4e12-4fde-b2d7-197236a75097",
-      "postUrl": "https://blog.naver.com/ahffkekd12/224318560752",
-      "completedAt": "2026-06-17T02:17:51.209Z",
-      "createdAt": "2026-06-17T00:28:55.307Z",
-      "updatedAt": "2026-06-17T02:17:51.210Z"
-    },
-    {
-      "id": "job_00776895-d12a-4209-8b3d-354080c3206f",
-      "scheduleId": "sch_9187a6cb-92fa-4440-86e8-6fe3b06624d2",
-      "accountId": "q9v3m7a2",
-      "blogId": "q9v3m7a2",
-      "nickname": "포비 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "칼슘",
-      "normalizedKeyword": "칼슘",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_00776895-d12a-4209-8b3d-354080c3206f",
-      "publishJobId": "publish_job_00776895-d12a-4209-8b3d-354080c3206f",
-      "postUrl": "https://blog.naver.com/q9v3m7a2/224318508262",
-      "completedAt": "2026-06-17T01:31:40.232Z",
-      "createdAt": "2026-06-17T00:29:01.134Z",
-      "updatedAt": "2026-06-17T01:31:40.232Z"
-    },
-    {
-      "id": "job_6ded3d85-047b-4370-b60b-97bae4376ba3",
-      "scheduleId": "sch_15ba2805-9d5b-403d-b35e-e1b48d1a327b",
-      "accountId": "laghunter8",
-      "blogId": "laghunter8",
-      "nickname": "도도 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "failed",
-      "keyword": "임산부음식추천",
-      "normalizedKeyword": "임산부음식추천",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_6ded3d85-047b-4370-b60b-97bae4376ba3",
-      "publishJobId": "publish_job_6ded3d85-047b-4370-b60b-97bae4376ba3",
-      "postUrl": "https://blog.naver.com/laghunter8/224318594561",
-      "completedAt": "2026-06-17T02:48:57.392Z",
-      "createdAt": "2026-06-17T00:29:04.735Z",
-      "updatedAt": "2026-06-17T02:48:57.393Z"
-    },
-    {
-      "id": "job_af7d0f44-dfa9-438f-a6cc-7c9154b86c98",
-      "scheduleId": "sch_bb87a11f-3def-467e-8f99-75cdd4a00784",
-      "accountId": "eghfsa5478",
-      "blogId": "eghfsa5478",
-      "nickname": "오세아니야 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "흑염소중탕",
-      "normalizedKeyword": "흑염소중탕",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T10:28:33+09:00",
-      "slot": 1,
-      "status": "published",
-      "generateJobId": "generate_job_af7d0f44-dfa9-438f-a6cc-7c9154b86c98",
-      "publishJobId": "publish_job_af7d0f44-dfa9-438f-a6cc-7c9154b86c98",
-      "postUrl": "https://blog.naver.com/eghfsa5478/224318617132",
-      "completedAt": "2026-06-17T03:11:34.988Z",
-      "createdAt": "2026-06-17T00:29:06.986Z",
-      "updatedAt": "2026-06-17T03:11:34.988Z"
-    },
     {
       "id": "job_7fd57d7e-64e0-49c2-99da-a22827874a5d",
       "scheduleId": "sch_17e629d8-0494-4bf6-9a57-ab9c8281ee8a",
@@ -1012,78 +604,6 @@
       "updatedAt": "2026-06-17T02:55:45.598Z"
     },
     {
-      "id": "job_cd19a45b-a204-48be-ade4-4397ff1e5cf7",
-      "scheduleId": "sch_686ed0f4-f567-4126-828e-221e54a3dce1",
-      "accountId": "dhtksk1p",
-      "blogId": "dhtksk1p",
-      "nickname": "빨간모자앤  1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "고콜레스테롤혈증의심",
-      "normalizedKeyword": "고콜레스테롤혈증의심",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T11:28:33+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_cd19a45b-a204-48be-ade4-4397ff1e5cf7",
-      "publishJobId": "publish_job_cd19a45b-a204-48be-ade4-4397ff1e5cf7",
-      "postUrl": "https://blog.naver.com/dhtksk1p/224318581067",
-      "completedAt": "2026-06-17T02:36:12.474Z",
-      "createdAt": "2026-06-17T00:28:49.204Z",
-      "updatedAt": "2026-06-17T02:36:12.475Z"
-    },
-    {
-      "id": "job_936c39b1-b459-4a69-bd02-31b657a7fdcc",
-      "scheduleId": "sch_8a289001-736d-4bf0-b7bb-9aaa163346ad",
-      "accountId": "ahffkekd12",
-      "blogId": "ahffkekd12",
-      "nickname": "긍정이백퍼  1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "소화불량",
-      "normalizedKeyword": "소화불량",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T11:28:33+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_936c39b1-b459-4a69-bd02-31b657a7fdcc",
-      "publishJobId": "publish_job_936c39b1-b459-4a69-bd02-31b657a7fdcc",
-      "postUrl": "https://blog.naver.com/ahffkekd12",
-      "completedAt": "2026-06-17T01:49:18.839Z",
-      "createdAt": "2026-06-17T00:28:55.307Z",
-      "updatedAt": "2026-06-17T01:49:18.840Z"
-    },
-    {
-      "id": "job_a7c9c40c-832e-4395-8b86-f433a503ccc3",
-      "scheduleId": "sch_9187a6cb-92fa-4440-86e8-6fe3b06624d2",
-      "accountId": "q9v3m7a2",
-      "blogId": "q9v3m7a2",
-      "nickname": "포비 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "기력회복",
-      "normalizedKeyword": "기력회복",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T11:28:33+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_a7c9c40c-832e-4395-8b86-f433a503ccc3",
-      "publishJobId": "publish_job_a7c9c40c-832e-4395-8b86-f433a503ccc3",
-      "postUrl": "https://blog.naver.com/q9v3m7a2",
-      "completedAt": "2026-06-17T01:48:51.930Z",
-      "createdAt": "2026-06-17T00:29:01.134Z",
-      "updatedAt": "2026-06-17T01:48:51.930Z"
-    },
-    {
       "id": "job_658ab7c8-09a8-4523-b2ad-4d3f7ef63559",
       "scheduleId": "sch_15ba2805-9d5b-403d-b35e-e1b48d1a327b",
       "accountId": "laghunter8",
@@ -1108,54 +628,6 @@
       "updatedAt": "2026-06-17T02:27:47.328Z"
     },
     {
-      "id": "job_40ee81e2-06eb-476a-8ae1-26d3498fc600",
-      "scheduleId": "sch_bb87a11f-3def-467e-8f99-75cdd4a00784",
-      "accountId": "eghfsa5478",
-      "blogId": "eghfsa5478",
-      "nickname": "오세아니야 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "흑염소효능남성",
-      "normalizedKeyword": "흑염소효능남성",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T11:28:33+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_40ee81e2-06eb-476a-8ae1-26d3498fc600",
-      "publishJobId": "publish_job_40ee81e2-06eb-476a-8ae1-26d3498fc600",
-      "postUrl": "https://blog.naver.com/eghfsa5478/224318613558",
-      "completedAt": "2026-06-17T03:07:47.943Z",
-      "createdAt": "2026-06-17T00:29:06.986Z",
-      "updatedAt": "2026-06-17T03:07:47.943Z"
-    },
-    {
-      "id": "job_1251d734-f0ca-4be9-a9b4-cd42a59e6c90",
-      "scheduleId": "sch_17e629d8-0494-4bf6-9a57-ab9c8281ee8a",
-      "accountId": "pixelninja3",
-      "blogId": "pixelninja3",
-      "nickname": "건강박사석사 1",
-      "accountCategory": "흑염소",
-      "service": "default",
-      "ref": "core-daily-goat-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "failed",
-      "keyword": "임산부식단",
-      "normalizedKeyword": "임산부식단",
-      "jobCategory": "한려담원",
-      "scheduledAt": "2026-06-17T11:28:33+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_1251d734-f0ca-4be9-a9b4-cd42a59e6c90",
-      "publishJobId": "publish_job_1251d734-f0ca-4be9-a9b4-cd42a59e6c90",
-      "postUrl": "https://blog.naver.com/pixelninja3",
-      "completedAt": "2026-06-17T02:11:01.917Z",
-      "createdAt": "2026-06-17T00:29:09.829Z",
-      "updatedAt": "2026-06-17T02:11:01.918Z"
-    },
-    {
       "id": "job_818d3f37-a774-444b-94fa-4632eb4f2037",
       "scheduleId": "sch_6014f3cb-87d6-4a78-873c-3d4afe3605b8",
       "accountId": "tinyfish183",
@@ -1178,30 +650,6 @@
       "completedAt": "2026-06-17T01:39:18.289Z",
       "createdAt": "2026-06-17T00:29:12.474Z",
       "updatedAt": "2026-06-17T01:39:18.290Z"
-    },
-    {
-      "id": "job_2d844b98-f766-45a4-ab51-940dab903584",
-      "scheduleId": "sch_91ce302c-9f06-4cd1-a07c-529adb42cc21",
-      "accountId": "orangeswan630",
-      "blogId": "orangeswan630",
-      "nickname": "똑똑한건희씨",
-      "accountCategory": "추상의구체화",
-      "service": "default",
-      "ref": "core-daily-chusang-2026-06-17",
-      "scheduleDate": "2026-06-17",
-      "scheduleStatus": "completed",
-      "keyword": "비아그라 부작용",
-      "normalizedKeyword": "비아그라부작용",
-      "jobCategory": "추상의구체화",
-      "scheduledAt": "2026-06-17T11:28:34+09:00",
-      "slot": 2,
-      "status": "published",
-      "generateJobId": "generate_job_2d844b98-f766-45a4-ab51-940dab903584",
-      "publishJobId": "publish_job_2d844b98-f766-45a4-ab51-940dab903584",
-      "postUrl": "https://blog.naver.com/orangeswan630",
-      "completedAt": "2026-06-17T01:30:43.026Z",
-      "createdAt": "2026-06-17T00:29:12.822Z",
-      "updatedAt": "2026-06-17T01:30:43.026Z"
     },
     {
       "id": "job_c04fec0a-7011-47a8-9507-215609d94eb2",
