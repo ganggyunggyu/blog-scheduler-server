@@ -1,0 +1,297 @@
+{
+  "targetDate": "2026-06-17",
+  "execute": false,
+  "generatedAt": "2026-06-17T14:39:39.453Z",
+  "expectedPerAccount": 2,
+  "totalTargets": 11,
+  "totalDeleted": 0,
+  "plans": [
+    {
+      "accountId": "pixelninja3",
+      "blogId": "pixelninja3",
+      "nickname": "건강박사석사 1",
+      "matchedPosts": [
+        {
+          "logNo": "224318879279",
+          "title": "임산부식단 실수하는 포인트 먼저 체크하세요",
+          "keyword": "임산부식단",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318553038",
+          "title": "임산부식단 신경 쓰이는데 이것만은 꼭 챙기세요",
+          "keyword": "임산부식단",
+          "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318553038",
+          "title": "임산부식단 신경 쓰이는데 이것만은 꼭 챙기세요",
+          "keyword": "임산부식단",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 1,
+      "deleted": []
+    },
+    {
+      "accountId": "ahffkekd12",
+      "blogId": "ahffkekd12",
+      "nickname": "긍정이백퍼  1",
+      "matchedPosts": [
+        {
+          "logNo": "224318901369",
+          "title": "소화불량, 왜 생기는지 원인부터 알면 다릅니다",
+          "keyword": "소화불량",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318879200",
+          "title": "만성피로해결, 자도 자도 피곤한 진짜 이유",
+          "keyword": "만성피로해결",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318560752",
+          "title": "만성피로해결 원인부터 짚고 가는 핵심 관리법",
+          "keyword": "만성피로해결",
+          "pubDate": "Wed, 17 Jun 2026 11:17:42 +0900"
+        },
+        {
+          "logNo": "224318528843",
+          "title": "소화불량 왜 생기는 걸까 질문부터 시작",
+          "keyword": "소화불량",
+          "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318528843",
+          "title": "소화불량 왜 생기는 걸까 질문부터 시작",
+          "keyword": "소화불량",
+          "reason": "duplicate-keyword"
+        },
+        {
+          "logNo": "224318560752",
+          "title": "만성피로해결 원인부터 짚고 가는 핵심 관리법",
+          "keyword": "만성피로해결",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    },
+    {
+      "accountId": "laghunter8",
+      "blogId": "laghunter8",
+      "nickname": "도도 1",
+      "matchedPosts": [
+        {
+          "logNo": "224318924863",
+          "title": "임산부 과일, 하루 권장량과 조심해야 할 과일",
+          "keyword": "임산부과일",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318921067",
+          "title": "임산부음식추천 권장량과 함께",
+          "keyword": "임산부음식추천",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318594561",
+          "title": "임산부음식추천 언제부터 챙기는 게 맞을까",
+          "keyword": "임산부음식추천",
+          "pubDate": "Wed, 17 Jun 2026 11:48:53 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318594561",
+          "title": "임산부음식추천 언제부터 챙기는 게 맞을까",
+          "keyword": "임산부음식추천",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    },
+    {
+      "accountId": "dhtksk1p",
+      "blogId": "dhtksk1p",
+      "nickname": "빨간모자앤  1",
+      "matchedPosts": [
+        {
+          "logNo": "224318915709",
+          "title": "고콜레스테롤혈증 의심 증상부터 알아야 하는 이유",
+          "keyword": "고콜레스테롤혈증의심",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318910409",
+          "title": "근감소증, 그냥 늙어서 힘 빠지는 게 아니라고?",
+          "keyword": "근감소증",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318581067",
+          "title": "고콜레스테롤혈증 의심 결과는 원인부터 다르다",
+          "keyword": "고콜레스테롤혈증의심",
+          "pubDate": "Wed, 17 Jun 2026 11:36:07 +0900"
+        },
+        {
+          "logNo": "224318575373",
+          "title": "30대부터 시작되는 근감소증, 이유가 있었네",
+          "keyword": "근감소증",
+          "pubDate": "Wed, 17 Jun 2026 11:30:49 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318575373",
+          "title": "30대부터 시작되는 근감소증, 이유가 있었네",
+          "keyword": "근감소증",
+          "reason": "duplicate-keyword"
+        },
+        {
+          "logNo": "224318581067",
+          "title": "고콜레스테롤혈증 의심 결과는 원인부터 다르다",
+          "keyword": "고콜레스테롤혈증의심",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    },
+    {
+      "accountId": "regular14631",
+      "blogId": "regular14631",
+      "nickname": "소원 1",
+      "matchedPosts": [
+        {
+          "logNo": "224318904516",
+          "title": "제목 임신영양제 권장량부터 챙겨야 할까 체질별 차이까지",
+          "keyword": "임신영양제",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318897582",
+          "title": "임산부 독감, 병원 가야 할 때와 집에서 관리할 때",
+          "keyword": "임산부독감",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318617847",
+          "title": "임산부독감 증상부터 치료까지 병원 가야 하나",
+          "keyword": "임산부독감",
+          "pubDate": "Wed, 17 Jun 2026 12:12:19 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318617847",
+          "title": "임산부독감 증상부터 치료까지 병원 가야 하나",
+          "keyword": "임산부독감",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    },
+    {
+      "accountId": "eghfsa5478",
+      "blogId": "eghfsa5478",
+      "nickname": "오세아니야 1",
+      "matchedPosts": [
+        {
+          "logNo": "224318911531",
+          "title": "흑염소효능남성 고를 때 놓치는 실수",
+          "keyword": "흑염소효능남성",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318904291",
+          "title": "흑염소중탕 꼭 먹어야 할까 복용 순서와 조합 가이드",
+          "keyword": "흑염소중탕",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318617132",
+          "title": "흑염소중탕 꼭 먹어야 할까 실수 포인트 정리",
+          "keyword": "흑염소중탕",
+          "pubDate": "Wed, 17 Jun 2026 12:11:32 +0900"
+        },
+        {
+          "logNo": "224318613558",
+          "title": "흑염소효능남성 챙길 타이밍과 선택 기준 정리",
+          "keyword": "흑염소효능남성",
+          "pubDate": "Wed, 17 Jun 2026 12:07:43 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318613558",
+          "title": "흑염소효능남성 챙길 타이밍과 선택 기준 정리",
+          "keyword": "흑염소효능남성",
+          "reason": "duplicate-keyword"
+        },
+        {
+          "logNo": "224318617132",
+          "title": "흑염소중탕 꼭 먹어야 할까 실수 포인트 정리",
+          "keyword": "흑염소중탕",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    },
+    {
+      "accountId": "q9v3m7a2",
+      "blogId": "q9v3m7a2",
+      "nickname": "포비 1",
+      "matchedPosts": [
+        {
+          "logNo": "224318907445",
+          "title": "1. 기력회복 원인부터 짚는 기운 보충 음식",
+          "keyword": "기력회복",
+          "pubDate": "Wed, 17 Jun 2026 18:00:00 +0900"
+        },
+        {
+          "logNo": "224318900968",
+          "title": "칼슘 실수하지 않고 먹는 법",
+          "keyword": "칼슘",
+          "pubDate": "Wed, 17 Jun 2026 17:00:00 +0900"
+        },
+        {
+          "logNo": "224318528322",
+          "title": "기력회복 언제부터 떨어졌나요, 원인부터 짚고 기준으로 고르는 법",
+          "keyword": "기력회복",
+          "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900"
+        },
+        {
+          "logNo": "224318508262",
+          "title": "칼슘 권장량과 복용 시기 언제부터 챙겨야 할까",
+          "keyword": "칼슘",
+          "pubDate": "Wed, 17 Jun 2026 10:31:15 +0900"
+        }
+      ],
+      "deleteTargets": [
+        {
+          "logNo": "224318508262",
+          "title": "칼슘 권장량과 복용 시기 언제부터 챙겨야 할까",
+          "keyword": "칼슘",
+          "reason": "duplicate-keyword"
+        },
+        {
+          "logNo": "224318528322",
+          "title": "기력회복 언제부터 떨어졌나요, 원인부터 짚고 기준으로 고르는 법",
+          "keyword": "기력회복",
+          "reason": "duplicate-keyword"
+        }
+      ],
+      "remainingCount": 2,
+      "deleted": []
+    }
+  ]
+}
