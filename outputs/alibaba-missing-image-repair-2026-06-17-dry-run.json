@@ -1,0 +1,134 @@
+{
+  "targetDate": "2026-06-17",
+  "execute": false,
+  "generatedAt": "2026-06-18T04:41:50.364Z",
+  "totals": {
+    "targets": 6,
+    "ok": 0,
+    "skipped": 0,
+    "failed": 0,
+    "dryRun": 6
+  },
+  "results": [
+    {
+      "target": {
+        "accountId": "mad1651",
+        "blogId": "mad1651",
+        "logNo": "224318488621",
+        "keyword": "해외구매",
+        "title": "알리바바닷컴 해외구매대행 절차부터 관세까지 총정리",
+        "dateCode": "0617"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318488621/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    },
+    {
+      "target": {
+        "accountId": "mad1651",
+        "blogId": "mad1651",
+        "logNo": "224318473701",
+        "keyword": "해외배송대행",
+        "title": "해외배송대행 해외직구 초보자를 위한 가이드",
+        "dateCode": "0617"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318473701/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    },
+    {
+      "target": {
+        "accountId": "weed3122",
+        "blogId": "weed3122",
+        "logNo": "224318497711",
+        "keyword": "해외구매",
+        "title": "해외구매 통관 A부터 Z까지 총정리",
+        "dateCode": "0617"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318497711/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    },
+    {
+      "target": {
+        "accountId": "weed3122",
+        "blogId": "weed3122",
+        "logNo": "224318490743",
+        "keyword": "해외배송대행",
+        "title": "해외배송대행 비교 방법부터 주의점까지 총정리",
+        "dateCode": "0617"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318490743/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    },
+    {
+      "target": {
+        "accountId": "weed3122",
+        "blogId": "weed3122",
+        "logNo": "224318484952",
+        "keyword": "해외직구통관배송조회",
+        "title": "해외직구통관배송조회 완벽정리",
+        "dateCode": "0616"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318484952/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    },
+    {
+      "target": {
+        "accountId": "individual14144",
+        "blogId": "individual14144",
+        "logNo": "224318512063",
+        "keyword": "해외구매",
+        "title": "해외구매 피해야 하는 이유 지금 알려드려요",
+        "dateCode": "0617"
+      },
+      "beforeImageCount": 0,
+      "preparedImages": {
+        "body": 5,
+        "excludeLibrary": 1,
+        "individual": 0,
+        "slide": 0,
+        "collage": 0
+      },
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/individual14144/224318512063/라이브러리제외_1.webp",
+      "status": "DRY_RUN"
+    }
+  ]
+}
