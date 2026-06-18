@@ -1,6 +1,6 @@
 {
   "targetDate": "2026-06-17",
-  "generatedAt": "2026-06-18T02:26:58.975Z",
+  "generatedAt": "2026-06-18T05:01:53.612Z",
   "criteria": {
     "expectedPerAccount": 3,
     "minBodyImages": 1,
@@ -9,9 +9,9 @@
   "totals": {
     "accounts": 5,
     "posts": 15,
-    "ok": 9,
-    "problems": 6,
-    "missingImages": 6,
+    "ok": 15,
+    "problems": 0,
+    "missingImages": 0,
     "brokenImages": 0,
     "checkFailed": 0
   },
@@ -32,9 +32,9 @@
       "nickname": "알리바바 신규2",
       "postCount": 3,
       "expected": 3,
-      "okCount": 1,
-      "problemCount": 2,
-      "status": "CHECK"
+      "okCount": 3,
+      "problemCount": 0,
+      "status": "OK"
     },
     {
       "accountId": "heavymouse448",
@@ -52,9 +52,9 @@
       "nickname": "알리바바 신규4",
       "postCount": 3,
       "expected": 3,
-      "okCount": 0,
-      "problemCount": 3,
-      "status": "CHECK"
+      "okCount": 3,
+      "problemCount": 0,
+      "status": "OK"
     },
     {
       "accountId": "individual14144",
@@ -62,109 +62,12 @@
       "nickname": "알리바바 신규6",
       "postCount": 3,
       "expected": 3,
-      "okCount": 2,
-      "problemCount": 1,
-      "status": "CHECK"
+      "okCount": 3,
+      "problemCount": 0,
+      "status": "OK"
     }
   ],
-  "problems": [
-    {
-      "accountId": "mad1651",
-      "blogId": "mad1651",
-      "nickname": "알리바바 신규2",
-      "logNo": "224318488621",
-      "title": "알리바바닷컴 해외구매대행 절차부터 관세까지 총정리",
-      "url": "https://blog.naver.com/mad1651/224318488621",
-      "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    },
-    {
-      "accountId": "mad1651",
-      "blogId": "mad1651",
-      "nickname": "알리바바 신규2",
-      "logNo": "224318473701",
-      "title": "해외배송대행 해외직구 초보자를 위한 가이드",
-      "url": "https://blog.naver.com/mad1651/224318473701",
-      "pubDate": "Wed, 17 Jun 2026 10:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    },
-    {
-      "accountId": "weed3122",
-      "blogId": "weed3122",
-      "nickname": "알리바바 신규4",
-      "logNo": "224318497711",
-      "title": "해외구매 통관 A부터 Z까지 총정리",
-      "url": "https://blog.naver.com/weed3122/224318497711",
-      "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    },
-    {
-      "accountId": "weed3122",
-      "blogId": "weed3122",
-      "nickname": "알리바바 신규4",
-      "logNo": "224318490743",
-      "title": "해외배송대행 비교 방법부터 주의점까지 총정리",
-      "url": "https://blog.naver.com/weed3122/224318490743",
-      "pubDate": "Wed, 17 Jun 2026 10:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    },
-    {
-      "accountId": "weed3122",
-      "blogId": "weed3122",
-      "nickname": "알리바바 신규4",
-      "logNo": "224318484952",
-      "title": "해외직구통관배송조회 완벽정리",
-      "url": "https://blog.naver.com/weed3122/224318484952",
-      "pubDate": "Wed, 17 Jun 2026 10:10:17 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    },
-    {
-      "accountId": "individual14144",
-      "blogId": "individual14144",
-      "nickname": "알리바바 신규6",
-      "logNo": "224318512063",
-      "title": "해외구매 피해야 하는 이유 지금 알려드려요",
-      "url": "https://blog.naver.com/individual14144/224318512063",
-      "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
-      "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
-    }
-  ],
+  "problems": [],
   "posts": [
     {
       "accountId": "crvfwy7062",
@@ -278,13 +181,23 @@
       "title": "알리바바닷컴 해외구매대행 절차부터 관세까지 총정리",
       "url": "https://blog.naver.com/mad1651/224318488621",
       "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMjc4/MDAxNzgxNzU4NTU1NDI2.xTLpRHSnSR_d2fqlrR-qJPd1Erf4evyrmukakkrX3UIg.tPILO7Z74c-OKoMtFL0J91bfcfrk4K9lDYZcfh3C2swg.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 418,
+          "renderedWidth": 886,
+          "renderedHeight": 383,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "mad1651",
@@ -294,13 +207,23 @@
       "title": "해외배송대행 해외직구 초보자를 위한 가이드",
       "url": "https://blog.naver.com/mad1651/224318473701",
       "pubDate": "Wed, 17 Jun 2026 10:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMjAg/MDAxNzgxNzU4NTgxNTM3.AtEweU-nQQQlYgnm9Pus_rWlL9uozBHFUS1gZ0fqpBMg.YIWWL122kIwMCFilCvp4khRUf0BmbDyNbLoE3R1Jg9Mg.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 543,
+          "renderedWidth": 886,
+          "renderedHeight": 498,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "heavymouse448",
@@ -388,13 +311,23 @@
       "title": "해외구매 통관 A부터 Z까지 총정리",
       "url": "https://blog.naver.com/weed3122/224318497711",
       "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMjQx/MDAxNzgxNzU4NjA4NTkz.TZus47EV5rBCD-gVSETre7lozIJHyJUA3s622uvj6A8g.WgU2hCEMMN7rE7_HY44To43HycQNBRQGewAg2uZn9HUg.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 666,
+          "renderedWidth": 886,
+          "renderedHeight": 611,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "weed3122",
@@ -404,13 +337,23 @@
       "title": "해외배송대행 비교 방법부터 주의점까지 총정리",
       "url": "https://blog.naver.com/weed3122/224318490743",
       "pubDate": "Wed, 17 Jun 2026 10:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMjk5/MDAxNzgxNzU4NjM0Njk2.C7WzSj0dwNEOVqD2W9SJ_uk0jOK9zz1o_82Kl2IyfdIg.5EZW_OU9SN9putTr8u0vv2yyfxv04nh8BbFFXL5CE8gg.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 570,
+          "renderedWidth": 886,
+          "renderedHeight": 523,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "weed3122",
@@ -420,13 +363,23 @@
       "title": "해외직구통관배송조회 완벽정리",
       "url": "https://blog.naver.com/weed3122/224318484952",
       "pubDate": "Wed, 17 Jun 2026 10:10:17 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMTk0/MDAxNzgxNzU4NjYxMDQy.cYuDiRbDXwm-XzynQ1R3WraCLPAmEUV0M__rhGm3jpcg.9_MydUzuw49BIVuiy3fj0IrTRm2K-M_xDc-_92GzrMkg.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 583,
+          "renderedWidth": 886,
+          "renderedHeight": 535,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "individual14144",
@@ -436,13 +389,23 @@
       "title": "해외구매 피해야 하는 이유 지금 알려드려요",
       "url": "https://blog.naver.com/individual14144/224318512063",
       "pubDate": "Wed, 17 Jun 2026 11:20:00 +0900",
-      "bodyImageCount": 0,
-      "loadedImageCount": 0,
+      "bodyImageCount": 1,
+      "loadedImageCount": 1,
       "brokenImageCount": 0,
-      "hasImage": false,
-      "ok": false,
-      "status": "NO_IMAGE",
-      "images": []
+      "hasImage": true,
+      "ok": true,
+      "status": "OK",
+      "images": [
+        {
+          "src": "https://postfiles.pstatic.net/MjAyNjA2MThfMjQ5/MDAxNzgxNzU4Njg4MDYw.-uv93sBB79LqldcZXLNwCYz4spWLJ8IxQboYF0Trx00g.KaINxp_BnUsrmRA3mfGPWEvabha79uXgd5NbGdN23v8g.PNG/body_1.png?type=w966",
+          "alt": "",
+          "naturalWidth": 966,
+          "naturalHeight": 281,
+          "renderedWidth": 886,
+          "renderedHeight": 258,
+          "complete": true
+        }
+      ]
     },
     {
       "accountId": "individual14144",
