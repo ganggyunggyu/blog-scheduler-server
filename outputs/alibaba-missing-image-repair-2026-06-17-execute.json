@@ -1,12 +1,12 @@
 {
   "targetDate": "2026-06-17",
   "execute": true,
-  "generatedAt": "2026-06-18T04:54:59.520Z",
+  "generatedAt": "2026-06-18T04:58:25.858Z",
   "totals": {
     "targets": 6,
-    "ok": 0,
+    "ok": 6,
     "skipped": 0,
-    "failed": 6,
+    "failed": 0,
     "dryRun": 0
   },
   "results": [
@@ -27,11 +27,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318488621/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/mad1651/224318488621",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318488621/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/mad1651/224318488621"
     },
     {
       "target": {
@@ -50,11 +49,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318473701/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/mad1651/224318473701",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/mad1651/224318473701/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/mad1651/224318473701"
     },
     {
       "target": {
@@ -73,11 +71,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318497711/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/weed3122/224318497711",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318497711/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/weed3122/224318497711"
     },
     {
       "target": {
@@ -96,11 +93,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318490743/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/weed3122/224318490743",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318490743/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/weed3122/224318490743"
     },
     {
       "target": {
@@ -119,11 +115,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318484952/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/weed3122/224318484952",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/weed3122/224318484952/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/weed3122/224318484952"
     },
     {
       "target": {
@@ -142,11 +137,10 @@
         "slide": 0,
         "collage": 0
       },
-      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/individual14144/224318512063/라이브러리제외_1.webp",
-      "status": "FAILED",
-      "afterImageCount": 0,
-      "postUrl": "https://blog.naver.com/individual14144/224318512063",
-      "error": "공개 본문 이미지 수 증가 확인 실패"
+      "imagePath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/alibaba-missing-image-repair-2026-06-17/individual14144/224318512063/body_1.webp",
+      "status": "OK",
+      "afterImageCount": 1,
+      "postUrl": "https://blog.naver.com/individual14144/224318512063"
     }
   ]
 }
