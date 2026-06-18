@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildProvidedProductData,
+  hasPreparedBodyImages,
   hasMultiImageData,
   hasPreparedProductImages,
   needsBodyImageFallback,
@@ -53,6 +54,30 @@ test('hasPreparedProductImages: 알리바바용 product 이미지 묶음이 하�
     hasPreparedProductImages({
       bodyImages: [],
       excludeLibrary: [],
+      multiImages: {},
+      excludeLibraryLink: [],
+      metadata: {},
+    }),
+    false,
+  );
+});
+
+test('hasPreparedBodyImages: 본문 삽입용 body 이미지만 true로 인정함', () => {
+  assert.equal(
+    hasPreparedBodyImages({
+      bodyImages: ['/tmp/body.webp'],
+      excludeLibrary: [],
+      multiImages: {},
+      excludeLibraryLink: [],
+      metadata: {},
+    }),
+    true,
+  );
+
+  assert.equal(
+    hasPreparedBodyImages({
+      bodyImages: [],
+      excludeLibrary: ['/tmp/excluded.webp'],
       multiImages: {},
       excludeLibraryLink: [],
       metadata: {},

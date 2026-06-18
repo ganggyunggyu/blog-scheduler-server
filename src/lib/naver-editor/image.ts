@@ -53,8 +53,10 @@ const selectImageType = async (frame: Frame, imageType: ImageType): Promise<bool
 };
 
 const MAX_FILECHOOSER_RETRIES = 3;
+const IMAGE_UPLOAD_ATTEMPTS = 3;
 const FILECHOOSER_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
 const IMAGE_CLICK_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
+const IMAGE_INSERT_TIMEOUT_MS = 12000;
 const TRANSFER_ERROR_POPUP_SELECTOR =
   'div[data-group="popupLayer"][data-name="se-popup-transfer-error"]';
 const TRANSFER_ERROR_DISMISS_RETRIES = 3;
@@ -213,6 +215,32 @@ const clickAndWaitForFileChooser = async (
   throw new Error('filechooser unreachable');
 };
 
+const IMAGE_COMPONENT_SELECTOR = '.se-component.se-image';
+
+const countImageComponents = async (frame: Frame): Promise<number> => {
+  try {
+    return await frame.locator(IMAGE_COMPONENT_SELECTOR).count();
+  } catch {
+    return 0;
+  }
+};
+
+const waitForImageComponentIncrease = async (
+  frame: Frame,
+  beforeCount: number,
+): Promise<boolean> => {
+  try {
+    await frame.waitForFunction(
+      ({ selector, before }) => document.querySelectorAll(selector).length > before,
+      { selector: IMAGE_COMPONENT_SELECTOR, before: beforeCount },
+      { timeout: IMAGE_INSERT_TIMEOUT_MS },
+    );
+    return true;
+  } catch {
+    return (await countImageComponents(frame)) > beforeCount;
+  }
+};
+
 export const uploadImage = async (
   page: Page,
   frame: Frame,
@@ -229,29 +257,40 @@ export const uploadImage = async (
     return false;
   }
 
-  try {
-    const fileChooser = await clickAndWaitForFileChooser(page, frame);
+  for (let attempt = 1; attempt <= IMAGE_UPLOAD_ATTEMPTS; attempt += 1) {
+    try {
+      const beforeCount = await countImageComponents(frame);
+      const fileChooser = await clickAndWaitForFileChooser(page, frame);
 
-    log.info('filechooser.ready');
-    await fileChooser.setFiles(imagePath);
-    await page.waitForTimeout(8000);
+      log.info('filechooser.ready', { attempt });
+      await fileChooser.setFiles(imagePath);
+      await page.waitForTimeout(8000);
 
-    const transferError = await dismissTransferErrorPopup(page, frame);
-    if (transferError) {
-      log.warn('upload.transfer.error', { fileName, message: transferError });
-      return false;
+      const transferError = await dismissTransferErrorPopup(page, frame);
+      if (transferError) {
+        log.warn('upload.transfer.error', { fileName, message: transferError, attempt });
+      } else if (await waitForImageComponentIncrease(frame, beforeCount)) {
+        const afterCount = await countImageComponents(frame);
+        log.info('upload.done', { fileName, attempt, beforeCount, afterCount });
+        return true;
+      } else {
+        const afterCount = await countImageComponents(frame);
+        log.warn('upload.notInserted', { fileName, attempt, beforeCount, afterCount });
+      }
+    } catch (error) {
+      const transferError = await dismissTransferErrorPopup(page, frame);
+      const msg = error instanceof Error ? error.message : String(error);
+      log.warn('upload.failed', { fileName, message: msg, transferError: transferError ?? '', attempt });
     }
 
-    log.info('upload.done', { fileName });
-    return true;
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    log.warn('upload.failed', { fileName, message: msg });
-    return false;
+    if (attempt < IMAGE_UPLOAD_ATTEMPTS) {
+      await page.waitForTimeout(2000);
+    }
   }
-};
 
-const IMAGE_COMPONENT_SELECTOR = '.se-component.se-image';
+  log.warn('upload.exhausted', { fileName, attempts: IMAGE_UPLOAD_ATTEMPTS });
+  return false;
+};
 
 export const removeImage = async (
   page: Page,
@@ -317,28 +356,46 @@ export const uploadMultipleImages = async (
     return { success: 0, failed: imagePaths.length };
   }
 
-  try {
-    const fileChooser = await clickAndWaitForFileChooser(page, frame);
+  for (let attempt = 1; attempt <= IMAGE_UPLOAD_ATTEMPTS; attempt += 1) {
+    try {
+      const beforeCount = await countImageComponents(frame);
+      const fileChooser = await clickAndWaitForFileChooser(page, frame);
 
-    await fileChooser.setFiles(validPaths);
-    await page.waitForTimeout(3000);
+      await fileChooser.setFiles(validPaths);
+      await page.waitForTimeout(3000);
 
-    if (validPaths.length >= 2) {
-      await page.waitForTimeout(2000);
-      await selectImageType(frame, imageType);
-      await page.waitForTimeout(1000);
+      if (validPaths.length >= 2) {
+        await page.waitForTimeout(2000);
+        await selectImageType(frame, imageType);
+        await page.waitForTimeout(1000);
+      }
+
+      const waitTime = Math.min(validPaths.length * 5000, 45000);
+      await page.waitForTimeout(waitTime);
+
+      const transferError = await dismissTransferErrorPopup(page, frame);
+      if (transferError) {
+        log.warn('multiUpload.transfer.error', { message: transferError, attempt });
+      } else if (await waitForImageComponentIncrease(frame, beforeCount)) {
+        const afterCount = await countImageComponents(frame);
+        log.info('multiUpload.done', { count: validPaths.length, type: imageType, attempt, beforeCount, afterCount });
+        return { success: validPaths.length, failed: imagePaths.length - validPaths.length };
+      } else {
+        const afterCount = await countImageComponents(frame);
+        log.warn('multiUpload.notInserted', { count: validPaths.length, type: imageType, attempt, beforeCount, afterCount });
+      }
+    } catch (error) {
+      const transferError = await dismissTransferErrorPopup(page, frame);
+      const msg = error instanceof Error ? error.message : String(error);
+      log.warn('multiUpload.failed', { message: msg, transferError: transferError ?? '', attempt });
     }
 
-    const waitTime = Math.min(validPaths.length * 5000, 45000);
-    await page.waitForTimeout(waitTime);
-
-    log.info('multiUpload.done', { count: validPaths.length, type: imageType });
-    return { success: validPaths.length, failed: imagePaths.length - validPaths.length };
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    log.warn('multiUpload.failed', { message: msg });
-    return { success: 0, failed: validPaths.length };
+    if (attempt < IMAGE_UPLOAD_ATTEMPTS) {
+      await page.waitForTimeout(2000);
+    }
   }
+
+  return { success: 0, failed: validPaths.length };
 };
 
 // MultiImageData 구조로 업로드 (individual/slide/collage)

@@ -213,12 +213,12 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
       title,
       content,
     });
-    await typeContentWithImages(page, frame, contentText, contentImages, {
+    const result = await typeContentWithImages(page, frame, contentText, contentImages, {
       keywordCategory,
       imagePlacement: isEyeBrandPipelineCategory(keywordCategory) ? 'eyeBrand' : 'default',
-      requireAllImages: manuscriptType === 'alibaba',
+      minUploadedImages: manuscriptType === 'alibaba' ? 1 : undefined,
     });
-    log.info('content.entered');
+    log.info('content.entered', result);
   },
   excluded3: async ({ page, excluded3 }) => {
     if (!excluded3) return;
@@ -226,17 +226,28 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await page.waitForTimeout(500);
     log.info('excluded.3.uploaded');
   },
-  allExcluded: async ({ page, frame, excludeLibrary }) => {
+  allExcluded: async ({ page, frame, manuscriptType, excludeLibrary }) => {
     if (!excludeLibrary?.length) return;
+    let uploadedCount = 0;
     for (const imagePath of excludeLibrary) {
       const uploaded = await uploadExcludedImage(page, imagePath);
       if (!uploaded) {
+        if (manuscriptType === 'alibaba') {
+          const transferError = await dismissTransferErrorPopup(page, frame);
+          log.warn('allExcluded.upload.failed.continue', {
+            imagePath,
+            transferError: transferError ?? '',
+          });
+          await focusLastParagraphEnd(frame);
+          continue;
+        }
         throw new Error(`excludeLibrary upload failed: ${imagePath}`);
       }
+      uploadedCount += 1;
       await page.waitForTimeout(500);
     }
     await focusLastParagraphEnd(frame);
-    log.info('allExcluded.uploaded', { count: excludeLibrary.length });
+    log.info('allExcluded.uploaded', { count: uploadedCount, total: excludeLibrary.length });
   },
   spacing: async ({ page, frame }) => {
     await focusLastParagraphEnd(frame);
@@ -267,7 +278,7 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     const result = await uploadFromMultiImageData(page, frame, uploadData);
     log.info('multiImages.uploaded', { total: result.total, success: result.success, failed: result.failed });
     if (manuscriptType === 'alibaba' && result.failed > 0) {
-      throw new Error(`multiImages upload failed: total=${result.total} success=${result.success} failed=${result.failed}`);
+      log.warn('multiImages.partial.continue', { total: result.total, success: result.success, failed: result.failed });
     }
   },
   whiteText: async ({ page, frame }) => {

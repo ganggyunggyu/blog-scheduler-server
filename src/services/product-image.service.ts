@@ -13,6 +13,8 @@ export { type MultiImageData } from '../lib/naver-editor/image.js';
 const imageLog = logger.child({ scope: 'Image' });
 const DOWNLOAD_ATTEMPTS = 3;
 const DOWNLOAD_RETRY_DELAY_MS = 1000;
+const PRODUCT_DATA_ATTEMPTS = 3;
+const PRODUCT_DATA_RETRY_DELAY_MS = 3000;
 
 export interface ImageData {
   url: string;
@@ -117,6 +119,42 @@ export const getProductData = async ({ keyword, blogId, category, dateCode, blog
       url: metadata?.url,
     } as ProductMetadata,
   };
+};
+
+const getProductDataWithRetry = async (
+  options: ProductDataOptions,
+) => {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= PRODUCT_DATA_ATTEMPTS; attempt += 1) {
+    try {
+      const data = await getProductData(options);
+      if (attempt > 1) {
+        imageLog.info('product.retry.ok', {
+          keyword: options.keyword,
+          blogId: options.blogId,
+          attempt,
+        });
+      }
+      return data;
+    } catch (error) {
+      lastError = error;
+      const message = error instanceof Error ? error.message : String(error);
+      imageLog.warn('product.retry.failed', {
+        keyword: options.keyword,
+        blogId: options.blogId,
+        attempt,
+        maxAttempts: PRODUCT_DATA_ATTEMPTS,
+        message,
+      });
+
+      if (attempt < PRODUCT_DATA_ATTEMPTS) {
+        await sleep(PRODUCT_DATA_RETRY_DELAY_MS);
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 };
 
 const isBase64DataUrl = (str: string): boolean => {
@@ -224,7 +262,7 @@ export const prepareProductImages = async ({
   imagesDir,
   ...productDataOptions
 }: PrepareProductImagesOptions): Promise<PreparedProductData> => {
-  let data = await getProductData(productDataOptions);
+  let data = await getProductDataWithRetry(productDataOptions);
 
   if (
     productDataOptions.manuscriptType === 'alibaba' &&
@@ -240,7 +278,7 @@ export const prepareProductImages = async ({
       body: data.bodyImages.length,
       excludeLibrary: data.excludeLibrary.length,
     });
-    data = await getProductData({
+    data = await getProductDataWithRetry({
       ...productDataOptions,
       blogId: fallback.blogId,
       blogName: fallback.blogName,

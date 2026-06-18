@@ -11,6 +11,13 @@ interface ContentTypingOptions {
   keywordCategory?: string;
   imagePlacement?: 'default' | 'eyeBrand';
   requireAllImages?: boolean;
+  minUploadedImages?: number;
+}
+
+export interface ContentTypingResult {
+  attemptedImages: number;
+  uploadedImages: number;
+  failedImages: number;
 }
 
 const resetPetContentTypingStyle = async (
@@ -234,8 +241,8 @@ export const typeContentWithImages = async (
   content: string,
   images?: string[],
   options: ContentTypingOptions = {}
-): Promise<void> => {
-  const { imagePlacement, keywordCategory, requireAllImages } = options;
+): Promise<ContentTypingResult> => {
+  const { imagePlacement, keywordCategory, requireAllImages, minUploadedImages } = options;
   const paragraphs = content.split('\n');
   const imageMap = images?.length
     ? imagePlacement === 'eyeBrand'
@@ -256,6 +263,9 @@ export const typeContentWithImages = async (
   if (keywordCategory === '애견') {
     await resetPetContentTypingStyle(page, frame);
   }
+
+  let uploadedImages = 0;
+  const failedImagePaths: string[] = [];
 
   for (let i = 0; i < paragraphs.length; i += 1) {
     const line = paragraphs[i].trim();
@@ -280,8 +290,10 @@ export const typeContentWithImages = async (
       if (uploadProgress) {
         log.info(uploadProgress.tick(uploaded ? 'ok' : 'fail'));
       }
-      if (!uploaded && requireAllImages) {
-        throw new Error(`image upload failed: ${imagePath}`);
+      if (uploaded) {
+        uploadedImages += 1;
+      } else {
+        failedImagePaths.push(imagePath);
       }
     }
   }
@@ -289,4 +301,23 @@ export const typeContentWithImages = async (
   if (uploadProgress) {
     log.info(uploadProgress.done('done'));
   }
+
+  const requiredImageCount = minUploadedImages ?? (requireAllImages ? uploadTotal : 0);
+  if (requiredImageCount > 0 && uploadedImages < requiredImageCount) {
+    const firstFailedPath = failedImagePaths[0];
+    if (requireAllImages && firstFailedPath) {
+      throw new Error(`image upload failed: ${firstFailedPath}`);
+    }
+    throw new Error(`image upload requirement failed: required=${requiredImageCount} uploaded=${uploadedImages}`);
+  }
+
+  if (requireAllImages && failedImagePaths.length > 0) {
+    throw new Error(`image upload failed: ${failedImagePaths[0]}`);
+  }
+
+  return {
+    attemptedImages: uploadTotal,
+    uploadedImages,
+    failedImages: failedImagePaths.length,
+  };
 };

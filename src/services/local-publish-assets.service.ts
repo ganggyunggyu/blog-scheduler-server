@@ -22,6 +22,9 @@ export const hasPreparedProductImages = (productData?: PreparedProductData | nul
     ),
   );
 
+export const hasPreparedBodyImages = (productData?: PreparedProductData | null): boolean =>
+  Boolean(productData?.bodyImages.length);
+
 const addImages = (
   target: MultiImageData,
   key: keyof MultiImageData,

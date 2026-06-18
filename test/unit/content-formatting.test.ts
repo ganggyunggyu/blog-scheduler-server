@@ -174,6 +174,22 @@ test('typeContentWithImages: 필수 이미지 업로드 실패 시 예외를 던
   );
 });
 
+test('typeContentWithImages: 최소 이미지 삽입 수를 만족하지 못하면 예외를 던짐', async () => {
+  const page = createMockPage();
+  const frame = createMockFrame(page.getEvents());
+
+  await assert.rejects(
+    typeContentWithImages(
+      page as never,
+      frame as never,
+      ['첫 문단', '둘째 문단', '셋째 문단'].join('\n'),
+      ['/tmp/scheduler-server-missing-image.webp'],
+      { minUploadedImages: 1 },
+    ),
+    /image upload requirement failed: required=1 uploaded=0/,
+  );
+});
+
 test('buildImageParagraphMap: 소제목이 있으면 소제목 위치에 이미지를 매핑함', () => {
   const imageMap = buildImageParagraphMap(
     [
