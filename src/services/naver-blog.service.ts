@@ -216,6 +216,7 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     await typeContentWithImages(page, frame, contentText, contentImages, {
       keywordCategory,
       imagePlacement: isEyeBrandPipelineCategory(keywordCategory) ? 'eyeBrand' : 'default',
+      requireAllImages: manuscriptType === 'alibaba',
     });
     log.info('content.entered');
   },
@@ -260,11 +261,14 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     const result = await insertLink(page, frame, metadata.url);
     log.info('link.inserted', { success: result, url: metadata.url });
   },
-  multiImages: async ({ page, frame, keywordCategory, multiImages }) => {
+  multiImages: async ({ page, frame, keywordCategory, manuscriptType, multiImages }) => {
     const uploadData = getMultiImagesForBlock({ keywordCategory, multiImages });
     if (!uploadData) return;
     const result = await uploadFromMultiImageData(page, frame, uploadData);
     log.info('multiImages.uploaded', { total: result.total, success: result.success, failed: result.failed });
+    if (manuscriptType === 'alibaba' && result.failed > 0) {
+      throw new Error(`multiImages upload failed: total=${result.total} success=${result.success} failed=${result.failed}`);
+    }
   },
   whiteText: async ({ page, frame }) => {
     const applied = await setFontColorWhite(page, frame);

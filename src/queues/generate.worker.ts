@@ -10,7 +10,7 @@ import { assessLoginFailure } from '../services/login-failure.service.js';
 import { buildSchedulePublishJobId } from '../services/schedule-idempotency.service.js';
 import { logger } from '../lib/logging/logger.js';
 import { getFallbackSlideImageCount } from '../services/naver-blog-pipeline.js';
-import { buildProvidedProductData, hasMultiImageData, needsBodyImageFallback } from '../services/local-publish-assets.service.js';
+import { buildProvidedProductData, hasMultiImageData, hasPreparedProductImages, needsBodyImageFallback } from '../services/local-publish-assets.service.js';
 
 export interface GenerateJobData {
   scheduleId: string;
@@ -286,6 +286,13 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         }
         log.info('fallback.body.s3', { count: fallbackImages.length });
       }
+    }
+
+    const hasAlibabaImages = productData
+      ? hasPreparedProductImages(productData)
+      : prepared.images.length > 0;
+    if (manuscriptType === 'alibaba' && !hasAlibabaImages) {
+      throw new Error(`alibaba image data missing: keyword=${keyword}`);
     }
 
     await ScheduleJobModel.findByIdAndUpdate(scheduleJobId, {

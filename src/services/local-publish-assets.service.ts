@@ -9,6 +9,19 @@ export const hasMultiImageData = (multiImages?: MultiImageData): boolean =>
     (multiImages?.collage?.length ?? 0),
   );
 
+export const hasPreparedProductImages = (productData?: PreparedProductData | null): boolean =>
+  Boolean(
+    productData &&
+    (
+      productData.bodyImages.length +
+      productData.excludeLibrary.length +
+      productData.excludeLibraryLink.length +
+      (productData.multiImages.individual?.length ?? 0) +
+      (productData.multiImages.slide?.length ?? 0) +
+      (productData.multiImages.collage?.length ?? 0)
+    ),
+  );
+
 const addImages = (
   target: MultiImageData,
   key: keyof MultiImageData,

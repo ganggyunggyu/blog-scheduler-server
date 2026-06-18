@@ -158,6 +158,22 @@ test('typeContentWithImages: 기본 카테고리는 pet 전용 reset을 수행�
   assert.ok(events.includes('type:본문 첫줄'));
 });
 
+test('typeContentWithImages: 필수 이미지 업로드 실패 시 예외를 던짐', async () => {
+  const page = createMockPage();
+  const frame = createMockFrame(page.getEvents());
+
+  await assert.rejects(
+    typeContentWithImages(
+      page as never,
+      frame as never,
+      ['첫 문단', '둘째 문단', '셋째 문단'].join('\n'),
+      ['/tmp/scheduler-server-missing-image.webp'],
+      { requireAllImages: true },
+    ),
+    /image upload failed: \/tmp\/scheduler-server-missing-image\.webp/,
+  );
+});
+
 test('buildImageParagraphMap: 소제목이 있으면 소제목 위치에 이미지를 매핑함', () => {
   const imageMap = buildImageParagraphMap(
     [

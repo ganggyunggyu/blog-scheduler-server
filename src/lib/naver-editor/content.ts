@@ -10,6 +10,7 @@ const log = logger.child({ scope: 'Content' });
 interface ContentTypingOptions {
   keywordCategory?: string;
   imagePlacement?: 'default' | 'eyeBrand';
+  requireAllImages?: boolean;
 }
 
 const resetPetContentTypingStyle = async (
@@ -234,7 +235,7 @@ export const typeContentWithImages = async (
   images?: string[],
   options: ContentTypingOptions = {}
 ): Promise<void> => {
-  const { imagePlacement, keywordCategory } = options;
+  const { imagePlacement, keywordCategory, requireAllImages } = options;
   const paragraphs = content.split('\n');
   const imageMap = images?.length
     ? imagePlacement === 'eyeBrand'
@@ -278,6 +279,9 @@ export const typeContentWithImages = async (
       const uploaded = await uploadImage(page, frame, imagePath);
       if (uploadProgress) {
         log.info(uploadProgress.tick(uploaded ? 'ok' : 'fail'));
+      }
+      if (!uploaded && requireAllImages) {
+        throw new Error(`image upload failed: ${imagePath}`);
       }
     }
   }
