@@ -1,0 +1,163 @@
+{
+  "generatedAt": "2026-06-18T15:10:10.091Z",
+  "scheduleDate": "2026-06-18",
+  "submittedScheduleIds": [
+    "sch_c18a9a71-6e1b-4237-bb76-3030bd75c70a",
+    "sch_82787f0a-6c39-4c31-b62f-42ee52d2d73d",
+    "sch_74e1f141-3c7a-419c-9e96-4f656812c7e9",
+    "sch_24b883ca-1481-43a9-872b-1951ae68688b"
+  ],
+  "schedules": [
+    {
+      "_id": "sch_74e1f141-3c7a-419c-9e96-4f656812c7e9",
+      "accountId": "8ua1womn",
+      "status": "failed",
+      "totalJobs": 2,
+      "completedJobs": 0,
+      "failedJobs": 2
+    },
+    {
+      "_id": "sch_c18a9a71-6e1b-4237-bb76-3030bd75c70a",
+      "accountId": "b6x2k9w3",
+      "status": "failed",
+      "totalJobs": 2,
+      "completedJobs": 0,
+      "failedJobs": 2
+    },
+    {
+      "_id": "sch_24b883ca-1481-43a9-872b-1951ae68688b",
+      "accountId": "ghhoy",
+      "status": "failed",
+      "totalJobs": 3,
+      "completedJobs": 0,
+      "failedJobs": 3
+    },
+    {
+      "_id": "sch_82787f0a-6c39-4c31-b62f-42ee52d2d73d",
+      "accountId": "loand3324",
+      "status": "failed",
+      "totalJobs": 2,
+      "completedJobs": 0,
+      "failedJobs": 2
+    }
+  ],
+  "jobs": [
+    {
+      "_id": "job_488c4652-cec7-48de-804c-11a69aee33c6",
+      "scheduleId": "sch_24b883ca-1481-43a9-872b-1951ae68688b",
+      "keyword": "난시교정술",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:03:21.330Z",
+      "error": "보안문자 자동 풀기 실패"
+    },
+    {
+      "_id": "job_0cd4c943-7ffc-4307-9927-5fe1ff3801e6",
+      "scheduleId": "sch_24b883ca-1481-43a9-872b-1951ae68688b",
+      "keyword": "라섹수술",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:03:21.487Z",
+      "error": "보안문자 자동 풀기 실패"
+    },
+    {
+      "_id": "job_fb93d6d2-43e0-40f2-b5c6-65c4a188a7f7",
+      "scheduleId": "sch_24b883ca-1481-43a9-872b-1951ae68688b",
+      "keyword": "비문증치료",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:03:21.487Z",
+      "error": "보안문자 자동 풀기 실패"
+    },
+    {
+      "_id": "job_d18ef36b-9d86-42c2-b30f-b41fb4b94ba3",
+      "scheduleId": "sch_74e1f141-3c7a-419c-9e96-4f656812c7e9",
+      "keyword": "강아지입양보내기",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:07:08.206Z",
+      "error": "로그인 실패: Caps Lock이 켜져 있습니다."
+    },
+    {
+      "_id": "job_35f1a52b-77fa-43ef-8741-5e435ea2b021",
+      "scheduleId": "sch_74e1f141-3c7a-419c-9e96-4f656812c7e9",
+      "keyword": "강아지종류",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:07:36.219Z",
+      "error": "로그인 실패: Caps Lock이 켜져 있습니다."
+    },
+    {
+      "_id": "job_74de5072-03f7-4914-b617-db639b565f97",
+      "scheduleId": "sch_82787f0a-6c39-4c31-b62f-42ee52d2d73d",
+      "keyword": "강아지키우기",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:03:24.083Z",
+      "error": "보안문자 자동 풀기 실패"
+    },
+    {
+      "_id": "job_bfa1f4d7-8ecd-46cd-b620-310be907ba6f",
+      "scheduleId": "sch_82787f0a-6c39-4c31-b62f-42ee52d2d73d",
+      "keyword": "강아지분양",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:03:24.242Z",
+      "error": "보안문자 자동 풀기 실패"
+    },
+    {
+      "_id": "job_798080f4-d5d1-460c-936f-86ad6552366d",
+      "scheduleId": "sch_c18a9a71-6e1b-4237-bb76-3030bd75c70a",
+      "keyword": "부산강아지무료분양",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:07:06.214Z",
+      "error": "로그인 실패: 로그인 페이지에 머물러 있습니다."
+    },
+    {
+      "_id": "job_391b75cf-9b3a-48b6-98d9-c847a46f50e8",
+      "scheduleId": "sch_c18a9a71-6e1b-4237-bb76-3030bd75c70a",
+      "keyword": "고양이무료분양",
+      "status": "failed",
+      "completedAt": "2026-06-18T15:07:38.882Z",
+      "error": "로그인 실패: 로그인 페이지에 머물러 있습니다."
+    }
+  ],
+  "publicVerification": {
+    "ok": 30,
+    "totalAccounts": 35,
+    "problemAccounts": [
+      {
+        "accountId": "b6x2k9w3",
+        "expected": 2,
+        "actual": 0,
+        "reason": "NAVER permanent service restriction screen"
+      },
+      {
+        "accountId": "loand3324",
+        "expected": 2,
+        "actual": 0,
+        "reason": "captcha/credential verification failed"
+      },
+      {
+        "accountId": "pwg7r3sl",
+        "expected": 2,
+        "actual": 0,
+        "reason": "no password in cafe-bot.accounts or reusable BullMQ payload"
+      },
+      {
+        "accountId": "8ua1womn",
+        "expected": 2,
+        "actual": 0,
+        "reason": "NAVER rejected ID/password"
+      },
+      {
+        "accountId": "ghhoy",
+        "expected": 3,
+        "actual": 0,
+        "reason": "captcha/credential verification failed"
+      }
+    ]
+  },
+  "artifacts": {
+    "makeupPlan": "outputs/missing-publish-makeup-2026-06-18.json",
+    "failureScreenshots": [
+      "data/login-failures/2026-06-18T15-05-09-071Z_b6x2k9w3.png",
+      "data/login-failures/2026-06-18T15-05-06-775Z_8ua1womn.png",
+      "data/login-failures/2026-06-18T15-03-23-845Z_loand3324.png",
+      "data/login-failures/2026-06-18T15-03-21-217Z_ghhoy.png"
+    ]
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "generatedAt": "2026-06-18T15:02:26.743Z",
+  "scheduleDate": "2026-06-18",
+  "mode": "execute",
+  "blocked": {
+    "pet": [],
+    "eye": [],
+    "legal": [
+      {
+        "accountId": "pwg7r3sl",
+        "blogId": "pwg7r3sl",
+        "blogName": "오리의 다락방",
+        "domain": "법률",
+        "count": 2,
+        "reason": "missing_password_in_cafe_db_and_bullmq_payload"
+      }
+    ]
+  },
+  "queues": {
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "blogId": "b6x2k9w3",
+        "blogName": "웅이",
+        "keywords": [
+          "부산강아지무료분양",
+          "고양이무료분양"
+        ],
+        "items": [
+          {
+            "keyword": "부산강아지무료분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-18T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "고양이무료분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-18T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_b6x2k9w3",
+          "productFolders": 10,
+          "selected": [
+            {
+              "keyword": "부산강아지무료분양",
+              "folder": "강아지무료분양",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "고양이무료분양",
+              "folder": "고양이무료분양",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "loand3324",
+        "blogId": "loand3324",
+        "blogName": "라우드",
+        "keywords": [
+          "강아지키우기",
+          "강아지분양"
+        ],
+        "items": [
+          {
+            "keyword": "강아지키우기",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-18T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "강아지분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-18T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_loand3324",
+          "productFolders": 51,
+          "selected": [
+            {
+              "keyword": "강아지키우기",
+              "folder": "강아지",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "강아지분양",
+              "folder": "강아지분양",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "8ua1womn",
+        "blogId": "8ua1womn",
+        "blogName": "세월",
+        "keywords": [
+          "강아지입양보내기",
+          "강아지종류"
+        ],
+        "items": [
+          {
+            "keyword": "강아지입양보내기",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-18T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "강아지종류",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-18T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_8ua1womn",
+          "productFolders": 38,
+          "selected": [
+            {
+              "keyword": "강아지입양보내기",
+              "folder": "강아지입양보내기",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "강아지종류",
+              "folder": "강아지종류",
+              "libraryCount": 2
+            }
+          ]
+        }
+      }
+    ],
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "blogId": "ghhoy",
+        "blogName": "탐험기 - 교체",
+        "keywords": [
+          "난시교정술",
+          "라섹수술",
+          "비문증치료"
+        ],
+        "items": [
+          {
+            "keyword": "난시교정술",
+            "scheduledAt": "2026-06-18T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라섹수술",
+            "scheduledAt": "2026-06-18T22:02:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "비문증치료",
+            "scheduledAt": "2026-06-18T22:03:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_ghhoy"
+        }
+      }
+    ]
+  },
+  "submissions": {
+    "pet": {
+      "totalJobs": 6,
+      "schedules": [
+        {
+          "account": "b6x***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_c18a9a71-6e1b-4237-bb76-3030bd75c70a",
+          "jobs": [
+            {
+              "id": "job_798080f4-d5d1-460c-936f-86ad6552366d",
+              "keyword": "부산강아지무료분양",
+              "scheduledAt": "2026-06-18T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_391b75cf-9b3a-48b6-98d9-c847a46f50e8",
+              "keyword": "고양이무료분양",
+              "scheduledAt": "2026-06-18T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "loa***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_82787f0a-6c39-4c31-b62f-42ee52d2d73d",
+          "jobs": [
+            {
+              "id": "job_74de5072-03f7-4914-b617-db639b565f97",
+              "keyword": "강아지키우기",
+              "scheduledAt": "2026-06-18T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_bfa1f4d7-8ecd-46cd-b620-310be907ba6f",
+              "keyword": "강아지분양",
+              "scheduledAt": "2026-06-18T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "8ua***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_74e1f141-3c7a-419c-9e96-4f656812c7e9",
+          "jobs": [
+            {
+              "id": "job_d18ef36b-9d86-42c2-b30f-b41fb4b94ba3",
+              "keyword": "강아지입양보내기",
+              "scheduledAt": "2026-06-18T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_35f1a52b-77fa-43ef-8741-5e435ea2b021",
+              "keyword": "강아지종류",
+              "scheduledAt": "2026-06-18T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        }
+      ]
+    },
+    "eye": {
+      "totalJobs": 3,
+      "schedules": [
+        {
+          "account": "ghh***",
+          "reused": false,
+          "totalJobs": 3,
+          "scheduleId": "sch_24b883ca-1481-43a9-872b-1951ae68688b",
+          "jobs": [
+            {
+              "id": "job_488c4652-cec7-48de-804c-11a69aee33c6",
+              "keyword": "난시교정술",
+              "scheduledAt": "2026-06-18T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_0cd4c943-7ffc-4307-9927-5fe1ff3801e6",
+              "keyword": "라섹수술",
+              "scheduledAt": "2026-06-18T22:02:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_fb93d6d2-43e0-40f2-b5c6-65c4a188a7f7",
+              "keyword": "비문증치료",
+              "scheduledAt": "2026-06-18T22:03:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

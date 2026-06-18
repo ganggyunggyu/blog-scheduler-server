@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-06-18T15:00:15.625Z",
+  "execute": true,
+  "scheduleDate": "2026-06-18",
+  "slots": [
+    "22:01",
+    "22:02"
+  ],
+  "perAccount": 2,
+  "domains": {
+    "pet": []
+  },
+  "blocked": {
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "displayName": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "loand3324",
+        "displayName": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error"
+      },
+      {
+        "accountId": "8ua1womn",
+        "displayName": "8ua1womn",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "displayName": "고양이밥 1",
+        "category": "서리펫",
+        "reason": "missing_password"
+      }
+    ]
+  },
+  "submissions": {}
+}
