@@ -1,0 +1,72 @@
+{
+  "targetDate": "2026-06-18",
+  "generatedAt": "2026-06-18T02:24:44.733Z",
+  "criteria": {
+    "expectedPerAccount": 3,
+    "minBodyImages": 1,
+    "imageSource": "public Naver post body via Playwright"
+  },
+  "totals": {
+    "accounts": 5,
+    "posts": 0,
+    "ok": 0,
+    "problems": 0,
+    "missingImages": 0,
+    "brokenImages": 0,
+    "checkFailed": 0
+  },
+  "accounts": [
+    {
+      "accountId": "crvfwy7062",
+      "blogId": "crvfwy7062",
+      "nickname": "알리바바 신규1",
+      "postCount": 0,
+      "expected": 3,
+      "okCount": 0,
+      "problemCount": 0,
+      "status": "CHECK"
+    },
+    {
+      "accountId": "mad1651",
+      "blogId": "mad1651",
+      "nickname": "알리바바 신규2",
+      "postCount": 0,
+      "expected": 3,
+      "okCount": 0,
+      "problemCount": 0,
+      "status": "CHECK"
+    },
+    {
+      "accountId": "heavymouse448",
+      "blogId": "heavymouse448",
+      "nickname": "알리바바 신규3",
+      "postCount": 0,
+      "expected": 3,
+      "okCount": 0,
+      "problemCount": 0,
+      "status": "CHECK"
+    },
+    {
+      "accountId": "weed3122",
+      "blogId": "weed3122",
+      "nickname": "알리바바 신규4",
+      "postCount": 0,
+      "expected": 3,
+      "okCount": 0,
+      "problemCount": 0,
+      "status": "CHECK"
+    },
+    {
+      "accountId": "individual14144",
+      "blogId": "individual14144",
+      "nickname": "알리바바 신규6",
+      "postCount": 0,
+      "expected": 3,
+      "okCount": 0,
+      "problemCount": 0,
+      "status": "CHECK"
+    }
+  ],
+  "problems": [],
+  "posts": []
+}
