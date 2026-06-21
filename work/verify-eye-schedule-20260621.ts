@@ -76,11 +76,14 @@ interface VerifyAccountResult {
   popupTotalText: string;
   expectedKeywords: string[];
   expectedTimes: string[];
-  keywordHits: string[];
-  timeHits: string[];
+  combinedHits: string[];
+  postHits: string[];
+  reserveHits: string[];
+  reserveTimeHits: string[];
   debugTextPath: string;
   screenshotPath: string;
-  popupText: string;
+  postText: string;
+  reserveText: string;
   error?: string;
 }
 
@@ -332,6 +335,15 @@ const verifyAccount = async (
     context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
     await context.addCookies(normalizeSessionCookies(cookies));
 
+    const postPage = await context.newPage();
+    await postPage.goto(`https://blog.naver.com/PostList.naver?blogId=${blogId}&from=postList`, {
+      waitUntil: 'domcontentloaded',
+      timeout: env.PLAYWRIGHT_NAVIGATION_TIMEOUT_MS,
+    });
+    await postPage.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => undefined);
+    await postPage.waitForTimeout(5000);
+    const postText = await getTextFromFrames(postPage);
+
     const page = await context.newPage();
     await page.goto(`https://blog.naver.com/${blogId}?Redirect=Write&`, {
       waitUntil: 'domcontentloaded',
@@ -350,8 +362,20 @@ const verifyAccount = async (
     }
     await page.waitForTimeout(7000);
 
-    const popupText = await getTextFromFrames(popupPage ?? page);
-    await fs.writeFile(debugTextPath, popupText, 'utf8');
+    const reserveText = await getTextFromFrames(popupPage ?? page);
+    const combinedText = `${postText}\n${reserveText}`;
+    const combinedHits = expectedKeywords.filter((keyword) => combinedText.includes(keyword));
+    const postHits = expectedKeywords.filter((keyword) => postText.includes(keyword));
+    const reserveHits = expectedKeywords.filter((keyword) => reserveText.includes(keyword));
+    const reserveTimeHits = expectedTimes.filter((time) => reserveText.includes(time));
+
+    await fs.writeFile(debugTextPath, [
+      '[POSTLIST]',
+      postText,
+      '',
+      '[RESERVE]',
+      reserveText,
+    ].join('\n'), 'utf8');
     await page.screenshot({ path: screenshotPath, fullPage: true }).catch(() => undefined);
 
     return {
@@ -359,14 +383,17 @@ const verifyAccount = async (
       blogId,
       blogName,
       reserveButtonText,
-      popupTotalText: popupText.match(/총\s*\d+\s*개/u)?.[0]?.replace(/\s+/g, ' ').trim() ?? '',
+      popupTotalText: reserveText.match(/총\s*\d+\s*개/u)?.[0]?.replace(/\s+/g, ' ').trim() ?? '',
       expectedKeywords,
       expectedTimes,
-      keywordHits: expectedKeywords.filter((keyword) => popupText.includes(keyword)),
-      timeHits: expectedTimes.filter((time) => popupText.includes(time)),
+      combinedHits,
+      postHits,
+      reserveHits,
+      reserveTimeHits,
       debugTextPath,
       screenshotPath,
-      popupText,
+      postText,
+      reserveText,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -379,11 +406,14 @@ const verifyAccount = async (
       popupTotalText: '',
       expectedKeywords,
       expectedTimes,
-      keywordHits: [],
-      timeHits: [],
+      combinedHits: [],
+      postHits: [],
+      reserveHits: [],
+      reserveTimeHits: [],
       debugTextPath,
       screenshotPath,
-      popupText: '',
+      postText: '',
+      reserveText: '',
       error: message,
     };
   } finally {
@@ -395,16 +425,20 @@ const buildVerificationText = (result: VerifyAccountResult, keyword: string, tim
   if (result.error) {
     return `실확인 실패: ${result.error}`;
   }
-  const keywordOk = result.keywordHits.includes(keyword);
-  const timeOk = result.timeHits.includes(time);
-  if (keywordOk && timeOk) {
-    return `${result.reserveButtonText || '예약 목록'} / ${result.popupTotalText || '총수 미확인'} / 키워드·시간 확인`;
+  const inPostList = result.postHits.includes(keyword);
+  const inReserveList = result.reserveHits.includes(keyword);
+  const reserveTimeOk = result.reserveTimeHits.includes(time);
+  if (inReserveList && reserveTimeOk) {
+    return `${result.reserveButtonText || '예약 목록'} / ${result.popupTotalText || '총수 미확인'} / 예약 키워드·시간 확인`;
   }
-  return `${result.reserveButtonText || '예약 목록'} / ${result.popupTotalText || '총수 미확인'} / 키워드 ${keywordOk ? '확인' : '누락'}, 시간 ${timeOk ? '확인' : '누락'}`;
+  if (inPostList) {
+    return '오늘 발행 목록 확인';
+  }
+  return `${result.reserveButtonText || '예약 목록'} / ${result.popupTotalText || '총수 미확인'} / 발행·예약 목록 누락`;
 };
 
-const extractTitleForKeyword = (popupText: string, keyword: string): string => {
-  const lines = popupText
+const extractTitleForKeyword = (result: VerifyAccountResult, keyword: string): string => {
+  const lines = `${result.postText}\n${result.reserveText}`
     .split(/\r?\n/u)
     .map((line) => normalizeText(line))
     .filter(Boolean);
@@ -451,10 +485,10 @@ const appendStatusRows = async (
       job.blogName,
       job.accountId,
       job.keyword,
-      job.status === 'published' ? '예약' : '실패',
+      job.status === 'published' ? '예약/발행완료' : '실패',
       MODE_LABEL,
       verify ? buildVerificationText(verify, job.keyword, reservationTime) : '실확인 결과 없음',
-      verify ? extractTitleForKeyword(verify.popupText, job.keyword) : job.keyword,
+      verify ? extractTitleForKeyword(verify, job.keyword) : job.keyword,
       formatActualTime(job.scheduledAt),
       job.scheduleId,
       job.jobId,
@@ -508,8 +542,10 @@ const main = async (): Promise<void> => {
       console.log(JSON.stringify({
         phase: 'verify',
         accountId,
-        keywordHits: `${result.keywordHits.length}/${result.expectedKeywords.length}`,
-        timeHits: `${result.timeHits.length}/${result.expectedTimes.length}`,
+        combinedHits: `${result.combinedHits.length}/${result.expectedKeywords.length}`,
+        postHits: `${result.postHits.length}/${result.expectedKeywords.length}`,
+        reserveHits: `${result.reserveHits.length}/${result.expectedKeywords.length}`,
+        reserveTimeHits: `${result.reserveTimeHits.length}/${result.expectedTimes.length}`,
         error: result.error ?? '',
       }));
     }
