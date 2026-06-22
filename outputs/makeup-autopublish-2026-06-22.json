@@ -1,0 +1,934 @@
+{
+  "generatedAt": "2026-06-22T13:39:28.245Z",
+  "execute": true,
+  "scheduleDate": "2026-06-22",
+  "slots": [
+    "22:01",
+    "22:02",
+    "22:03"
+  ],
+  "queues": {
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "blogId": "b6x2k9w3",
+        "blogName": "b6x2k9w3",
+        "keywords": [
+          "폼스키",
+          "강아지파양"
+        ],
+        "items": [
+          {
+            "keyword": "폼스키",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "강아지파양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_b6x2k9w3",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 10,
+          "selected": [
+            {
+              "keyword": "폼스키",
+              "folder": "폼스키",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "강아지파양",
+              "folder": "강아지파양",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "k7d9x2m4",
+        "blogId": "k7d9x2m4",
+        "blogName": "강아지강하지 1",
+        "keywords": [
+          "아비시니안",
+          "랙돌고양이"
+        ],
+        "items": [
+          {
+            "keyword": "아비시니안",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "랙돌고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 82,
+          "selected": [
+            {
+              "keyword": "아비시니안",
+              "folder": "아비시니안",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "랙돌고양이",
+              "folder": "고양이",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "fail5644",
+        "blogId": "fail5644",
+        "blogName": "고구마스틱2",
+        "keywords": [
+          "렉돌",
+          "고양이종류"
+        ],
+        "items": [
+          {
+            "keyword": "렉돌",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "고양이종류",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 124,
+          "selected": [
+            {
+              "keyword": "렉돌",
+              "folder": "렉돌",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "고양이종류",
+              "folder": "고양이",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "loand3324",
+        "blogId": "loand3324",
+        "blogName": "라우드 2",
+        "keywords": [
+          "애완동물",
+          "강아지보호소"
+        ],
+        "items": [
+          {
+            "keyword": "애완동물",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "강아지보호소",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_loand3324",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 51,
+          "selected": [
+            {
+              "keyword": "애완동물",
+              "folder": "애완동물",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "강아지보호소",
+              "folder": "강아지",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "compare14310",
+        "blogId": "compare14310",
+        "blogName": "룰루랄라 2",
+        "keywords": [
+          "먼치킨고양이",
+          "러시안블루분양"
+        ],
+        "items": [
+          {
+            "keyword": "먼치킨고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "러시안블루분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 112,
+          "selected": [
+            {
+              "keyword": "먼치킨고양이",
+              "folder": "먼치킨고양이",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "러시안블루분양",
+              "folder": "러시안블루",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "ghostrush7",
+        "blogId": "ghostrush7",
+        "blogName": "실눈캐",
+        "keywords": [
+          "노르웨이숲고양이",
+          "고양이"
+        ],
+        "items": [
+          {
+            "keyword": "노르웨이숲고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "도그마루 글밥",
+          "productFolders": 85,
+          "selected": [
+            {
+              "keyword": "노르웨이숲고양이",
+              "folder": "고양이",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "고양이",
+              "folder": "고양이",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "8ua1womn",
+        "blogId": "8ua1womn",
+        "blogName": "8ua1womn",
+        "keywords": [
+          "안산고양이분양",
+          "천안강아지분양"
+        ],
+        "items": [
+          {
+            "keyword": "안산고양이분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "천안강아지분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_8ua1womn",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 38,
+          "selected": [
+            {
+              "keyword": "안산고양이분양",
+              "folder": "고양이분양",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "천안강아지분양",
+              "folder": "강아지분양",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "blogId": "n7c3w8z2",
+        "blogName": "고양이밥 1",
+        "keywords": [
+          "치와와",
+          "강아지입양"
+        ],
+        "items": [
+          {
+            "keyword": "치와와",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "강아지입양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_n7c3w8z2",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 69,
+          "selected": [
+            {
+              "keyword": "치와와",
+              "folder": "치와와",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "강아지입양",
+              "folder": "강아지입양",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "respawnking9",
+        "blogId": "respawnking9",
+        "blogName": "리스팩식스팩 1",
+        "keywords": [
+          "메인쿤",
+          "유기견보호센터"
+        ],
+        "items": [
+          {
+            "keyword": "메인쿤",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "유기견보호센터",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 72,
+          "selected": [
+            {
+              "keyword": "메인쿤",
+              "folder": "메인쿤",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "유기견보호센터",
+              "folder": "유기견",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "blogId": "ahffkdlek12",
+        "blogName": "바삭바삭해 1",
+        "keywords": [
+          "안양강아지분양",
+          "웰시코기"
+        ],
+        "items": [
+          {
+            "keyword": "안양강아지분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "웰시코기",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 69,
+          "selected": [
+            {
+              "keyword": "안양강아지분양",
+              "folder": "강아지분양",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "웰시코기",
+              "folder": "웰시코기",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "blogId": "ahsxkfldk12",
+        "blogName": "쉽고간단하게",
+        "keywords": [
+          "먼치킨분양",
+          "단모치와와"
+        ],
+        "items": [
+          {
+            "keyword": "먼치킨분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "단모치와와",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 69,
+          "selected": [
+            {
+              "keyword": "먼치킨분양",
+              "folder": "먼치킨",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "단모치와와",
+              "folder": "치와와",
+              "libraryCount": 2
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "ahfflwl123",
+        "blogId": "ahfflwl123",
+        "blogName": "햄부기",
+        "keywords": [
+          "시바이누",
+          "도베르만"
+        ],
+        "items": [
+          {
+            "keyword": "시바이누",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "도베르만",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 0,
+          "category": "서리펫",
+          "productFolders": 70,
+          "selected": [
+            {
+              "keyword": "시바이누",
+              "folder": "시바이누",
+              "libraryCount": 2
+            },
+            {
+              "keyword": "도베르만",
+              "folder": "도베르만",
+              "libraryCount": 2
+            }
+          ]
+        }
+      }
+    ],
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "blogId": "ghhoy",
+        "blogName": "탐험기 - 교체",
+        "keywords": [
+          "라식수술비",
+          "노안렌즈삽입술",
+          "백내장수술후주의사항"
+        ],
+        "items": [
+          {
+            "keyword": "라식수술비",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "노안렌즈삽입술",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "백내장수술후주의사항",
+            "scheduledAt": "2026-06-22T22:03:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "credentialSource": "generate_ghhoy",
+          "currentGoodCount": 0,
+          "category": "에스앤비안과-백업",
+          "selected": [
+            {
+              "keyword": "라식수술비"
+            },
+            {
+              "keyword": "노안렌즈삽입술"
+            },
+            {
+              "keyword": "백내장수술후주의사항"
+            }
+          ]
+        }
+      }
+    ],
+    "goat": [
+      {
+        "accountId": "pixelninja3",
+        "blogId": "pixelninja3",
+        "blogName": "건강박사석사 1",
+        "keywords": [
+          "임산부유산균"
+        ],
+        "items": [
+          {
+            "keyword": "임산부유산균",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 1,
+          "category": "흑염소",
+          "selected": [
+            {
+              "keyword": "임산부유산균"
+            }
+          ]
+        }
+      },
+      {
+        "accountId": "eghfsa5478",
+        "blogId": "eghfsa5478",
+        "blogName": "오세아니야 1",
+        "keywords": [
+          "임산부소화제"
+        ],
+        "items": [
+          {
+            "keyword": "임산부소화제",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "slot": 2
+          }
+        ],
+        "debug": {
+          "credentialSource": "cafe-bot.accounts",
+          "currentGoodCount": 1,
+          "category": "흑염소",
+          "selected": [
+            {
+              "keyword": "임산부소화제"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "blocked": [
+    {
+      "accountId": "pwg7r3sl",
+      "blogId": "pwg7r3sl",
+      "blogName": "오리의 다락방",
+      "domain": "legal",
+      "desired": 2,
+      "reason": "keyword_sheet_tab_missing",
+      "detail": "미노출 시트 탭은 종합/흑염소 신규/흑염소 구/추상의구체화/윤슬/안과/애견뿐임"
+    },
+    {
+      "accountId": "rqr1io45",
+      "blogId": "rqr1io45",
+      "blogName": "알리바바 신규5",
+      "domain": "alibaba",
+      "desired": 3,
+      "reason": "naver_protection_and_disabled_account",
+      "detail": "DB isEnabled=false, 오늘 3개 job 모두 보호조치 로그인 실패"
+    }
+  ],
+  "submissions": {
+    "pet": {
+      "totalJobs": 24,
+      "schedules": [
+        {
+          "account": "b6x***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_216bcc2e-df80-41af-b0cf-0036ffe32975",
+          "jobs": [
+            {
+              "id": "job_140c3aa0-8cfb-4620-95b8-12ac1e0a3b7e",
+              "keyword": "폼스키",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_6d8bf6d9-75ee-4074-a59e-35a94bbef963",
+              "keyword": "강아지파양",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "k7d***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_c36eb954-9ffe-4efd-ae0e-36b220709584",
+          "jobs": [
+            {
+              "id": "job_a4a2921b-4dcb-4078-a324-058ec12fd14a",
+              "keyword": "아비시니안",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_97bfad05-d581-4908-ba0a-37e18ecb5451",
+              "keyword": "랙돌고양이",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "fai***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_94fbba0b-f849-4a0b-a787-91dc3266064f",
+          "jobs": [
+            {
+              "id": "job_164ef6cd-8e9f-49ba-8453-c53ce4a1cdfa",
+              "keyword": "렉돌",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_6dbaf211-6e39-4c5a-b084-aa92d8451bf0",
+              "keyword": "고양이종류",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "loa***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_218ce418-4664-4fc1-93e6-f493093624b4",
+          "jobs": [
+            {
+              "id": "job_51494c96-a5ff-44dc-8857-6827921a2d91",
+              "keyword": "애완동물",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_6b9a6b37-d160-4174-8ede-5d1bceb52fb8",
+              "keyword": "강아지보호소",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "com***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_44f0a4f6-5391-4494-a20b-4777785f0874",
+          "jobs": [
+            {
+              "id": "job_ebf4ef3f-bd4d-409c-8f87-f7c52044a185",
+              "keyword": "먼치킨고양이",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_bc957547-6e9a-4495-a408-af03e521c9b1",
+              "keyword": "러시안블루분양",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "gho***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_238adbaa-b35b-4111-bb00-f58573bda144",
+          "jobs": [
+            {
+              "id": "job_57cc9fe5-905f-46c9-bd21-982d030fd098",
+              "keyword": "노르웨이숲고양이",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_378bdfdc-7832-48b2-8142-aad453fe986a",
+              "keyword": "고양이",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "8ua***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_c4e4969c-39e0-4c66-b49d-5de4d4c8644a",
+          "jobs": [
+            {
+              "id": "job_8272ed5f-3ca9-4451-a7d8-d5fc0f74265f",
+              "keyword": "안산고양이분양",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_91463134-99bf-4fb9-8a3e-b7d101a0a8f4",
+              "keyword": "천안강아지분양",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "n7c***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_dbd62926-778f-4641-9f52-8cc0468f003f",
+          "jobs": [
+            {
+              "id": "job_fd8fe98d-5bf2-4707-bdfb-1806c707d2ce",
+              "keyword": "치와와",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_7c9faa1a-018a-4e03-9f50-4862f911d918",
+              "keyword": "강아지입양",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "res***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_f5f78b7a-ed4a-455c-a740-cec02215db93",
+          "jobs": [
+            {
+              "id": "job_48d673a6-b213-4133-8d08-184775a3dd7d",
+              "keyword": "메인쿤",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_bdba3db5-4b31-4138-a10d-68e1822cc447",
+              "keyword": "유기견보호센터",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "ahf***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_6a278cc9-43ad-40ee-8f79-d7e8a2facb14",
+          "jobs": [
+            {
+              "id": "job_b699d672-caaa-41bb-91ed-c40d2daa18f9",
+              "keyword": "안양강아지분양",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_1f4d584e-4c73-422b-bf15-caa84e541519",
+              "keyword": "웰시코기",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "ahs***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_987aabf0-eaf8-4339-9636-3f5dcb6962ae",
+          "jobs": [
+            {
+              "id": "job_dac1bba9-f4b3-45c1-b3f0-5db655ca739f",
+              "keyword": "먼치킨분양",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_a131a522-2146-43e9-89b0-83caebae1a07",
+              "keyword": "단모치와와",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "ahf***",
+          "reused": false,
+          "totalJobs": 2,
+          "scheduleId": "sch_fce3dae8-68bb-4b8e-954c-d044e068173b",
+          "jobs": [
+            {
+              "id": "job_a00d9ec5-7ea1-4f95-967d-ecae8e70c33b",
+              "keyword": "시바이누",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_7b4cc602-6b17-447b-a0bb-56d2f63243f6",
+              "keyword": "도베르만",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        }
+      ]
+    },
+    "eye": {
+      "totalJobs": 3,
+      "schedules": [
+        {
+          "account": "ghh***",
+          "reused": false,
+          "totalJobs": 3,
+          "scheduleId": "sch_e4f974a7-9af5-4e2b-846d-fc6a8f1961f4",
+          "jobs": [
+            {
+              "id": "job_01ee25e4-1d9f-406c-8d53-e026745dea2b",
+              "keyword": "라식수술비",
+              "scheduledAt": "2026-06-22T22:01:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_b210f57b-1426-4871-aab2-c8f2215d6b21",
+              "keyword": "노안렌즈삽입술",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_08505c19-3ad4-45c8-baa6-99d2bbb7b081",
+              "keyword": "백내장수술후주의사항",
+              "scheduledAt": "2026-06-22T22:03:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    },
+    "goat": {
+      "totalJobs": 2,
+      "schedules": [
+        {
+          "account": "pix***",
+          "reused": false,
+          "totalJobs": 1,
+          "scheduleId": "sch_afc6c1d6-cfab-4469-8204-f7eb50ebb43d",
+          "jobs": [
+            {
+              "id": "job_bc96300e-ec95-4d7e-bf0d-13ce453f61d4",
+              "keyword": "임산부유산균",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        },
+        {
+          "account": "egh***",
+          "reused": false,
+          "totalJobs": 1,
+          "scheduleId": "sch_f2949456-1e4a-4bcf-baeb-9406b56e6fbd",
+          "jobs": [
+            {
+              "id": "job_191c9903-87cb-4a81-af53-c61520db1ba6",
+              "keyword": "임산부소화제",
+              "scheduledAt": "2026-06-22T22:02:00+09:00",
+              "slot": 2
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

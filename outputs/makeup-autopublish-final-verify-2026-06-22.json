@@ -1,0 +1,740 @@
+{
+  "generatedAt": "2026-06-22T14:00:16.894Z",
+  "scheduleDate": "2026-06-22",
+  "source": {
+    "accountDb": "Atlas blogaccounts",
+    "keywordSheets": [
+      "애견",
+      "안과",
+      "흑염소 신규"
+    ],
+    "ui": "Naver Blog PostList public PC UI"
+  },
+  "makeupSubmission": {
+    "scheduleIds": [
+      "sch_216bcc2e-df80-41af-b0cf-0036ffe32975",
+      "sch_c36eb954-9ffe-4efd-ae0e-36b220709584",
+      "sch_94fbba0b-f849-4a0b-a787-91dc3266064f",
+      "sch_218ce418-4664-4fc1-93e6-f493093624b4",
+      "sch_44f0a4f6-5391-4494-a20b-4777785f0874",
+      "sch_238adbaa-b35b-4111-bb00-f58573bda144",
+      "sch_c4e4969c-39e0-4c66-b49d-5de4d4c8644a",
+      "sch_dbd62926-778f-4641-9f52-8cc0468f003f",
+      "sch_f5f78b7a-ed4a-455c-a740-cec02215db93",
+      "sch_6a278cc9-43ad-40ee-8f79-d7e8a2facb14",
+      "sch_987aabf0-eaf8-4339-9636-3f5dcb6962ae",
+      "sch_fce3dae8-68bb-4b8e-954c-d044e068173b",
+      "sch_e4f974a7-9af5-4e2b-846d-fc6a8f1961f4",
+      "sch_afc6c1d6-cfab-4469-8204-f7eb50ebb43d",
+      "sch_f2949456-1e4a-4bcf-baeb-9406b56e6fbd"
+    ],
+    "totalQueuedJobs": 29,
+    "statusCounts": {
+      "failed": 9,
+      "published": 20
+    }
+  },
+  "summary": {
+    "verifiedAccounts": 11,
+    "remainingAccounts": 6,
+    "uiPublishedCount": 22
+  },
+  "blocked": [
+    {
+      "accountId": "pwg7r3sl",
+      "blogId": "pwg7r3sl",
+      "blogName": "오리의 다락방",
+      "domain": "legal",
+      "desired": 2,
+      "reason": "keyword_sheet_tab_missing",
+      "detail": "미노출 시트 탭은 종합/흑염소 신규/흑염소 구/추상의구체화/윤슬/안과/애견뿐임"
+    },
+    {
+      "accountId": "rqr1io45",
+      "blogId": "rqr1io45",
+      "blogName": "알리바바 신규5",
+      "domain": "alibaba",
+      "desired": 3,
+      "reason": "naver_protection_and_disabled_account",
+      "detail": "DB isEnabled=false, 오늘 3개 job 모두 보호조치 로그인 실패"
+    }
+  ],
+  "accounts": [
+    {
+      "accountId": "b6x2k9w3",
+      "blogId": "b6x2k9w3",
+      "blogName": "b6x2k9w3",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 0,
+        "failed": 2,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_216bcc2e-df80-41af-b0cf-0036ffe32975",
+            "jobId": "job_140c3aa0-8cfb-4620-95b8-12ac1e0a3b7e",
+            "keyword": "폼스키",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "failed",
+            "error": "로그인 실패: 로그인 페이지에 머물러 있습니다."
+          },
+          {
+            "scheduleId": "sch_216bcc2e-df80-41af-b0cf-0036ffe32975",
+            "jobId": "job_6d8bf6d9-75ee-4074-a59e-35a94bbef963",
+            "keyword": "강아지파양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "failed",
+            "error": "로그인 실패: 로그인 페이지에 머물러 있습니다."
+          }
+        ]
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "공개 글 목록 오늘 글 없음"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "blogId": "k7d9x2m4",
+      "blogName": "강아지강하지 1",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_c36eb954-9ffe-4efd-ae0e-36b220709584",
+            "jobId": "job_a4a2921b-4dcb-4078-a324-058ec12fd14a",
+            "keyword": "아비시니안",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/k7d9x2m4/224323906561"
+          },
+          {
+            "scheduleId": "sch_c36eb954-9ffe-4efd-ae0e-36b220709584",
+            "jobId": "job_97bfad05-d581-4908-ba0a-37e18ecb5451",
+            "keyword": "랙돌고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/k7d9x2m4/224323911382"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "랙돌고양이 결정 전에 알아볼 분양 비용 현실적으로 괜찮을까",
+          "아비시니안 꼭 체크할 건강관리 유전병 3년 키워보니 알게 된 것들"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "fail5644",
+      "blogId": "fail5644",
+      "blogName": "고구마스틱2",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_94fbba0b-f849-4a0b-a787-91dc3266064f",
+            "jobId": "job_164ef6cd-8e9f-49ba-8453-c53ce4a1cdfa",
+            "keyword": "렉돌",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/fail5644/224323907872"
+          },
+          {
+            "scheduleId": "sch_94fbba0b-f849-4a0b-a787-91dc3266064f",
+            "jobId": "job_6dbaf211-6e39-4c5a-b084-aa92d8451bf0",
+            "keyword": "고양이종류",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/fail5644/224323912166"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "고양이종류 나에게 어울릴까 성향별 난이도와 현실적인 차이점",
+          "렉돌 유전병 털빠짐 건강관리 키우기 어려운 이유"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "loand3324",
+      "blogId": "loand3324",
+      "blogName": "라우드 2",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 0,
+        "failed": 2,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_218ce418-4664-4fc1-93e6-f493093624b4",
+            "jobId": "job_51494c96-a5ff-44dc-8857-6827921a2d91",
+            "keyword": "애완동물",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "failed",
+            "error": "보안문자 자동 풀기 실패"
+          },
+          {
+            "scheduleId": "sch_218ce418-4664-4fc1-93e6-f493093624b4",
+            "jobId": "job_6b9a6b37-d160-4174-8ede-5d1bceb52fb8",
+            "keyword": "강아지보호소",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "failed",
+            "error": "보안문자 자동 풀기 실패"
+          }
+        ]
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "공개 글 목록 최신 글이 5월 게시물"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "compare14310",
+      "blogId": "compare14310",
+      "blogName": "룰루랄라 2",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_44f0a4f6-5391-4494-a20b-4777785f0874",
+            "jobId": "job_ebf4ef3f-bd4d-409c-8f87-f7c52044a185",
+            "keyword": "먼치킨고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/compare14310/224323906539"
+          },
+          {
+            "scheduleId": "sch_44f0a4f6-5391-4494-a20b-4777785f0874",
+            "jobId": "job_bc957547-6e9a-4495-a408-af03e521c9b1",
+            "keyword": "러시안블루분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/compare14310/224323911206"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "러시안블루분양 유전병과 털빠짐 건강관리 안 되면 키우기 힘든 이유",
+          "먼치킨고양이 초보자라면 분양가보다 먼저 확인할 현실적인 성격 수명 털빠짐"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "ghostrush7",
+      "blogId": "ghostrush7",
+      "blogName": "실눈캐",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_238adbaa-b35b-4111-bb00-f58573bda144",
+            "jobId": "job_57cc9fe5-905f-46c9-bd21-982d030fd098",
+            "keyword": "노르웨이숲고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ghostrush7/224323906709"
+          },
+          {
+            "scheduleId": "sch_238adbaa-b35b-4111-bb00-f58573bda144",
+            "jobId": "job_378bdfdc-7832-48b2-8142-aad453fe986a",
+            "keyword": "고양이",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ghostrush7/224323911375"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "고양이 결정 전에 반드시 확인해야 할 유전병 건강관리 현실 공개",
+          "노르웨이숲고양이 분양 결정 전에 반드시 알아야 할 키우기 힘든 이유"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "pwg7r3sl",
+      "blogId": "pwg7r3sl",
+      "blogName": "오리의 다락방",
+      "desired": 2,
+      "domain": "legal",
+      "db": {
+        "totalJobs": 0,
+        "published": 0,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": []
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "법률 미노출 시트 탭 없음"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "8ua1womn",
+      "blogId": "8ua1womn",
+      "blogName": "8ua1womn",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 0,
+        "failed": 2,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_c4e4969c-39e0-4c66-b49d-5de4d4c8644a",
+            "jobId": "job_8272ed5f-3ca9-4451-a7d8-d5fc0f74265f",
+            "keyword": "안산고양이분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "failed",
+            "error": "로그인 실패: Caps Lock이 켜져 있습니다."
+          },
+          {
+            "scheduleId": "sch_c4e4969c-39e0-4c66-b49d-5de4d4c8644a",
+            "jobId": "job_91463134-99bf-4fb9-8a3e-b7d101a0a8f4",
+            "keyword": "천안강아지분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "failed",
+            "error": "로그인 실패: Caps Lock이 켜져 있습니다."
+          }
+        ]
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "공개 글 목록 오늘 글 없음"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "blogId": "n7c3w8z2",
+      "blogName": "고양이밥 1",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_dbd62926-778f-4641-9f52-8cc0468f003f",
+            "jobId": "job_fd8fe98d-5bf2-4707-bdfb-1806c707d2ce",
+            "keyword": "치와와",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/n7c3w8z2/224323906265"
+          },
+          {
+            "scheduleId": "sch_dbd62926-778f-4641-9f52-8cc0468f003f",
+            "jobId": "job_7c9faa1a-018a-4e03-9f50-4862f911d918",
+            "keyword": "강아지입양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/n7c3w8z2/224323910839"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "강아지입양 유전병 털빠짐 건강관리 주의점 3년 키워보니 알게 된 것들",
+          "치와와 유지비 초기비용 숨은 지출과 초보가 감당하기 힘든 이유"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "respawnking9",
+      "blogId": "respawnking9",
+      "blogName": "리스팩식스팩 1",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_f5f78b7a-ed4a-455c-a740-cec02215db93",
+            "jobId": "job_48d673a6-b213-4133-8d08-184775a3dd7d",
+            "keyword": "메인쿤",
+            "category": "고양이품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/respawnking9/224323906388"
+          },
+          {
+            "scheduleId": "sch_f5f78b7a-ed4a-455c-a740-cec02215db93",
+            "jobId": "job_bdba3db5-4b31-4138-a10d-68e1822cc447",
+            "keyword": "유기견보호센터",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/respawnking9/224323911117"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "유기견보호센터 유지비 초기비용 입양 후가 생각보다 힘든 이유",
+          "메인쿤 유전병 털빠짐 건강관리 시 꼭 체크할 5가지"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "blogId": "ahffkdlek12",
+      "blogName": "바삭바삭해 1",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_6a278cc9-43ad-40ee-8f79-d7e8a2facb14",
+            "jobId": "job_b699d672-caaa-41bb-91ed-c40d2daa18f9",
+            "keyword": "안양강아지분양",
+            "category": "강아지분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahffkdlek12/224323906626"
+          },
+          {
+            "scheduleId": "sch_6a278cc9-43ad-40ee-8f79-d7e8a2facb14",
+            "jobId": "job_1f4d584e-4c73-422b-bf15-caa84e541519",
+            "keyword": "웰시코기",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahffkdlek12/224323911193"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "웰시코기 유전병 털빠짐 건강관리 주의사항 정리해봤어요",
+          "안양강아지분양 유전병 건강관리와 숨은 비용 체크리스트 5가지"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "blogId": "ahsxkfldk12",
+      "blogName": "쉽고간단하게",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_987aabf0-eaf8-4339-9636-3f5dcb6962ae",
+            "jobId": "job_dac1bba9-f4b3-45c1-b3f0-5db655ca739f",
+            "keyword": "먼치킨분양",
+            "category": "고양이분양정보",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahsxkfldk12/224323906836"
+          },
+          {
+            "scheduleId": "sch_987aabf0-eaf8-4339-9636-3f5dcb6962ae",
+            "jobId": "job_a131a522-2146-43e9-89b0-83caebae1a07",
+            "keyword": "단모치와와",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahsxkfldk12/224323911663"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "단모치와와 분양 가격 거품 없이 확인하는 기준 5가지",
+          "먼치킨분양 유지비 초기비용과 숨은 지출 대비를 위한 5가지"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "blogId": "ahfflwl123",
+      "blogName": "햄부기",
+      "desired": 2,
+      "domain": "pet",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_fce3dae8-68bb-4b8e-954c-d044e068173b",
+            "jobId": "job_a00d9ec5-7ea1-4f95-967d-ecae8e70c33b",
+            "keyword": "시바이누",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahfflwl123/224323906619"
+          },
+          {
+            "scheduleId": "sch_fce3dae8-68bb-4b8e-954c-d044e068173b",
+            "jobId": "job_7b4cc602-6b17-447b-a0bb-56d2f63243f6",
+            "keyword": "도베르만",
+            "category": "강아지품종",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/ahfflwl123/224323911203"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "도베르만 입양 전 꼭 체크할 현실적인 유지비와 관리 기준 5가지",
+          "시바이누 실제 성격부터 털빠짐까지 분양 전 체크할 5가지"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "rqr1io45",
+      "blogId": "rqr1io45",
+      "blogName": "알리바바 신규5",
+      "desired": 3,
+      "domain": "alibaba",
+      "db": {
+        "totalJobs": 3,
+        "published": 0,
+        "failed": 3,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_06f9a665-a101-4bf2-9170-911873e869e5",
+            "jobId": "job_6fe51819-7360-4c66-a369-094109ee1a9d",
+            "keyword": "글로벌소싱",
+            "scheduledAt": "2026-06-22T19:05:34+09:00",
+            "status": "failed",
+            "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }"
+          },
+          {
+            "scheduleId": "sch_06f9a665-a101-4bf2-9170-911873e869e5",
+            "jobId": "job_b4e9df85-49ee-4bbc-a73c-828fc118cf63",
+            "keyword": "해외직구관세납부방법",
+            "scheduledAt": "2026-06-22T20:05:34+09:00",
+            "status": "failed",
+            "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }"
+          },
+          {
+            "scheduleId": "sch_06f9a665-a101-4bf2-9170-911873e869e5",
+            "jobId": "job_0ac2e330-75c4-447a-a385-c742e4d393db",
+            "keyword": "배대지 사이트",
+            "scheduledAt": "2026-06-22T21:05:34+09:00",
+            "status": "failed",
+            "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }"
+          }
+        ]
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "DB 비활성 및 보호조치 로그인 실패"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "ghhoy",
+      "blogId": "ghhoy",
+      "blogName": "탐험기 - 교체",
+      "desired": 3,
+      "domain": "eye",
+      "db": {
+        "totalJobs": 3,
+        "published": 0,
+        "failed": 3,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_e4f974a7-9af5-4e2b-846d-fc6a8f1961f4",
+            "jobId": "job_01ee25e4-1d9f-406c-8d53-e026745dea2b",
+            "keyword": "라식수술비",
+            "scheduledAt": "2026-06-22T22:01:00+09:00",
+            "status": "failed",
+            "error": "보안문자 자동 풀기 실패"
+          },
+          {
+            "scheduleId": "sch_e4f974a7-9af5-4e2b-846d-fc6a8f1961f4",
+            "jobId": "job_b210f57b-1426-4871-aab2-c8f2215d6b21",
+            "keyword": "노안렌즈삽입술",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "failed",
+            "error": "보안문자 자동 풀기 실패"
+          },
+          {
+            "scheduleId": "sch_e4f974a7-9af5-4e2b-846d-fc6a8f1961f4",
+            "jobId": "job_08505c19-3ad4-45c8-baa6-99d2bbb7b081",
+            "keyword": "백내장수술후주의사항",
+            "scheduledAt": "2026-06-22T22:03:00+09:00",
+            "status": "failed",
+            "error": "보안문자 자동 풀기 실패"
+          }
+        ]
+      },
+      "ui": {
+        "count": 0,
+        "titles": [],
+        "note": "보안문자 자동 풀기 실패"
+      },
+      "final": "remaining_action"
+    },
+    {
+      "accountId": "pixelninja3",
+      "blogId": "pixelninja3",
+      "blogName": "건강박사석사 1",
+      "desired": 2,
+      "domain": "goat",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_5573c6f7-4b80-44e9-bf91-3e6dcffbc695",
+            "jobId": "job_84af7126-814d-4377-918e-faba375ae143",
+            "keyword": "소음인흑염소",
+            "category": "한려담원",
+            "scheduledAt": "2026-06-22T19:05:34+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/pixelninja3"
+          },
+          {
+            "scheduleId": "sch_afc6c1d6-cfab-4469-8204-f7eb50ebb43d",
+            "jobId": "job_bc96300e-ec95-4d7e-bf0d-13ce453f61d4",
+            "keyword": "임산부유산균",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/pixelninja3/224323906002"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "임산부유산균 시기별로 챙기는 이유와 선택 기준",
+          "소음인 흑염소 실수하지 않고 고르는 법 체질에 맞는 선택"
+        ]
+      },
+      "final": "verified_published"
+    },
+    {
+      "accountId": "eghfsa5478",
+      "blogId": "eghfsa5478",
+      "blogName": "오세아니야 1",
+      "desired": 2,
+      "domain": "goat",
+      "db": {
+        "totalJobs": 2,
+        "published": 2,
+        "failed": 0,
+        "activeLike": 0,
+        "jobs": [
+          {
+            "scheduleId": "sch_512f6248-80c6-42be-9a05-a117a73e658e",
+            "jobId": "job_3025b946-418d-44f4-b080-d89d8c1e5bf1",
+            "keyword": "소음인특징",
+            "category": "한려담원",
+            "scheduledAt": "2026-06-22T19:05:34+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/eghfsa5478"
+          },
+          {
+            "scheduleId": "sch_f2949456-1e4a-4bcf-baeb-9406b56e6fbd",
+            "jobId": "job_191c9903-87cb-4a81-af53-c61520db1ba6",
+            "keyword": "임산부소화제",
+            "scheduledAt": "2026-06-22T22:02:00+09:00",
+            "status": "published",
+            "postUrl": "https://blog.naver.com/eghfsa5478/224323906521"
+          }
+        ]
+      },
+      "ui": {
+        "count": 2,
+        "titles": [
+          "임산부 소화제 언제부터 챙겨야 할까 임신 시기별 대처법",
+          "소음인 특징과 잘 맞는 건강 관리법"
+        ]
+      },
+      "final": "verified_published"
+    }
+  ]
+}
