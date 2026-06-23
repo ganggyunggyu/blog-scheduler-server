@@ -34,6 +34,7 @@ const TARGET_ACCOUNT_IDS = [
   'fail5644',
   'compare14310',
   'ghostrush7',
+  'n7c3w8z2',
   'respawnking9',
   'ahffkdlek12',
   'ahsxkfldk12',
@@ -278,6 +279,40 @@ const resolveAccounts = async (): Promise<AccountDoc[]> => {
     .toArray();
 
   const byId = new Map(accounts.map((account) => [account.accountId, account]));
+
+  const accountRows = await mongoose.connection.db.collection<AccountDoc>('blogaccounts')
+    .find({ accountId: { $in: ids } }, { projection: { accountId: 1, blogId: 1, nickname: 1, category: 1 } })
+    .toArray();
+  for (const row of accountRows) {
+    const existing = byId.get(row.accountId);
+    byId.set(row.accountId, {
+      ...row,
+      ...existing,
+      password: existing?.password ?? '',
+    });
+  }
+
+  for (const id of ids) {
+    const account = byId.get(id);
+    if (account?.password) {
+      continue;
+    }
+
+    const queue = getGenerateQueue(id);
+    const jobs = await queue.getJobs(['waiting', 'active', 'delayed', 'completed', 'failed'], 0, 1000, false);
+    const jobWithPassword = jobs.find((job) => typeof job.data?.account?.password === 'string' && job.data.account.password);
+    if (jobWithPassword?.data.account.password) {
+      byId.set(id, {
+        accountId: id,
+        blogId: account?.blogId ?? id,
+        nickname: account?.nickname,
+        category: account?.category,
+        isActive: account?.isActive,
+        password: jobWithPassword.data.account.password,
+      });
+    }
+  }
+
   const missing = ids.filter((id) => !byId.get(id)?.password);
   if (missing.length > 0) {
     throw new Error(`계정 또는 비밀번호 없음: ${missing.join(', ')}`);
