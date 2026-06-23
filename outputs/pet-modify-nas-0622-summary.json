@@ -1,0 +1,199 @@
+{
+  "generatedAtKst": "2026-06-23 11:05:03",
+  "service": "pet-modify-nas-0622",
+  "ref": "2026-06-22-nas-recent2",
+  "dateCode": "0622",
+  "nas": {
+    "inputDir": "/Volumes/21lab_데이터관리/0_자동발행/0_애견자동발행/애견_0622",
+    "outputDir": "/Volumes/21lab_데이터관리/0_자동발행/0_애견자동발행/애견_0622_출력",
+    "processedBlogs": 9,
+    "processedKeywords": 18,
+    "processedLibraryExcludedImages": 36,
+    "uploadedToS3Images": 36,
+    "keywordCategoryTxt": "/Volumes/21lab_데이터관리/0_자동발행/0_애견자동발행/애견_0622_출력/키워드_카테고리.txt"
+  },
+  "modify": {
+    "totalJobs": 18,
+    "counts": {
+      "published": 18
+    },
+    "recoveredPublishQueues": [
+      "fail5644",
+      "ghostrush7",
+      "respawnking9"
+    ],
+    "allPublished": true
+  },
+  "rows": [
+    {
+      "accountId": "ahffkdlek12",
+      "scheduleId": "sch_14df3115-4386-4278-aafc-a74234b335f3",
+      "keyword": "골든리트리버",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahffkdlek12/224323911193",
+      "completedAt": "2026-06-23T01:47:07.955Z",
+      "publishJobId": "publish_job_f27e39de-6f28-4d83-ab0f-6eeed3726284"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "scheduleId": "sch_14df3115-4386-4278-aafc-a74234b335f3",
+      "keyword": "닥스훈트",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahffkdlek12/224323906626",
+      "completedAt": "2026-06-23T01:48:28.402Z",
+      "publishJobId": "publish_job_fcbd28b7-9be8-48db-8700-5f41710d828a"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "scheduleId": "sch_89767483-a1b1-4c1a-ad72-6441efab539b",
+      "keyword": "요크셔테리어",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahfflwl123/224323911203",
+      "completedAt": "2026-06-23T01:48:36.856Z",
+      "publishJobId": "publish_job_a4767f03-c0ff-4340-a952-e8434cd6b107"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "scheduleId": "sch_89767483-a1b1-4c1a-ad72-6441efab539b",
+      "keyword": "웰시코기",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahfflwl123/224323906619",
+      "completedAt": "2026-06-23T01:48:57.785Z",
+      "publishJobId": "publish_job_09cc7ab3-7146-466e-982a-71aebe6acea3"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "scheduleId": "sch_62afc7a2-3f8c-4804-84fc-29a6ca359f06",
+      "keyword": "시바이누",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahsxkfldk12/224323911663",
+      "completedAt": "2026-06-23T01:50:03.778Z",
+      "publishJobId": "publish_job_fe2ad88a-b87f-4801-9219-34313dbbca0d"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "scheduleId": "sch_62afc7a2-3f8c-4804-84fc-29a6ca359f06",
+      "keyword": "진돗개",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ahsxkfldk12/224323906836",
+      "completedAt": "2026-06-23T01:47:04.773Z",
+      "publishJobId": "publish_job_8b960dc0-b0cd-4906-b765-985aeb279a73"
+    },
+    {
+      "accountId": "compare14310",
+      "scheduleId": "sch_7da8d240-16c1-467d-9660-365bd9b618de",
+      "keyword": "고양이품종",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/compare14310/224323911206",
+      "completedAt": "2026-06-23T01:49:19.456Z",
+      "publishJobId": "publish_job_85e83bd8-baf4-4265-9224-039606d8901d"
+    },
+    {
+      "accountId": "compare14310",
+      "scheduleId": "sch_7da8d240-16c1-467d-9660-365bd9b618de",
+      "keyword": "그레이하운드",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/compare14310/224323906539",
+      "completedAt": "2026-06-23T01:49:21.770Z",
+      "publishJobId": "publish_job_b92e1123-bc7a-4c63-af49-cfc48b61de64"
+    },
+    {
+      "accountId": "fail5644",
+      "scheduleId": "sch_6508c1e5-57ac-4640-9d29-9de995b70b6b",
+      "keyword": "고양이종류",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/fail5644/224323912166",
+      "completedAt": "2026-06-23T02:04:19.779Z",
+      "publishJobId": "publish_recover_job_cb15c944-a9ac-4d28-b041-8703f32afed0_1782179964238"
+    },
+    {
+      "accountId": "fail5644",
+      "scheduleId": "sch_6508c1e5-57ac-4640-9d29-9de995b70b6b",
+      "keyword": "골든리트리버분양",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/fail5644/224323907872",
+      "completedAt": "2026-06-23T01:51:49.139Z",
+      "publishJobId": "publish_job_cf52b146-52aa-40d7-b03d-dea3a7e2ed82"
+    },
+    {
+      "accountId": "ghostrush7",
+      "scheduleId": "sch_1724d17d-54af-4927-9cef-df8a26f295a7",
+      "keyword": "고양이품종",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ghostrush7/224323911375",
+      "completedAt": "2026-06-23T01:49:47.105Z",
+      "publishJobId": "publish_job_9e6df4a6-420e-4e74-83c5-1384bff3173b"
+    },
+    {
+      "accountId": "ghostrush7",
+      "scheduleId": "sch_1724d17d-54af-4927-9cef-df8a26f295a7",
+      "keyword": "그레이하운드",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/ghostrush7/224323906709",
+      "completedAt": "2026-06-23T02:04:25.151Z",
+      "publishJobId": "publish_recover_job_334b5a13-cfdd-49b2-8b61-5676d5e3a096_1782179964345"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "scheduleId": "sch_ce97e53e-691b-4dea-bb36-4bcbae6b5629",
+      "keyword": "고양이종류",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/k7d9x2m4/224323911382",
+      "completedAt": "2026-06-23T01:48:48.123Z",
+      "publishJobId": "publish_job_852dffeb-7172-426a-98cd-dc3d0ec317c4"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "scheduleId": "sch_ce97e53e-691b-4dea-bb36-4bcbae6b5629",
+      "keyword": "골든리트리버",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/k7d9x2m4/224323906561",
+      "completedAt": "2026-06-23T01:49:33.952Z",
+      "publishJobId": "publish_job_06f149fb-1cd5-4c8c-9be8-9c499588a8d1"
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "scheduleId": "sch_c2d9bcf7-3bbe-4065-84d3-ed2627055f99",
+      "keyword": "먼치킨고양이",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/n7c3w8z2/224323910839",
+      "completedAt": "2026-06-23T01:51:12.952Z",
+      "publishJobId": "publish_job_567fc8c8-2748-406a-a5ee-ff8324d01266"
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "scheduleId": "sch_c2d9bcf7-3bbe-4065-84d3-ed2627055f99",
+      "keyword": "시츄",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/n7c3w8z2/224323906265",
+      "completedAt": "2026-06-23T01:47:26.862Z",
+      "publishJobId": "publish_job_1903ed9d-8e2b-4557-99c3-afccca6684f6"
+    },
+    {
+      "accountId": "respawnking9",
+      "scheduleId": "sch_09035459-f2a8-44f6-a5e4-bff42b2d7928",
+      "keyword": "브리티쉬숏헤어",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/respawnking9/224323911117",
+      "completedAt": "2026-06-23T01:50:33.918Z",
+      "publishJobId": "publish_job_88a02b45-1f63-4ff3-9895-b2bacc5370f4"
+    },
+    {
+      "accountId": "respawnking9",
+      "scheduleId": "sch_09035459-f2a8-44f6-a5e4-bff42b2d7928",
+      "keyword": "사모예드",
+      "status": "published",
+      "postUrl": "https://blog.naver.com/respawnking9/224323906388",
+      "completedAt": "2026-06-23T02:04:11.780Z",
+      "publishJobId": "publish_recover_job_42b52c69-b7c7-4b02-a487-b0c163b1a578_1782179964427"
+    }
+  ],
+  "verification": {
+    "atlasDbPublished": "18/18",
+    "naverEditorUi": "18 update.done observed through Playwright Naver editor flow",
+    "publicMobilePageHttpOk": "18/18",
+    "lintGate": "passed: node scripts/run-lint-gate.mjs",
+    "typecheck": "passed: pnpm typecheck",
+    "queueResidue": "recovered publish queues fail5644/ghostrush7/respawnking9 have waiting=0 active=0 delayed=0 failed=0"
+  }
+}
