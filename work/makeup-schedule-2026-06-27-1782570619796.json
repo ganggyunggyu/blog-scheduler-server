@@ -1,0 +1,512 @@
+{
+  "generatedAt": "2026-06-27T14:30:11.396Z",
+  "execute": true,
+  "scheduleDate": "2026-06-27",
+  "slots": [
+    "23:35",
+    "23:45",
+    "23:55"
+  ],
+  "perAccount": 3,
+  "domains": {
+    "eye": [
+      {
+        "accountId": "nes1p2kx",
+        "blogId": "nes1p2kx",
+        "blogName": "에스앤비안과 1 (노출)",
+        "keywords": [
+          "라섹회복기간",
+          "백내장수술비용",
+          "라섹수술"
+        ],
+        "items": [
+          {
+            "keyword": "라섹회복기간",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술비용",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라섹수술",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "mh8j62wm",
+        "blogId": "mh8j62wm",
+        "blogName": "에스앤비안과 2 (노출)",
+        "keywords": [
+          "노안수술비용",
+          "백내장수술회복기간",
+          "결막모반제거"
+        ],
+        "items": [
+          {
+            "keyword": "노안수술비용",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "백내장수술회복기간",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "결막모반제거",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "h9ag469z",
+        "blogId": "h9ag469z",
+        "blogName": "에스앤비안과 정보",
+        "keywords": [
+          "라섹",
+          "스마일라식비용",
+          "라식비용"
+        ],
+        "items": [
+          {
+            "keyword": "라섹",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "스마일라식비용",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라식비용",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "dq1h3bjy",
+        "blogId": "dq1h3bjy",
+        "blogName": "에스앤비안과, 29년 경력 (노출)",
+        "keywords": [
+          "백내장수술후기",
+          "스마일라식가격",
+          "렌즈삽입술가격"
+        ],
+        "items": [
+          {
+            "keyword": "백내장수술후기",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "스마일라식가격",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "렌즈삽입술가격",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 21,
+          "productFolderHits": 3
+        }
+      },
+      {
+        "accountId": "hagyga",
+        "blogId": "hagyga",
+        "blogName": "에스앤비안과의원 - 교체",
+        "keywords": [
+          "라섹재수술",
+          "라식과라섹차이",
+          "라섹가격"
+        ],
+        "items": [
+          {
+            "keyword": "라섹재수술",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "라식과라섹차이",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "라섹가격",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      },
+      {
+        "accountId": "geenl",
+        "blogId": "geenl",
+        "blogName": "모험 - 교체",
+        "keywords": [
+          "라식라섹비용",
+          "스마일라식각막두께",
+          "백내장수술후주의사항"
+        ],
+        "items": [
+          {
+            "keyword": "라식라섹비용",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          },
+          {
+            "keyword": "스마일라식각막두께",
+            "scheduledAt": "2026-06-27T23:45:00+09:00",
+            "slot": 2
+          },
+          {
+            "keyword": "백내장수술후주의사항",
+            "scheduledAt": "2026-06-27T23:55:00+09:00",
+            "slot": 3
+          }
+        ],
+        "debug": {
+          "domain": "안과",
+          "category": "에스앤비안과-백업",
+          "productFolders": 0,
+          "productFolderHits": 0
+        }
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "k7d9x2m4",
+        "blogId": "k7d9x2m4",
+        "blogName": "강아지강하지 1",
+        "keywords": [
+          "유기견"
+        ],
+        "items": [
+          {
+            "keyword": "유기견",
+            "scheduledAt": "2026-06-27T23:35:00+09:00",
+            "slot": 1
+          }
+        ],
+        "debug": {
+          "domain": "애견",
+          "category": "도그마루 글밥",
+          "productFolders": 87,
+          "productFolderHits": 0
+        }
+      }
+    ],
+    "brand": []
+  },
+  "blocked": {
+    "eye": [
+      {
+        "accountId": "ghhoy",
+        "displayName": "탐험기 - 교체",
+        "category": "에스앤비안과-백업",
+        "reason": "missing_password"
+      }
+    ],
+    "pet": [
+      {
+        "accountId": "b6x2k9w3",
+        "displayName": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "loand3324",
+        "displayName": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error"
+      },
+      {
+        "accountId": "8ua1womn",
+        "displayName": "8ua1womn",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "displayName": "고양이밥 1",
+        "category": "서리펫",
+        "reason": "missing_password"
+      },
+      {
+        "accountId": "k7d9x2m4",
+        "displayName": "강아지강하지 1",
+        "needed": 3,
+        "selected": 1
+      },
+      {
+        "accountId": "fail5644",
+        "displayName": "고구마스틱2 (10개) 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "compare14310",
+        "displayName": "룰루랄라 2 (12개) 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ghostrush7",
+        "displayName": "실눈캐",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "respawnking9",
+        "displayName": "리스팩식스팩 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "displayName": "바삭바삭해 1",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "displayName": "쉽고간단하게",
+        "needed": 3,
+        "selected": 0
+      },
+      {
+        "accountId": "ahfflwl123",
+        "displayName": "햄부기",
+        "needed": 3,
+        "selected": 0
+      }
+    ],
+    "brand": [
+      {
+        "accountId": "adplan3th",
+        "displayName": "에스앤비안과 브랜드",
+        "reason": "no_unused_local_package"
+      }
+    ]
+  },
+  "submissions": {
+    "eye": {
+      "success": true,
+      "totalJobs": 18,
+      "schedules": [
+        {
+          "scheduleId": "sch_7568b61e-f551-486f-97f6-d09d5b9c6a16",
+          "account": "nes***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_5c6ed954-810c-4a9b-91c1-3e1ff54156e9",
+              "keyword": "라섹회복기간",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_dad0599e-f187-4f59-98ee-0e22af2489b8",
+              "keyword": "백내장수술비용",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_dbbe7628-ddcf-4edc-b254-e3fca969aad2",
+              "keyword": "라섹수술",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_7e3aad8b-aaa6-4239-a876-bc3b067d8a67",
+          "account": "mh8***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_55b8229b-2f42-4327-992f-ed3b2ee90237",
+              "keyword": "노안수술비용",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_d71c604a-4606-4db7-8d88-50213ec1c124",
+              "keyword": "백내장수술회복기간",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_466713a2-0c52-4d9d-95db-5b39a1cbffcb",
+              "keyword": "결막모반제거",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_04f0a23e-517a-4898-a13c-f90d4980b321",
+          "account": "h9a***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_6315d11f-f6a6-44db-8e98-067ac07f5770",
+              "keyword": "라섹",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_7aa6e327-59a5-4406-9cea-f515aab26035",
+              "keyword": "스마일라식비용",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_473d71aa-00fd-441c-81ab-812769d909fe",
+              "keyword": "라식비용",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_673ff34b-06aa-4f5f-a9e2-ec834d95bed9",
+          "account": "dq1***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_56dc7420-0cea-40ae-bf24-994305780966",
+              "keyword": "백내장수술후기",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_73e668d0-7df0-43a4-af88-f90b1cd37879",
+              "keyword": "스마일라식가격",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_7cdd8145-0cbf-4338-8fbe-84f0b04180f7",
+              "keyword": "렌즈삽입술가격",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_afae7241-4b79-48b7-b4ef-8f4aeca9e85e",
+          "account": "hag***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_d4892ff9-5b87-4e93-b088-3ac466110a3f",
+              "keyword": "라섹재수술",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_6441def0-6031-44af-b385-1fe971ccb8f4",
+              "keyword": "라식과라섹차이",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_8e37b195-8b03-4592-9c65-36146ec6b2a1",
+              "keyword": "라섹가격",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        },
+        {
+          "scheduleId": "sch_826b605f-46b5-4b92-a6d6-dcf1665aea4d",
+          "account": "gee***",
+          "reused": false,
+          "totalJobs": 3,
+          "jobs": [
+            {
+              "id": "job_91658f05-4a4b-4ce3-92bd-6722d9b147e4",
+              "keyword": "라식라섹비용",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            },
+            {
+              "id": "job_3266d9ad-7e70-48b3-a2af-631231964e09",
+              "keyword": "스마일라식각막두께",
+              "scheduledAt": "2026-06-27T23:45:00+09:00",
+              "slot": 2
+            },
+            {
+              "id": "job_4eed2960-5184-417c-b0cc-de6bb5903978",
+              "keyword": "백내장수술후주의사항",
+              "scheduledAt": "2026-06-27T23:55:00+09:00",
+              "slot": 3
+            }
+          ]
+        }
+      ]
+    },
+    "pet": {
+      "success": true,
+      "totalJobs": 1,
+      "schedules": [
+        {
+          "scheduleId": "sch_e806b7ca-9c22-4417-a038-a4f86b6ae04f",
+          "account": "k7d***",
+          "reused": false,
+          "totalJobs": 1,
+          "jobs": [
+            {
+              "id": "job_e9ee1c10-2e01-4bec-8051-90a530e886d2",
+              "keyword": "유기견",
+              "scheduledAt": "2026-06-27T23:35:00+09:00",
+              "slot": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

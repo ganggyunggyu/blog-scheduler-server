@@ -1,0 +1,208 @@
+{
+  "executed": false,
+  "scheduleDate": "2026-06-28",
+  "scheduleMode": "2",
+  "pet": {
+    "sheetGid": "1960709235",
+    "sourceRows": 46,
+    "unexposed": 1,
+    "fallback": 39,
+    "accountCount": 9,
+    "skippedAccounts": [
+      {
+        "accountId": "loand3324",
+        "nickname": "라우드 2 (5개) 1",
+        "category": "도그마루 글밥",
+        "reason": "credential_error_or_known_login_block"
+      },
+      {
+        "accountId": "b6x2k9w3",
+        "nickname": "b6x2k9w3",
+        "category": "도그마루 글밥",
+        "reason": "naver_permanent_service_restriction"
+      },
+      {
+        "accountId": "8ua1womn",
+        "nickname": "8ua1womn",
+        "category": "서리펫",
+        "reason": "naver_id_or_password_error"
+      }
+    ],
+    "queues": [
+      {
+        "accountId": "k7d9x2m4",
+        "blogName": "강아지강하지1",
+        "keywords": [
+          "렉돌분양",
+          "푸숑"
+        ]
+      },
+      {
+        "accountId": "fail5644",
+        "blogName": "고구마스틱2(10개)1",
+        "keywords": [
+          "스핑크스",
+          "강아지품종"
+        ]
+      },
+      {
+        "accountId": "compare14310",
+        "blogName": "룰루랄라2(12개)1",
+        "keywords": [
+          "폼피츠",
+          "요크셔테리어"
+        ]
+      },
+      {
+        "accountId": "ghostrush7",
+        "blogName": "실눈캐",
+        "keywords": [
+          "미니비숑분양",
+          "말티푸분양가"
+        ]
+      },
+      {
+        "accountId": "n7c3w8z2",
+        "blogName": "고양이밥1",
+        "keywords": [
+          "털없는고양이",
+          "스핑크스고양이"
+        ]
+      },
+      {
+        "accountId": "respawnking9",
+        "blogName": "리스팩식스팩1",
+        "keywords": [
+          "리트리버분양",
+          "말티푸분양"
+        ]
+      },
+      {
+        "accountId": "ahffkdlek12",
+        "blogName": "바삭바삭해1",
+        "keywords": [
+          "진돗개",
+          "먼치킨고양이"
+        ]
+      },
+      {
+        "accountId": "ahsxkfldk12",
+        "blogName": "쉽고간단하게",
+        "keywords": [
+          "입양조건",
+          "이탈리안그레이하운드"
+        ]
+      },
+      {
+        "accountId": "ahfflwl123",
+        "blogName": "햄부기",
+        "keywords": [
+          "시바",
+          "비숑프리제"
+        ]
+      }
+    ],
+    "result": {
+      "totalJobs": 0,
+      "schedules": []
+    }
+  },
+  "goat": {
+    "sheetGid": "1025121967",
+    "sourceRows": 49,
+    "unexposed": 41,
+    "fallback": 1,
+    "accountCount": 7,
+    "skippedAccounts": [],
+    "queues": [
+      {
+        "accountId": "regular14631",
+        "blogName": "소원1",
+        "keywords": [
+          "팔다리저림",
+          "소양인여자특징"
+        ],
+        "roots": [
+          "팔다리저림",
+          "소양인"
+        ]
+      },
+      {
+        "accountId": "pixelninja3",
+        "blogName": "건강박사석사1",
+        "keywords": [
+          "발이차가운원인",
+          "저체온증증상"
+        ],
+        "roots": [
+          "발이차가운",
+          "저체온증증상"
+        ]
+      },
+      {
+        "accountId": "ahffkekd12",
+        "blogName": "긍정이백퍼1",
+        "keywords": [
+          "손저림원인",
+          "저체온증"
+        ],
+        "roots": [
+          "손저림",
+          "저체온증"
+        ]
+      },
+      {
+        "accountId": "dhtksk1p",
+        "blogName": "빨간모자앤1",
+        "keywords": [
+          "말초신경병증증상",
+          "손가락저림"
+        ],
+        "roots": [
+          "말초신경병증증상",
+          "손가락저림"
+        ]
+      },
+      {
+        "accountId": "eghfsa5478",
+        "blogName": "오세아니야1",
+        "keywords": [
+          "소음인",
+          "손발이차가울때영양제"
+        ],
+        "roots": [
+          "소음인",
+          "손발"
+        ]
+      },
+      {
+        "accountId": "q9v3m7a2",
+        "blogName": "포비1",
+        "keywords": [
+          "족냉증",
+          "손끝저림"
+        ],
+        "roots": [
+          "족냉증",
+          "손끝"
+        ]
+      },
+      {
+        "accountId": "laghunter8",
+        "blogName": "도도1",
+        "keywords": [
+          "손목저림",
+          "수족냉증임신"
+        ],
+        "roots": [
+          "손목저림",
+          "수족냉증"
+        ]
+      }
+    ],
+    "result": {
+      "totalJobs": 0,
+      "schedules": []
+    }
+  }
+}
