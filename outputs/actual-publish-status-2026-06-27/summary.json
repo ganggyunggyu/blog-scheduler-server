@@ -1,0 +1,652 @@
+{
+  "targetDate": "2026-06-27",
+  "totalJobs": 83,
+  "rowsPrepared": 80,
+  "sheetResult": {
+    "spreadsheetId": "1oUo85a9m3MTTzWeX8FGnKZqCDfPRNdGZFxr4-vZqSrM",
+    "updatedRange": "'발행현황'!A108:L187",
+    "updatedRows": 80
+  },
+  "summary": [
+    {
+      "accountId": "n7c3w8z2",
+      "keyword": "보더콜리분양",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "보더콜리분양 초보자라면 성격과 활동량을 먼저 따져봐야 하는 이유",
+      "time": "2026-06-28 03:24"
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "keyword": "믹스견",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "믹스견 유지비 초기비용 숨은 지출 다 감당할 수 있을까",
+      "time": "2026-06-28 00:20"
+    },
+    {
+      "accountId": "h9ag469z",
+      "keyword": "라섹",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라섹 수술 결정 전 확인해야 할 5가지 핵심 비교",
+      "time": "2026-06-27 23:38"
+    },
+    {
+      "accountId": "h9ag469z",
+      "keyword": "라식비용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라식비용 종류별 차이와 합리적인 선택을 위한 필수 가이드",
+      "time": "2026-06-27 23:59"
+    },
+    {
+      "accountId": "h9ag469z",
+      "keyword": "스마일라식비용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "스마일라식비용과 시력 교정 효과를 비교해본 결과는",
+      "time": "2026-06-27 23:49"
+    },
+    {
+      "accountId": "loand3324",
+      "keyword": "메인쿤",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "loand3324",
+      "keyword": "털없는고양이",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:58"
+    },
+    {
+      "accountId": "rqr1io45",
+      "keyword": "중국구매대행추천",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 08:02"
+    },
+    {
+      "accountId": "rqr1io45",
+      "keyword": "중국수입대행업체",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 09:02"
+    },
+    {
+      "accountId": "rqr1io45",
+      "keyword": "중국택배",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 10:02"
+    },
+    {
+      "accountId": "eghfsa5478",
+      "keyword": "공진단효과",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "공진단효과 무엇이 다를까 원인부터 짚어봅니다",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "eghfsa5478",
+      "keyword": "고혈압원인",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "고혈압 원인 몰라서 방치하는 분들 꼭 보세요",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "keyword": "골든두들",
+      "status": "발행완료",
+      "rss": "miss",
+      "title": "",
+      "time": "2026-06-27 23:45"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "keyword": "고양이수명",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "고양이수명 유지비 초기비용 숨은 지출과 돌보기 어려운 이유",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "ghostrush7",
+      "keyword": "먼치킨분양",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "먼치킨분양 꼭 체크할 입양 전 주의사항과 분양가 현실 솔직 공개",
+      "time": "2026-06-28 00:00"
+    },
+    {
+      "accountId": "ghostrush7",
+      "keyword": "뱅갈고양이",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "뱅갈고양이 결정 전에 확인하는 에너자이저 성격과 관리 포인트 정리해봤어요",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "pixelninja3",
+      "keyword": "경옥고효능",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "경옥고효능 만성 피로가 말썽일 때 왜 찾는지 이유부터",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "pixelninja3",
+      "keyword": "빈혈에좋은음식",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "빈혈에좋은음식, 어떤 걸 골라야 할까",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "keyword": "리트리버분양",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "리트리버분양 털빠짐과 유전병 건강 관리 주의사항 체크해보세요",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "keyword": "시바",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "시바이누 독립심 강한 성격만큼 숨은 관리비가 꽤 들었던 3년 키워본 후기",
+      "time": "2026-06-22 22:52"
+    },
+    {
+      "accountId": "weed3122",
+      "keyword": "중국구매대행추천",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국구매대행추천 초보자를 위한 총정리",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "weed3122",
+      "keyword": "중국수입대행업체",
+      "status": "발행완료",
+      "rss": "miss",
+      "title": "",
+      "time": "2026-06-27 09:02"
+    },
+    {
+      "accountId": "weed3122",
+      "keyword": "중국택배",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국택배 발송부터 조회까지 총정리",
+      "time": "2026-06-27 10:00"
+    },
+    {
+      "accountId": "compare14310",
+      "keyword": "페르시안고양이",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "페르시안고양이 유지비 초기비용과 입양 전 따져볼 5가지",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "compare14310",
+      "keyword": "미니비숑분양",
+      "status": "발행완료",
+      "rss": "miss",
+      "title": "",
+      "time": "2026-06-27 23:58"
+    },
+    {
+      "accountId": "tinyfish183",
+      "keyword": "족저근막염 치료방법",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "족저근막염 치료방법 7가지 총정리",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "tinyfish183",
+      "keyword": "무지외반증 운동",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "무지외반증 운동으로 개선될까",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "bigfish773",
+      "keyword": "위고비 효과",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "위고비 효과와 부작용 비교 총정리",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "bigfish773",
+      "keyword": "프로페시아",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "프로페시아 6개월 복용 후기, 효과와 부작용 내 경험 그대로",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "dhtksk1p",
+      "keyword": "만성위염",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "만성위염 원인부터 짚는 속편한 관리의 시작",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "dhtksk1p",
+      "keyword": "기립성저혈압",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "일어설 때 핑 도는 이유 원인부터 짚는 기립성 저혈압 관리",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "individual14144",
+      "keyword": "중국구매대행추천",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국구매대행추천 고민된다면 꼭 확인하세요",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "individual14144",
+      "keyword": "중국수입대행업체",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국수입대행업체 고르는법 핵심체크",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "individual14144",
+      "keyword": "중국택배",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국택배 이용전 알아야할 5가지 핵심정보",
+      "time": "2026-06-27 10:00"
+    },
+    {
+      "accountId": "dq1h3bjy",
+      "keyword": "백내장수술후기",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "백내장수술후기 찾는 노년층이 꼭 확인해야 할 정보",
+      "time": "2026-06-27 23:39"
+    },
+    {
+      "accountId": "dq1h3bjy",
+      "keyword": "스마일라식가격",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "스마일라식가격 결정 요인과 부작용 예방 방법까지 총정리",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "dq1h3bjy",
+      "keyword": "렌즈삽입술가격",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "렌즈삽입술가격 고도근시 직장인을 위한 선택 가이드",
+      "time": "2026-06-28 03:16"
+    },
+    {
+      "accountId": "ahffkekd12",
+      "keyword": "만성피로해결",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "만성피로해결, 잠만으로는 안 되는 이유",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "ahffkekd12",
+      "keyword": "수족냉증에좋은음식",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "수족냉증에좋은음식 손발이 시렵다면 확인하세요",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "b6x2k9w3",
+      "keyword": "고양이종류",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "b6x2k9w3",
+      "keyword": "먼치킨고양이",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:58"
+    },
+    {
+      "accountId": "heavymouse448",
+      "keyword": "중국구매대행추천",
+      "status": "발행완료",
+      "rss": "miss",
+      "title": "",
+      "time": "2026-06-27 08:02"
+    },
+    {
+      "accountId": "heavymouse448",
+      "keyword": "중국수입대행업체",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국수입대행업체 업무 흐름부터 주의점까지 총정리",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "heavymouse448",
+      "keyword": "중국택배",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국택배 조회 방법 5가지 총정리",
+      "time": "2026-06-27 10:00"
+    },
+    {
+      "accountId": "respawnking9",
+      "keyword": "스핑크스고양이",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "스핑크스고양이 털빠짐 유전병 키우기 전 꼭 체크해보세요",
+      "time": "2026-05-29 18:50"
+    },
+    {
+      "accountId": "respawnking9",
+      "keyword": "비숑프리제",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "비숑프리제 유전병 털빠짐 건강관리 직접 키워보면 힘든 이유",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "nes1p2kx",
+      "keyword": "라섹회복기간",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라섹회복기간 직장인을 위한 단계별 가이드",
+      "time": "2026-06-27 23:38"
+    },
+    {
+      "accountId": "nes1p2kx",
+      "keyword": "백내장수술비용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "백내장수술비용 걱정되는 중장년층과 자녀를 위한 가이드",
+      "time": "2026-06-27 23:48"
+    },
+    {
+      "accountId": "nes1p2kx",
+      "keyword": "라섹수술",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라섹수술 라식수술 차이와 장단점 비교",
+      "time": "2026-06-27 23:55"
+    },
+    {
+      "accountId": "laghunter8",
+      "keyword": "고혈압증상",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "고혈압증상 왜 아무 신호도 없는데 위험할까",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "laghunter8",
+      "keyword": "흑염소효능남성",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "흑염소효능남성 꾸준히 먹으면 생기는 변화와 선택기준",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "mh8j62wm",
+      "keyword": "노안수술비용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "노안수술비용 렌즈 종류에 따라 차이가 나는 이유는",
+      "time": "2026-06-27 23:40"
+    },
+    {
+      "accountId": "mh8j62wm",
+      "keyword": "결막모반제거",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "결막모반제거 눈 속 점 때문에 고민하는 분들을 위한 가이드",
+      "time": "2026-06-28 00:04"
+    },
+    {
+      "accountId": "mh8j62wm",
+      "keyword": "백내장수술회복기간",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "백내장수술회복기간 걱정되신다면 지금 바로 확인해 보세요",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "geenl",
+      "keyword": "라식라섹비용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라식라섹비용 고민하는 직장인을 위한 선택 가이드",
+      "time": "2026-06-27 23:39"
+    },
+    {
+      "accountId": "geenl",
+      "keyword": "스마일라식각막두께",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "스마일라식각막두께 조건과 안전한 수술을 위한 필수 체크리스트",
+      "time": "2026-06-27 23:48"
+    },
+    {
+      "accountId": "geenl",
+      "keyword": "백내장수술후주의사항",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "백내장수술후주의사항 시력 회복 과정과 관리법 총정리",
+      "time": "2026-06-27 23:55"
+    },
+    {
+      "accountId": "fail5644",
+      "keyword": "포메",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "포메라니안분양 가격대별 차이점 실제 비교해보니",
+      "time": "2026-06-12 19:00"
+    },
+    {
+      "accountId": "fail5644",
+      "keyword": "렉돌분양",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "렉돌분양 유전병 털빠짐 건강관리 주의점 이것만 체크해보세요",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "8ua1womn",
+      "keyword": "말티푸분양가",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "8ua1womn",
+      "keyword": "푸숑",
+      "status": "실패",
+      "rss": "",
+      "title": "",
+      "time": "2026-06-27 23:58"
+    },
+    {
+      "accountId": "hagyga",
+      "keyword": "라섹재수술",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라섹재수술 시력 퇴행으로 고민이라면 이 내용을 확인해보세요",
+      "time": "2026-06-27 23:38"
+    },
+    {
+      "accountId": "hagyga",
+      "keyword": "라식과라섹차이",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라식과라섹차이 고민이라면 확인해보세요",
+      "time": "2026-06-27 23:47"
+    },
+    {
+      "accountId": "hagyga",
+      "keyword": "라섹가격",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "라섹가격 수술 전 꼭 알아야 할 비용 비교 가이드",
+      "time": "2026-06-27 23:57"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "keyword": "그레이하운드",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "그레이하운드 결정 전에 살펴볼 털빠짐과 건강 주의사항 5가지",
+      "time": "2026-06-27 23:58"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "keyword": "비숑",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "비숑 실제 성격부터 꼭 확인해야 할 분양가와 현실 건강 체크포인트",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "keyword": "러시안블루분양",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "러시안블루분양 성격 건강관리 유전병부터 꼼꼼히 살펴봐야 하는 이유",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "crvfwy7062",
+      "keyword": "중국구매대행추천",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국구매대행추천 안전성 수수료 가격 총정리",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "crvfwy7062",
+      "keyword": "중국수입대행업체",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국수입대행업체 처음 고르면 꼭 알아야 할 포인트",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "crvfwy7062",
+      "keyword": "중국택배",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국택배 vs 한국택배 차이 비교",
+      "time": "2026-06-27 10:00"
+    },
+    {
+      "accountId": "q9v3m7a2",
+      "keyword": "천궁",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "천궁 어디까지 알고 계세요",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "q9v3m7a2",
+      "keyword": "임신극초기증상",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "임신극초기증상, 언제부터 나타날까 실수하지 않는 법",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "mad1651",
+      "keyword": "중국구매대행추천",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국구매대행추천 이렇게 고르세요 총정리",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "mad1651",
+      "keyword": "중국수입대행업체",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국수입대행업체 선택 핵심 5가지",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "mad1651",
+      "keyword": "중국택배",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "중국택배 이용법 헷갈린다면 확인해보세요",
+      "time": "2026-06-27 10:00"
+    },
+    {
+      "accountId": "regular14631",
+      "keyword": "비타민E부작용",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "비타민E 부작용, 꼭 알아둬야 할 이유",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "regular14631",
+      "keyword": "임산부영양제시기",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "임산부 영양제 시기 복용법 언제부터 뭘 먹을까 고민될 때",
+      "time": "2026-06-27 09:00"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "keyword": "유기견",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "유기견 실제 입양 비용부터 알아야 할 절차 조건 준비물",
+      "time": "2026-06-27 23:35"
+    },
+    {
+      "accountId": "orangeswan630",
+      "keyword": "위고비",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "위고비 처방 전 병원에서 가장 먼저 확인하는 조건",
+      "time": "2026-06-27 08:00"
+    },
+    {
+      "accountId": "orangeswan630",
+      "keyword": "혈당 스파이크",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "혈당 스파이크 지금 관리해야 하는 이유",
+      "time": "2026-06-27 09:00"
+    }
+  ]
+}

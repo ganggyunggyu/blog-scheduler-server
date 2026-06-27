@@ -1,0 +1,247 @@
+{
+  "targetDate": "2026-06-28",
+  "services": [
+    "pet-sheet-sunday-20260628",
+    "goat-sheet-sunday-20260628"
+  ],
+  "totalJobs": 32,
+  "verifyResults": [
+    {
+      "accountId": "pixelninja3",
+      "blogId": "pixelninja3",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [],
+      "timeHits": [
+        "06:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/pixelninja3-1782585057077.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/pixelninja3-1782585057077.png"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "blogId": "ahsxkfldk12",
+      "reserveButtonText": "예약 발행 3건",
+      "popupTotalText": "총3개",
+      "keywordHits": [
+        "입양조건",
+        "이탈리안그레이하운드"
+      ],
+      "timeHits": [
+        "07:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahsxkfldk12-1782585057077.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahsxkfldk12-1782585057077.png"
+    },
+    {
+      "accountId": "ghostrush7",
+      "blogId": "ghostrush7",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "미니비숑분양",
+        "말티푸분양가"
+      ],
+      "timeHits": [
+        "07:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ghostrush7-1782585057077.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ghostrush7-1782585057077.png"
+    },
+    {
+      "accountId": "fail5644",
+      "blogId": "fail5644",
+      "reserveButtonText": "예약 발행 3건",
+      "popupTotalText": "총3개",
+      "keywordHits": [
+        "스핑크스",
+        "강아지품종"
+      ],
+      "timeHits": [
+        "07:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/fail5644-1782585080383.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/fail5644-1782585080383.png"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "blogId": "ahffkdlek12",
+      "reserveButtonText": "예약 발행 3건",
+      "popupTotalText": "총3개",
+      "keywordHits": [
+        "진돗개",
+        "먼치킨고양이"
+      ],
+      "timeHits": [
+        "07:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahffkdlek12-1782585102028.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahffkdlek12-1782585102028.png"
+    },
+    {
+      "accountId": "compare14310",
+      "blogId": "compare14310",
+      "reserveButtonText": "예약 발행 3건",
+      "popupTotalText": "총3개",
+      "keywordHits": [
+        "폼피츠",
+        "요크셔테리어"
+      ],
+      "timeHits": [
+        "08:00",
+        "10:20"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/compare14310-1782585109964.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/compare14310-1782585109964.png"
+    },
+    {
+      "accountId": "laghunter8",
+      "blogId": "laghunter8",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "손목저림"
+      ],
+      "timeHits": [
+        "08:00",
+        "10:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/laghunter8-1782585113168.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/laghunter8-1782585113168.png"
+    },
+    {
+      "accountId": "respawnking9",
+      "blogId": "respawnking9",
+      "reserveButtonText": "예약 발행 3건",
+      "popupTotalText": "총3개",
+      "keywordHits": [
+        "리트리버분양",
+        "말티푸분양"
+      ],
+      "timeHits": [
+        "09:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/respawnking9-1782585134710.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/respawnking9-1782585134710.png"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "blogId": "k7d9x2m4",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "렉돌분양",
+        "푸숑"
+      ],
+      "timeHits": [
+        "09:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/k7d9x2m4-1782585153077.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/k7d9x2m4-1782585153077.png"
+    },
+    {
+      "accountId": "regular14631",
+      "blogId": "regular14631",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "팔다리저림"
+      ],
+      "timeHits": [
+        "09:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/regular14631-1782585159595.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/regular14631-1782585159595.png"
+    },
+    {
+      "accountId": "ahffkekd12",
+      "blogId": "ahffkekd12",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "손저림원인",
+        "저체온증"
+      ],
+      "timeHits": [
+        "09:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahffkekd12-1782585183592.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahffkekd12-1782585183592.png"
+    },
+    {
+      "accountId": "q9v3m7a2",
+      "blogId": "q9v3m7a2",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "족냉증",
+        "손끝저림"
+      ],
+      "timeHits": [
+        "10:00",
+        "12:30"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/q9v3m7a2-1782585201274.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/q9v3m7a2-1782585201274.png"
+    },
+    {
+      "accountId": "dhtksk1p",
+      "blogId": "dhtksk1p",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "손가락저림"
+      ],
+      "timeHits": [
+        "10:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/dhtksk1p-1782585207223.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/dhtksk1p-1782585207223.png"
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "blogId": "n7c3w8z2",
+      "reserveButtonText": "",
+      "popupTotalText": "",
+      "keywordHits": [],
+      "timeHits": [],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/n7c3w8z2-1782585233523.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/n7c3w8z2-1782585233523.png"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "blogId": "ahfflwl123",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "시바",
+        "비숑프리제"
+      ],
+      "timeHits": [
+        "10:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahfflwl123-1782585249838.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/ahfflwl123-1782585249838.png"
+    },
+    {
+      "accountId": "eghfsa5478",
+      "blogId": "eghfsa5478",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "소음인",
+        "손발이차가울때영양제"
+      ],
+      "timeHits": [
+        "10:00"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/eghfsa5478-1782585260169.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-06-28/eghfsa5478-1782585260169.png"
+    }
+  ],
+  "sheetResult": {
+    "spreadsheetId": "1oUo85a9m3MTTzWeX8FGnKZqCDfPRNdGZFxr4-vZqSrM",
+    "updatedRange": "'발행현황'!A188:L219",
+    "updatedRows": 32
+  }
+}
