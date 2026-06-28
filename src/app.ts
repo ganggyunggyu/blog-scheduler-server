@@ -44,7 +44,11 @@ export const buildApp = async (): Promise<AppContext> => {
 
   log.info('bullboard.ready', { path: '/admin/queues' });
 
-  await initializeExistingQueues();
+  if (process.env.SCHEDULER_DISABLE_QUEUE_RESTORE === 'true') {
+    log.warn('queues.restore.skipped', { reason: 'SCHEDULER_DISABLE_QUEUE_RESTORE' });
+  } else {
+    await initializeExistingQueues();
+  }
 
   await registerRoutes(app);
 

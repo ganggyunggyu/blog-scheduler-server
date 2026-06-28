@@ -10,6 +10,7 @@ import { createAccountExecutionCoordinator } from './account-execution.js';
 
 const connection = redis as unknown as ConnectionOptions;
 const log = logger.child({ scope: 'QueueManager' });
+const areQueueWorkersDisabled = (): boolean => process.env.SCHEDULER_DISABLE_QUEUE_WORKERS === 'true';
 
 const generateQueues = new Map<string, Queue>();
 const publishQueues = new Map<string, Queue>();
@@ -161,7 +162,11 @@ export const getGenerateQueue = (accountId: string): Queue => {
 
   generateQueues.set(accountId, queue);
   log.info('queue.created', { type: 'generate', accountId: maskAccountId(accountId) });
-  ensureGenerateWorker(accountId);
+  if (areQueueWorkersDisabled()) {
+    log.warn('worker.skipped', { type: 'generate', accountId: maskAccountId(accountId) });
+  } else {
+    ensureGenerateWorker(accountId);
+  }
   refreshBullBoard();
 
   return queue;
@@ -176,7 +181,11 @@ export const getPublishQueue = (accountId: string): Queue => {
 
   publishQueues.set(accountId, queue);
   log.info('queue.created', { type: 'publish', accountId: maskAccountId(accountId) });
-  ensurePublishWorker(accountId);
+  if (areQueueWorkersDisabled()) {
+    log.warn('worker.skipped', { type: 'publish', accountId: maskAccountId(accountId) });
+  } else {
+    ensurePublishWorker(accountId);
+  }
   refreshBullBoard();
 
   return queue;
