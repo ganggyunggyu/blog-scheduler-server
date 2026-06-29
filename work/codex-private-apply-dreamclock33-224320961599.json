@@ -1,0 +1,218 @@
+{
+  "success": true,
+  "accountId": "dreamclock33",
+  "blogId": "dreamclock33",
+  "logNo": "224320961599",
+  "stage": "done",
+  "finalUrl": "https://blog.naver.com/PostView.naver?blogId=dreamclock33&Redirect=View&logNo=224320961599&categoryNo=127&isAfterWrite=true&isAfterUpdateOnly=true",
+  "publicCheck": {
+    "url": "https://blog.naver.com/dreamclock33",
+    "title": "철인 삼남매 우리 아이 연구소 : 네이버 블로그",
+    "hasPrivateText": false,
+    "hasOriginalTitle": false,
+    "textSample": ""
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/PostUpdateForm.naver?blogId=dreamclock33&logNo=224320961599"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/PostWriteFormSeOptions.naver?blogId=dreamclock33&logNo=224320961599"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/PostWriteFormManagerOptions.naver?blogId=dreamclock33&logNo=224320961599"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/blogs/dreamclock33/location-info-agree"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/blogs/dreamclock33/seller-candidate"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/buy-with-my-own-money/agreement"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/blogs/dreamclock33/posts/224320961599/product-sell-info"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/blogs/dreamclock33/shopping-connect/creator-status"
+    },
+    {
+      "method": "GET",
+      "url": "https://platform.editor.naver.com/api/blogpc001/v1/service_config"
+    },
+    {
+      "method": "GET",
+      "url": "https://section.blog.naver.com/api/feature-toggle"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/api/readonly/maintenance"
+    },
+    {
+      "method": "POST",
+      "url": "https://blog.naver.com/RabbitUpdate.naver",
+      "postData": "blogId=dreamclock33&documentModel=%7B%22documentId%22%3A%22224320961599%22%2C%22document%22%3A%7B%22version%22%3A%222.10.2%22%2C%22theme%22%3A%22default%22%2C%22language%22%3A%22ko-KR%22%2C%22id%22%3A%2201KVFA2QSR2R1771NQV0XJ33AV%22%2C%22di%22%3A%7B%22dif%22%3Afalse%2C%22dio%22%3A%5B%7B%22dis%22%3A%22N%22%2C%22dia%22%3A%7B%22t%22%3A0%2C%22p%22%3A0%2C%22st%22%3A228%2C%22sk%22%3A59%7D%7D%2C%7B%22dis%22%3A%22N%22%2C%22dia%22%3A%7B%22t%22%3A0%2C%22p%22%3A0%2C%22st%22%3A6%2C%22sk%22%3A0%7D%7D%5D%7D%2C%22components%22%3A%5B%7B%22id%22%3A%22SE-d0f7efa7-b01f-453d-8f75-1d9bf0d1447c%22%2C%22layout%22%3A%22default%22%2C%22title%22%3A%5B%7B%22id%22%3A%22SE-bfd2ffcd-d72e-4c99-b845-ec6f079ffb9f%22%2C%22nodes%22%3A%5B%7B%22id%22%3A%22SE-429c6aea-78e1-4ff3-8572-3a43d2452834%22%2C%22value%22%3A%22%EA%B0%80%EC%A1%B1%20%EC%97%AC%ED%96%89%20%EC%A4%91%20%EB%A7%89%EA%B5%AD%EC%88%98%EB%A1%9C%20%EC%86%8D%20%ED%8E%B8%ED%95%98%EA%B2%8C%20%EC%89%AC%EC%96%B4%EA%B0%84%20%EA%B0%95%EB%A6%89%20%EB%A7%9B%EC%A7%91%20%EC%B6%94%EC%B2%9C%22%2C%22%40ctype%22%3A%22textNode%22%7D%5D%2C%22%40ctype%22%3A%22paragraph%22%7D%5D%2C%22subTitle%22%3Anull%2C%22align%22%3A%22left%22%2C%22%40ctype%22%3A%22documentTitle%22%7D%2C%7B%22id%22%3A%22SE-55b22015-b372-433c-80d9-da57a9d8ec0b%22%2C%22layout%22%3A%22default%22%2C%22align%22%3A%22center%22%2C%22src%22%3A%22https%3A%2F%2Fblogfiles.pstatic.net%2FMjAyNjA2MTlfMjk1%2FMDAxNzgxODUxNzY3NzE0.HbbvcfUeNFI_XwZIZtNEUoJ3B6wBCsPGCNbd3br2eLgg.VpOygDSasKbddSz09mO17sOWhbtjhfXapLJoYPiB_58g.JPEG%2FIMG_9669.jpg%3Ftype%3Dw1%22%2C%22internalResource%22%3Atrue%2C%22represent%22%3Afalse%2C%22path%22%3A%22%2FMjAyNjA2MTlfMjk1%2FMDAxNzgxODUxNzY3NzE0.HbbvcfUeNFI_XwZIZtNEUoJ3B6wBCsPGCNbd3br2eLgg.VpOygDSasKbddSz09mO17sOWhbtjhfXapLJoYPiB_58g.JPEG%2FIMG_9669.jpg%22%2C%22domain%22%3A%22https%3A%2F%2Fblogfiles.pstatic.net%22%2C%22fileSize%22%3A557745%2C%22width%22%3A886%2C%22widthPercentage%22%3A0%2C%22height%22%3A579%2C%22originalWidth%22%3A2892%2C%22originalHeight%22%3A1891%2C%22fileName%22%3A"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/PostView.naver?blogId=dreamclock33&Redirect=View&logNo=224320961599&categoryNo=127&isAfterWrite=true&isAfterUpdateOnly=true"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning/PostView-876979288_https.css"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning/PostTopCommon-603656815_https.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjk1/MDAxNzgxODUxNzY3NzE0.HbbvcfUeNFI_XwZIZtNEUoJ3B6wBCsPGCNbd3br2eLgg.VpOygDSasKbddSz09mO17sOWhbtjhfXapLJoYPiB_58g.JPEG/IMG_9669.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjM3/MDAxNzgxODUxNzYwNDI5.wSjIRPZb13MJlfRvUjiqFC0brK5DZ0OyOtjOSdIi3kIg.lbAAWwzuTadkNehq9_ReYD1xYKm3p6nWJEPg-fLpuKAg.JPEG/1.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMTkg/MDAxNzgxODUxNzU0MjM1.20ZeR2-UMCLNH7VN7oQQa5XjZOj8Ow77gzB7DjOlzX8g.ykoT69hdZedXch04gmDU4yBYJFnMMaYdTsvdjKjZ0c4g.JPEG/11.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMTYw/MDAxNzgxODUxNzI0MDcx.DSb-qKc2qNBuFUaUgMH-b7VJCD9sD2VFw6Nx1ARj0vEg.uIRxE8NQskUf_MIt3Tesl_Cu7yAjj_6Quj53trq3BNIg.JPEG/KakaoTalk_20240408_134324504_09.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjI3/MDAxNzgxODUxNzM3NTgz.VZUv_ESq_hgWnGqpIAURLlV7OP69YmxgqodG7SD_qtAg.o9CLISekjp1GaOZ6pNqqAibzCk3erkMeIB2j5oGgYdwg.JPEG/IMG_9466.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMTY4/MDAxNzgxODUxNjc1NDM3.Tfj-6H35n_n7WSECuCWFpcTCAqimonsHSscLunbiG_Yg.EJ-Ou5_4tg0tgwGQMRC-Sugs5aDZ7-wPdmCfqElMA_0g.JPEG/KakaoTalk_20240408_134905677_12.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjgy/MDAxNzgxODUxNjg1ODIx.mTgwvmblxs6WhR3mgvRSp_IAOdbx25yw4ydZSnk5vikg.zSkcn_STwGDRzEWu2r1bPNp6Hc9zyNm-fpS3wR7KjJcg.JPEG/IMG_9502.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfODIg/MDAxNzgxODUxNjkzMzQ3.v6Tli6Bxh46kia7mjsgdxv4H0yGqT9NA0-qWIVSFBqEg.9QSSmSVm4hFnlQ9EbcA6Pxoto8MhTymYlrrIsHUdE-4g.JPEG/KakaoTalk_20240408_133947948_14.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjQz/MDAxNzgxODUxNjkzNTg4.1o83KSuLnCmi06mvz9926jaTMYpBl4hSK1mwXKSpeDIg.qy6HoyNtZEB0zdPnxYt7OwV_RD6Vy7hi9chtPTFInrAg.JPEG/KakaoTalk_20240408_133947948_21.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMTY1/MDAxNzgxODUxNzc2NzYz.8esjw_Zc2F19-XH8faM_ItV5slTA-S-i9WQ_IqrD-5cg.5DXBnVbQxlrz4eXxSX8adS9AftgPos0uRSzWk29poj4g.JPEG/KakaoTalk_20240408_134324504_22.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMTEy/MDAxNzgxODUxNzkwNzE5.8X6n3VprXylOBCffN924OO0Db08sGIN7uGaIWizrJG8g.dsLPckp_dWAiOxzjbpzqtjhW8AwRNszM9o4zH8FB61Eg.JPEG/IMG_9700.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfNDYg/MDAxNzgxODUxNzg0MDE1.HcIu0lxr7EYHRzP1xrmBE9cZR8cAYdVdgkQUcu6VrL4g.RlWoxbZgLtL6YfcZCuwJuq6-IJJW7FZhTW6KuyqziL0g.JPEG/IMG_9687.jpg?type=w80_blur"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning/SspAdPost-511951527_https.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning//js/post/ssp/SspAdContentCallerForPC-eee6756_https.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning/PostViewBottom-568233787_https.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://ssl.pstatic.net/t.static.blog/mylog/versioning/PostBottomCommon-919436922_https.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_thin_close.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/ico_file.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_download2.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_cancel3.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_close5.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_confirm.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_cancel.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_viewexif.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/btn_originaldn.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/mylog/post/tit_viewexif.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/book/publishingcompany/btn_close.gif"
+    },
+    {
+      "method": "GET",
+      "url": "https://blogimgs.pstatic.net/nblog/skins/poststyle/0000_input.png"
+    },
+    {
+      "method": "GET",
+      "url": "https://postfiles.pstatic.net/MjAyNjA2MTlfMjk1/MDAxNzgxODUxNzY3NzE0.HbbvcfUeNFI_XwZIZtNEUoJ3B6wBCsPGCNbd3br2eLgg.VpOygDSasKbddSz09mO17sOWhbtjhfXapLJoYPiB_58g.JPEG/IMG_9669.jpg?type=w966"
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/mylog/WidgetListAsync.naver?blogId=dreamclock33&listNumVisitor=5&isVisitorOpen=false&isBuddyOpen=false&selectCategoryNo=127&skinId=0&skinType=C&isCategoryOpen=true&isEnglish=false&listNumComment=5&areaCode=11B10101&weatherType=0&currencySign=ALL&enableWidgetKeys=profile%2Ccategory%2Cstat%2Crss%2Csearch%2Cbuddyconnect%2Cccl%2Ctitle%2Cmenu%2Ccontent%2Cadpost%2Cgnb%2Cexternalwidget&writingMaterialListType=1&calType="
+    },
+    {
+      "method": "GET",
+      "url": "https://blog.naver.com/PostViewBottomTitleListAsync.naver?blogId=dreamclock33&logNo=224320961599&viewDate=&categoryNo=127&parentCategoryNo=&showNextPage=false&showPreviousPage=false&sortDateInMilli=1781906400000&isThumbnailViewType=false&countPerPage="
+    },
+    {
+      "method": "GET",
+      "url": "https://nam.veta.naver.com/gfp/v1?u=pc_blog_bottom&xdid=ssp-adpost&p=blogId%3Adreamclock33%2Cpid%3A224320961599%2Cgdid%3A90000003_00000000000000343A923C3F%2CsessionId%3AE2640877B57F73BFF76801F941B9DDA9.jvm1%2CpublisherRequest%3AY%2Ccnt%3A1%2CadContentYN%3Atrue%2CadLocation%3Aboth%2CstyleHeadline%3Argb(0%252C%25200%252C%25200)%2CstyleDefault%3Argb(102%252C%2520102%252C%2520102)%2CstyleHighlight%3Argb(0%252C%25200%252C%25200)%2CblogGrade%3A5%2Ctitle%3A%25EA%25B0%2580%25EC%25A1%25B1%2520%25EC%2597%25AC%25ED%2596%2589%2520%25EC%25A4%2591%2520%25EB%25A7%2589%25EA%25B5%25AD%25EC%2588%2598%25EB%25A1%259C%2520%25EC%2586%258D%2520%25ED%258E%25B8%25ED%2595%2598%25EA%25B2%258C%2520%25EC%2589%25AC%25EC%2596%25B4%25EA%25B0%2584%2520%25EA%25B0%2595%25EB%25A6%2589%2520%25EB%25A7%259B%25EC%25A7%2591%2520%25EC%25B6%2594%25EC%25B2%259C%2CpageGroupId%3Af455be15-9571-4532-84c1-62edb166315e%2CpageId%3Af455be15-9571-4532-84c1-62edb166315e%2Cda_dom_id%3Assp-adpost&an=blog.naver.com&r=https%3A%2F%2Fblog.naver.com%2FPostUpdateForm.naver%3FblogId%3Ddreamclock33%26logNo%3D224320961599&c=https%3A%2F%2Fblog.naver.com%2FPostView.naver%3FblogId%3Ddreamclock33%26Redirect%3DView%26logNo%3D224320961599%26categoryNo%3D127%26isAfterWrite%3Dtrue%26isAfterUpdateOnly%3Dtrue&sn=web&sv=3.10.6&nt=0&iv=9f543044-3d05-40b3-89af-e0426f442dab&ivt=0&sa=0&rui=2938738072&br=0&sua=%7B%22browsers%22%3A%5B%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22Not.A%2FBrand%22%2C%22version%22%3A%5B%2299%22%2C%220%22%2C%220%22%2C%220%22%5D%7D%5D%2C%22platform%22%3A%7B%22brand%22%3A%22Windows%22%2C%22version%22%3A%5B%2210%22%2C%220%22%5D%7D%2C%22mobile%22%3A0%2C%22architecture%22%3A%22x64%22%2C%22bitness%22%3A%2264%22%2C%22model%22%3A%22%22%7D"
+    },
+    {
+      "method": "GET",
+      "url": "https://nam.veta.naver.com/gfp/v1?u=pc_blog_body&xdid=ssp-adcontent&p=blogId%3Adreamclock33%2Cpid%3A224320961599%2Cgdid%3A90000003_00000000000000343A923C3F%2CsessionId%3AE2640877B57F73BFF76801F941B9DDA9.jvm1%2CpublisherRequest%3AY%2Ccnt%3A1%2CadContentYN%3Atrue%2CadLocation%3Aboth%2CblogGrade%3A5%2Cda_dom_id%3Assp-adcontent&an=blog.naver.com&r=https%3A%2F%2Fblog.naver.com%2FPostUpdateForm.naver%3FblogId%3Ddreamclock33%26logNo%3D224320961599&c=https%3A%2F%2Fblog.naver.com%2FPostView.naver%3FblogId%3Ddreamclock33%26Redirect%3DView%26logNo%3D224320961599%26categoryNo%3D127%26isAfterWrite%3Dtrue%26isAfterUpdateOnly%3Dtrue&sn=web&sv=3.10.6&nt=0&iv=9f543044-3d05-40b3-89af-e0426f442dab&ivt=0&sa=0&rui=3197584537&br=0&sua=%7B%22browsers%22%3A%5B%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22Not.A%2FBrand%22%2C%22version%22%3A%5B%2299%22%2C%220%22%2C%220%22%2C%220%22%5D%7D%5D%2C%22platform%22%3A%7B%22brand%22%3A%22Windows%22%2C%22version%22%3A%5B%2210%22%2C%220%22%5D%7D%2C%22mobile%22%3A0%2C%22architecture%22%3A%22x64%22%2C%22bitness%22%3A%2264%22%2C%22model%22%3A%22%22%7D"
+    },
+    {
+      "method": "GET",
+      "url": "https://nam.veta.naver.com/gfp/v1?u=pc_blog_body_2nd&xdid=ssp-adcontent-1&p=blogId%3Adreamclock33%2Cpid%3A224320961599%2Cgdid%3A90000003_00000000000000343A923C3F%2CsessionId%3AE2640877B57F73BFF76801F941B9DDA9.jvm1%2CpublisherRequest%3AY%2Ccnt%3A1%2CadContentYN%3Atrue%2CadLocation%3Aboth%2CblogGrade%3A5%2Cda_dom_id%3Assp-adcontent-1&an=blog.naver.com&r=https%3A%2F%2Fblog.naver.com%2FPostUpdateForm.naver%3FblogId%3Ddreamclock33%26logNo%3D224320961599&c=https%3A%2F%2Fblog.naver.com%2FPostView.naver%3FblogId%3Ddreamclock33%26Redirect%3DView%26logNo%3D224320961599%26categoryNo%3D127%26isAfterWrite%3Dtrue%26isAfterUpdateOnly%3Dtrue&sn=web&sv=3.10.6&nt=0&iv=9f543044-3d05-40b3-89af-e0426f442dab&ivt=0&sa=0&rui=2067366030&br=0&sua=%7B%22browsers%22%3A%5B%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22Not.A%2FBrand%22%2C%22version%22%3A%5B%2299%22%2C%220%22%2C%220%22%2C%220%22%5D%7D%5D%2C%22platform%22%3A%7B%22brand%22%3A%22Windows%22%2C%22version%22%3A%5B%2210%22%2C%220%22%5D%7D%2C%22mobile%22%3A0%2C%22architecture%22%3A%22x64%22%2C%22bitness%22%3A%2264%22%2C%22model%22%3A%22%22%7D"
+    },
+    {
+      "method": "GET",
+      "url": "https://nam.veta.naver.com/gfp/v1?u=pc_blog_body_3rd&xdid=ssp-adcontent-2&p=blogId%3Adreamclock33%2Cpid%3A224320961599%2Cgdid%3A90000003_00000000000000343A923C3F%2CsessionId%3AE2640877B57F73BFF76801F941B9DDA9.jvm1%2CpublisherRequest%3AY%2Ccnt%3A1%2CadContentYN%3Atrue%2CadLocation%3Aboth%2CblogGrade%3A5%2Cda_dom_id%3Assp-adcontent-2&an=blog.naver.com&r=https%3A%2F%2Fblog.naver.com%2FPostUpdateForm.naver%3FblogId%3Ddreamclock33%26logNo%3D224320961599&c=https%3A%2F%2Fblog.naver.com%2FPostView.naver%3FblogId%3Ddreamclock33%26Redirect%3DView%26logNo%3D224320961599%26categoryNo%3D127%26isAfterWrite%3Dtrue%26isAfterUpdateOnly%3Dtrue&sn=web&sv=3.10.6&nt=0&iv=9f543044-3d05-40b3-89af-e0426f442dab&ivt=0&sa=0&rui=1182405195&br=0&sua=%7B%22browsers%22%3A%5B%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%5B%22136%22%2C%220%22%2C%227103%22%2C%2225%22%5D%7D%2C%7B%22brand%22%3A%22Not.A%2FBrand%22%2C%22version%22%3A%5B%2299%22%2C%220%22%2C%220%22%2C%220%22%5D%7D%5D%2C%22platform%22%3A%7B%22brand%22%3A%22Windows%22%2C%22version%22%3A%5B%2210%22%2C%220%22%5D%7D%2C%22mobile%22%3A0%2C%22architecture%22%3A%22x64%22%2C%22bitness%22%3A%2264%22%2C%22model%22%3A%22%22%7D&ba=www.%25ED%2596%2587%25EC%2582%25B4%25EC%25A4%2591%25EA%25B3%25A0%25EC%25B0%25A8.com&bx=GFA%253A2080241%7CURL%253Ahttp%253A%252F%252Fwww.%25ED%2596%2587%25EC%2582%25B4%25EC%25A4%2591%25EA%25B3%25A0%25EC%25B0%25A8.com"
+    }
+  ]
+}
