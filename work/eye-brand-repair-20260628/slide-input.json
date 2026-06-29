@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "keyword": "각막강화술",
+      "title": "각막강화술 검사 전 확인할 기준",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/01_각막강화술"
+    },
+    {
+      "keyword": "노안수술",
+      "title": "노안수술 선택 전 알아둘 내용",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/02_노안수술"
+    },
+    {
+      "keyword": "스마일라식회복기간",
+      "title": "스마일라식회복기간 상담 때 물어볼 핵심",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/03_스마일라식회복기간"
+    },
+    {
+      "keyword": "백내장수술후",
+      "title": "백내장수술후 방법과 주의사항 정리",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후"
+    },
+    {
+      "keyword": "IPL레이저",
+      "title": "IPL레이저 비교할 때 보는 기준",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저"
+    },
+    {
+      "keyword": "스마일라섹",
+      "title": "스마일라섹 정밀검사가 필요한 이유",
+      "dir": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹"
+    }
+  ]
+}
