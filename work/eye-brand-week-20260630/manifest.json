@@ -1,0 +1,220 @@
+{
+  "generatedAt": "2026-06-29T08:16:25.753Z",
+  "accountId": "adplan3th",
+  "blogId": "adplan3th",
+  "service": "eye-brand-weekly-local-generated",
+  "ref": "eye-brand-week-2026-06-30_2026-07-04",
+  "scheduleDate": "2026-06-30",
+  "items": [
+    {
+      "keyword": "스마일라식프로",
+      "title": "스마일라식프로 전 확인할 기준",
+      "scheduledAt": "2026-06-30T09:00:00+09:00",
+      "slot": 1,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/01_스마일라식프로/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "렌즈삽입술후기",
+      "title": "렌즈삽입술후기 방법과 주의할 점",
+      "scheduledAt": "2026-06-30T13:00:00+09:00",
+      "slot": 2,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/02_렌즈삽입술후기/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "노안렌즈삽입술",
+      "title": "노안렌즈삽입술 상담 전 알아둘 내용",
+      "scheduledAt": "2026-06-30T17:00:00+09:00",
+      "slot": 3,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/03_노안렌즈삽입술/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "백내장수술후주의사항",
+      "title": "백내장수술후주의사항 검사 기준과 선택 방법",
+      "scheduledAt": "2026-07-01T09:00:00+09:00",
+      "slot": 4,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/04_백내장수술후주의사항/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "노안수술비용",
+      "title": "노안수술비용 궁금할 때 확인할 점",
+      "scheduledAt": "2026-07-01T13:00:00+09:00",
+      "slot": 5,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/05_노안수술비용/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "스마일라식회복",
+      "title": "스마일라식회복 전 확인할 기준",
+      "scheduledAt": "2026-07-01T17:00:00+09:00",
+      "slot": 6,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/06_스마일라식회복/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "노안치료",
+      "title": "노안치료 방법과 주의할 점",
+      "scheduledAt": "2026-07-02T09:00:00+09:00",
+      "slot": 7,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/07_노안치료/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "녹내장증상",
+      "title": "녹내장증상 상담 전 알아둘 내용",
+      "scheduledAt": "2026-07-02T13:00:00+09:00",
+      "slot": 8,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/08_녹내장증상/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "스마일라식후기",
+      "title": "스마일라식후기 검사 기준과 선택 방법",
+      "scheduledAt": "2026-07-02T17:00:00+09:00",
+      "slot": 9,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/09_스마일라식후기/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "백내장수술후관리",
+      "title": "백내장수술후관리 궁금할 때 확인할 점",
+      "scheduledAt": "2026-07-03T09:00:00+09:00",
+      "slot": 10,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/10_백내장수술후관리/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "라식후렌즈",
+      "title": "라식후렌즈 전 확인할 기준",
+      "scheduledAt": "2026-07-03T13:00:00+09:00",
+      "slot": 11,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/11_라식후렌즈/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "라섹가격",
+      "title": "라섹가격 방법과 주의할 점",
+      "scheduledAt": "2026-07-03T17:00:00+09:00",
+      "slot": 12,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/12_라섹가격/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "난시치료",
+      "title": "난시치료 상담 전 알아둘 내용",
+      "scheduledAt": "2026-07-04T09:00:00+09:00",
+      "slot": 13,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/13_난시치료/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "노안백내장수술비용",
+      "title": "노안백내장수술비용 검사 기준과 선택 방법",
+      "scheduledAt": "2026-07-04T13:00:00+09:00",
+      "slot": 14,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/14_노안백내장수술비용/slide_06.png"
+      ]
+    },
+    {
+      "keyword": "백내장수술가격",
+      "title": "백내장수술가격 궁금할 때 확인할 점",
+      "scheduledAt": "2026-07-04T17:00:00+09:00",
+      "slot": 15,
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-week-20260630/slides/15_백내장수술가격/slide_06.png"
+      ]
+    }
+  ]
+}
