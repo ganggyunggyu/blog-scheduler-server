@@ -4,8 +4,8 @@ import path from 'node:path';
 import { env } from '../src/config/env.js';
 import { redis } from '../src/config/redis.js';
 import { updatePost } from '../src/services/naver-blog.service.js';
-import { getValidCookies, naverLogin } from '../src/services/naver-auth.service.js';
-import { getSession } from '../src/services/session.service.js';
+import { naverLogin } from '../src/services/naver-auth.service.js';
+import { getSession, saveSession } from '../src/services/session.service.js';
 
 interface FinalPackageItem {
   keyword: string;
@@ -81,27 +81,28 @@ const findFinalPackageItem = async (): Promise<FinalPackageItem> => {
 };
 
 const getCookies = async (): Promise<unknown[]> => {
-  const cached = await getSession(ACCOUNT_ID);
-  if (cached) {
-    return cached;
-  }
-
   const password = process.env.NAVER_BRAND_PASSWORD;
   if (!password) {
+    const cached = await getSession(ACCOUNT_ID);
+    if (cached) {
+      return cached;
+    }
     throw new Error('NAVER_BRAND_PASSWORD 없음');
-  }
-
-  const validated = await getValidCookies(ACCOUNT_ID, password);
-  if (validated.cookies.length > 0) {
-    return validated.cookies;
   }
 
   const login = await naverLogin(ACCOUNT_ID, password);
   if (!login.success) {
     throw new Error(login.message);
   }
+  await saveSession(ACCOUNT_ID, login.cookies);
   return login.cookies;
 };
+
+const removeStandaloneUrls = (content: string): string =>
+  content
+    .split(/\r?\n/u)
+    .filter((line) => !/^https?:\/\/\S+$/u.test(line.trim()))
+    .join('\n');
 
 const verifyPublicPost = async (item: FinalPackageItem): Promise<Record<string, unknown>> => {
   const url = `https://blog.naver.com/PostView.naver?blogId=${BLOG_ID}&logNo=${LOG_NO}&redirect=Dlog&widgetTypeCall=true&directAccess=false&_=${Date.now()}`;
@@ -146,14 +147,14 @@ const verifyPublicPost = async (item: FinalPackageItem): Promise<Record<string, 
     titleOk: title.includes(item.title),
     keywordOk: text.includes(item.keyword),
     brandOk: text.includes('에스앤비안과'),
-    linkOk: html.includes('224094493829'),
+    removedStandaloneUrls: !html.includes('224094493829') && !html.includes('snbeye.com/sb-review'),
     imageUrlCount,
   };
 };
 
 const main = async (): Promise<void> => {
   const item = await findFinalPackageItem();
-  const content = await fs.readFile(item.manuscriptPath, 'utf8');
+  const content = removeStandaloneUrls(await fs.readFile(item.manuscriptPath, 'utf8'));
   const result = await updatePost({
     cookies: await getCookies(),
     blogId: BLOG_ID,
