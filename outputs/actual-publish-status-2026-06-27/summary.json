@@ -1,11 +1,11 @@
 {
   "targetDate": "2026-06-27",
   "totalJobs": 83,
-  "rowsPrepared": 80,
+  "rowsPrepared": 0,
+  "rowsUpdated": 83,
   "sheetResult": {
-    "spreadsheetId": "1oUo85a9m3MTTzWeX8FGnKZqCDfPRNdGZFxr4-vZqSrM",
-    "updatedRange": "'발행현황'!A108:L187",
-    "updatedRows": 80
+    "updatedRange": "",
+    "updatedRows": 0
   },
   "summary": [
     {
@@ -108,9 +108,9 @@
       "accountId": "ahffkdlek12",
       "keyword": "골든두들",
       "status": "발행완료",
-      "rss": "miss",
-      "title": "",
-      "time": "2026-06-27 23:45"
+      "rss": "hit",
+      "title": "골든두들 결정 전에 꼭 따져봐야 할 성격과 3년 키워보니 알게 된 사실들",
+      "time": "2026-06-28 23:50"
     },
     {
       "accountId": "ahffkdlek12",
@@ -118,6 +118,30 @@
       "status": "발행완료",
       "rss": "hit",
       "title": "고양이수명 유지비 초기비용 숨은 지출과 돌보기 어려운 이유",
+      "time": "2026-06-27 23:50"
+    },
+    {
+      "accountId": "adplan3th",
+      "keyword": "자이스스마일프로",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "자이스스마일프로 원리와 특징",
+      "time": "2026-06-28 00:17"
+    },
+    {
+      "accountId": "adplan3th",
+      "keyword": "스마일프로가격",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "스마일프로가격 구성과 확인할 점",
+      "time": "2026-06-28 00:14"
+    },
+    {
+      "accountId": "adplan3th",
+      "keyword": "비쥬맥스800",
+      "status": "발행완료",
+      "rss": "hit",
+      "title": "비쥬맥스800과 스마일라식의 연결",
       "time": "2026-06-27 23:50"
     },
     {
@@ -165,8 +189,8 @@
       "keyword": "시바",
       "status": "발행완료",
       "rss": "hit",
-      "title": "시바이누 독립심 강한 성격만큼 숨은 관리비가 꽤 들었던 3년 키워본 후기",
-      "time": "2026-06-22 22:52"
+      "title": "시바 분양가 100만 원대 현실부터 키우기 난이도 솔직 공개",
+      "time": "2026-06-28 23:50"
     },
     {
       "accountId": "weed3122",
@@ -204,17 +228,17 @@
       "accountId": "compare14310",
       "keyword": "미니비숑분양",
       "status": "발행완료",
-      "rss": "miss",
-      "title": "",
-      "time": "2026-06-27 23:58"
+      "rss": "hit",
+      "title": "미니비숑분양 초기비용 유지비 꼼꼼히 따져봐야 하는 이유",
+      "time": "2026-06-28 23:50"
     },
     {
       "accountId": "tinyfish183",
       "keyword": "족저근막염 치료방법",
       "status": "발행완료",
       "rss": "hit",
-      "title": "족저근막염 치료방법 7가지 총정리",
-      "time": "2026-06-27 08:00"
+      "title": "족저근막염 치료방법 오해와 진실 비교 총정리",
+      "time": "2026-06-28 09:00"
     },
     {
       "accountId": "tinyfish183",
@@ -365,8 +389,8 @@
       "keyword": "스핑크스고양이",
       "status": "발행완료",
       "rss": "hit",
-      "title": "스핑크스고양이 털빠짐 유전병 키우기 전 꼭 체크해보세요",
-      "time": "2026-05-29 18:50"
+      "title": "스핑크스고양이 분양가 가격대별 비용과 숨은 지출 감당할 수 있을까",
+      "time": "2026-06-28 23:50"
     },
     {
       "accountId": "respawnking9",
@@ -469,8 +493,8 @@
       "keyword": "포메",
       "status": "발행완료",
       "rss": "hit",
-      "title": "포메라니안분양 가격대별 차이점 실제 비교해보니",
-      "time": "2026-06-12 19:00"
+      "title": "포메 결정 전에 실제 성격과 관리법 모르면 나중에 크게 고생합니다",
+      "time": "2026-06-28 23:50"
     },
     {
       "accountId": "fail5644",
@@ -533,8 +557,8 @@
       "keyword": "비숑",
       "status": "발행완료",
       "rss": "hit",
-      "title": "비숑 실제 성격부터 꼭 확인해야 할 분양가와 현실 건강 체크포인트",
-      "time": "2026-06-27 23:50"
+      "title": "비숑프리제 결정 전에 확인해야 할 건강 유전병 주의사항 정리해봤어요",
+      "time": "2026-06-28 12:20"
     },
     {
       "accountId": "k7d9x2m4",
@@ -637,8 +661,8 @@
       "keyword": "위고비",
       "status": "발행완료",
       "rss": "hit",
-      "title": "위고비 처방 전 병원에서 가장 먼저 확인하는 조건",
-      "time": "2026-06-27 08:00"
+      "title": "위고비 맞기 전에 반드시 확인해야 할 처방 조건",
+      "time": "2026-06-29 09:00"
     },
     {
       "accountId": "orangeswan630",

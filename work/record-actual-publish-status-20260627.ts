@@ -10,7 +10,7 @@ import {
 
 const STATUS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1oUo85a9m3MTTzWeX8FGnKZqCDfPRNdGZFxr4-vZqSrM/edit#gid=817577400';
 const STATUS_SHEET_GID = 817577400;
-const TARGET_DATE = '2026-06-27';
+const TARGET_DATE = process.env.TARGET_DATE ?? '2026-06-27';
 const OUTPUT_DIR = path.resolve(process.cwd(), 'outputs', `actual-publish-status-${TARGET_DATE}`);
 
 interface ScheduleRow {
@@ -45,6 +45,11 @@ interface RssItem {
 const normalizeText = (value: string): string => value.replace(/\s+/g, ' ').trim();
 
 const compact = (value: string): string => normalizeText(value).replace(/\s+/g, '');
+
+const sleep = async (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 const stripRss = (value: string): string =>
   value.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/&amp;/g, '&').trim();
@@ -95,7 +100,7 @@ const domainFor = (schedule: ScheduleRow, account?: AccountRow): string => {
 };
 
 const modeFor = (schedule: ScheduleRow): string =>
-  `${schedule.service ?? 'unknown'} / 27일 즉시 발행`;
+  `${schedule.service ?? 'unknown'} / ${TARGET_DATE} 즉시 발행`;
 
 const formatPubDate = (pubDate: string, fallback?: string): string => {
   if (!pubDate) return fallback ? `${fallback.slice(0, 10)} ${fallback.slice(11, 16)}` : '';
@@ -179,21 +184,24 @@ const main = async (): Promise<void> => {
     gid: STATUS_SHEET_GID,
     range: 'A:L',
   });
-  const existingKeys = new Set(
+  const existingRowsByKey = new Map(
     existing.values
       .slice(1)
-      .map((row) => `${row[0] ?? ''}|${row[3] ?? ''}|${row[4] ?? ''}|${row[10] ?? ''}|${row[11] ?? ''}`),
+      .map((row, index) => [
+        `${row[0] ?? ''}|${row[3] ?? ''}|${row[4] ?? ''}|${row[10] ?? ''}|${row[11] ?? ''}`,
+        { rowNumber: index + 2, row },
+      ]),
   );
 
   const summary: Array<Record<string, string>> = [];
   const rows: string[][] = [];
+  const updates: Array<{ rowNumber: number; row: string[] }> = [];
   for (const job of jobs) {
     const schedule = scheduleById.get(String(job.scheduleId));
     if (!schedule) continue;
     const account = accountById.get(schedule.accountId);
     const blogId = account?.blogId || schedule.accountId;
     const sheetKey = `${TARGET_DATE}|${schedule.accountId}|${job.keyword ?? ''}|${job.scheduleId}|${job._id}`;
-    if (existingKeys.has(sheetKey)) continue;
 
     const items = rssByBlogId.get(blogId) ?? [];
     const rssMatch = job.status === 'published' ? matchRssItem(items, job) : undefined;
@@ -211,7 +219,7 @@ const main = async (): Promise<void> => {
         ? `DB 실패: ${normalizeText(job.error).slice(0, 180)}`
         : `DB 상태: ${job.status ?? 'unknown'}`;
 
-    rows.push([
+    const row = [
       TARGET_DATE,
       domainFor(schedule, account),
       normalizeText(account?.nickname || schedule.accountId),
@@ -224,7 +232,18 @@ const main = async (): Promise<void> => {
       formatPubDate(rssMatch?.pubDate ?? '', job.scheduledAt),
       String(job.scheduleId),
       String(job._id),
-    ]);
+    ];
+
+    const existingRow = existingRowsByKey.get(sheetKey);
+    if (existingRow) {
+      const current = existingRow.row.slice(0, 12);
+      const changed = row.some((cell, index) => (current[index] ?? '') !== cell);
+      if (changed) {
+        updates.push({ rowNumber: existingRow.rowNumber, row });
+      }
+    } else {
+      rows.push(row);
+    }
 
     summary.push({
       accountId: schedule.accountId,
@@ -237,6 +256,7 @@ const main = async (): Promise<void> => {
   }
 
   let sheetResult = { updatedRange: '', updatedRows: 0 };
+  let updatedExistingRows = 0;
   if (rows.length > 0) {
     const startRow = findFirstEmptyRow(existing.values);
     const range = `A${startRow}:L${startRow + rows.length - 1}`;
@@ -247,12 +267,23 @@ const main = async (): Promise<void> => {
       values: rows,
     });
   }
+  for (const update of updates) {
+    await updateGoogleSheetValues({
+      spreadsheet: STATUS_SHEET_URL,
+      gid: STATUS_SHEET_GID,
+      range: `A${update.rowNumber}:L${update.rowNumber}`,
+      values: [update.row],
+    });
+    updatedExistingRows += 1;
+    await sleep(1200);
+  }
 
   const summaryPath = path.join(OUTPUT_DIR, 'summary.json');
   await fs.writeFile(summaryPath, JSON.stringify({
     targetDate: TARGET_DATE,
     totalJobs: jobs.length,
     rowsPrepared: rows.length,
+    rowsUpdated: updatedExistingRows,
     sheetResult,
     summary,
   }, null, 2), 'utf8');
@@ -261,6 +292,7 @@ const main = async (): Promise<void> => {
     targetDate: TARGET_DATE,
     totalJobs: jobs.length,
     rowsPrepared: rows.length,
+    rowsUpdated: updatedExistingRows,
     sheetUpdatedRows: sheetResult.updatedRows,
     sheetRange: sheetResult.updatedRange,
     summaryPath,
