@@ -4,7 +4,9 @@ import { SELECTORS } from '../../constants/selectors.js';
 const POPUP_SELECTORS = [
   SELECTORS.popup.cancel,
   SELECTORS.popup.helpClose,
+  'button.se-popup-button-confirm',
   'button.se-popup-button-cancel',
+  'button.se-popup-close-button',
   'button[class*="close"]',
 ];
 

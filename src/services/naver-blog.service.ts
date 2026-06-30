@@ -271,6 +271,9 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
     if (!metadata?.url) return;
     const result = await insertLink(page, frame, metadata.url);
     log.info('link.inserted', { success: result, url: metadata.url });
+    if (!result) {
+      throw new Error(`CTA link insert failed: ${metadata.url}`);
+    }
   },
   multiImages: async ({ page, frame, keywordCategory, manuscriptType, multiImages }) => {
     const uploadData = getMultiImagesForBlock({ keywordCategory, multiImages });

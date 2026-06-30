@@ -70,6 +70,7 @@ interface VerifyRow extends Assignment {
   titleOk: boolean;
   keywordOk: boolean;
   brandOk: boolean;
+  ctaLinkOk: boolean;
   imageCount: number;
   verified: boolean;
 }
@@ -886,7 +887,8 @@ const verifyAssignments = async (assignments: Assignment[]): Promise<VerifyRow[]
     const titleOk = normalizedTitle.includes(normalizedKeyword);
     const keywordOk = normalizeText(text).includes(normalizedKeyword);
     const brandOk = text.includes('한려담원') || text.includes('흑염소') || text.includes('염소');
-    const verified = titleOk && keywordOk && brandOk && imageCount >= 1;
+    const ctaLinkOk = html.includes('mkt.shopping.naver.com/link');
+    const verified = titleOk && keywordOk && brandOk && ctaLinkOk && imageCount >= IMAGE_COUNT;
 
     rows.push({
       ...assignment,
@@ -894,6 +896,7 @@ const verifyAssignments = async (assignments: Assignment[]): Promise<VerifyRow[]
       titleOk,
       keywordOk,
       brandOk,
+      ctaLinkOk,
       imageCount,
       verified,
     });

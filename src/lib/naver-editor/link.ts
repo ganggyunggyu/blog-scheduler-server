@@ -1,5 +1,6 @@
 import type { Frame, Page } from 'playwright';
 import { logger } from '../logging/logger.js';
+import { dismissPopups } from './popup.js';
 
 const log = logger.child({ scope: 'Link' });
 
@@ -8,6 +9,17 @@ const SELECTORS = {
   urlInput: 'input.se-popup-oglink-input',
   searchBtn: 'button.se-popup-oglink-button',
   confirmBtn: 'button.se-popup-button-confirm',
+  alertPopup: 'div[data-group="popupLayer"][data-name="se-popup-alert"]',
+};
+
+const getVisibleAlertText = async (frame: Frame): Promise<string | null> => {
+  const popup = await frame.$(SELECTORS.alertPopup);
+  if (!popup || !(await popup.isVisible().catch(() => false))) {
+    return null;
+  }
+
+  const text = await popup.textContent().catch(() => '');
+  return text?.replace(/\s+/g, ' ').trim() || 'unknown alert';
 };
 
 export const insertLink = async (
@@ -50,6 +62,13 @@ export const insertLink = async (
     // 4. 대기 (링크 미리보기 로딩)
     await page.waitForTimeout(8000);
     log.info('link.preview.loaded');
+
+    const alertText = await getVisibleAlertText(frame);
+    if (alertText) {
+      await dismissPopups(frame);
+      log.warn('link.preview.alert', { message: alertText });
+      return false;
+    }
 
     // 5. 확인 버튼 클릭
     const confirmBtn = await frame.$(SELECTORS.confirmBtn);
