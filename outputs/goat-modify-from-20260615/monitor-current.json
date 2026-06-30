@@ -2,11 +2,12 @@
   "service": "goat-modify-from-20260615",
   "ref": "all-public-posts-from-20260615-r3",
   "counts": {
-    "done": 71,
-    "completed/active": 6,
+    "done": 136,
+    "completed/active": 7,
+    "completed/waiting": 6,
     "active/missing": 7,
-    "waiting/missing": 230,
-    "completed/waiting": 3
+    "waiting/missing": 160,
+    "completed/delayed": 1
   },
   "rows": [
     {
@@ -256,8 +257,8 @@
       "generateJobId": "generate_adhoc_update_5ad7af7a4c5837f9b66b1e00",
       "publishJobId": "publish_adhoc_job_update_5ad7af7a4c5837f9b66b1e00",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -276,9 +277,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_914d4dd53a1ca1652339f656",
       "publishJobId": "publish_adhoc_job_update_914d4dd53a1ca1652339f656",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -297,9 +298,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_8a7317d72f6d78ae3feab84a",
       "publishJobId": "publish_adhoc_job_update_8a7317d72f6d78ae3feab84a",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -318,9 +319,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_073d4ad31ae2d88beb858992",
       "publishJobId": "publish_adhoc_job_update_073d4ad31ae2d88beb858992",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -339,9 +340,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_14a640d703f676171134b60b",
       "publishJobId": "publish_adhoc_job_update_14a640d703f676171134b60b",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -359,9 +360,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_020a6012922b239e27a1950e",
       "publishJobId": "publish_adhoc_job_update_020a6012922b239e27a1950e",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -380,9 +381,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_243dd0a34c952ef59dee2850",
       "publishJobId": "publish_adhoc_job_update_243dd0a34c952ef59dee2850",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -401,9 +402,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_635d6290193b5d10601f9ef9",
       "publishJobId": "publish_adhoc_job_update_635d6290193b5d10601f9ef9",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -421,9 +422,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_1b644498e2207eb418a27b82",
       "publishJobId": "publish_adhoc_job_update_1b644498e2207eb418a27b82",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -442,9 +443,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_fa1925d30e117d435ab51b6b",
       "publishJobId": "publish_adhoc_job_update_fa1925d30e117d435ab51b6b",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -463,9 +464,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_513351e2ad887bcba35776e8",
       "publishJobId": "publish_adhoc_job_update_513351e2ad887bcba35776e8",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -484,9 +485,9 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_6459e617b0b754e4de59239f",
       "publishJobId": "publish_adhoc_job_update_6459e617b0b754e4de59239f",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -505,8 +506,8 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_a91fc8c7a96a803c67db48ae",
       "publishJobId": "publish_adhoc_job_update_a91fc8c7a96a803c67db48ae",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -526,8 +527,8 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_02fd0fcfea532c734e7c0ab2",
       "publishJobId": "publish_adhoc_job_update_02fd0fcfea532c734e7c0ab2",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -547,7 +548,7 @@
       "publishQueueName": "publish_ahffkekd12",
       "generateJobId": "generate_adhoc_update_68236f4263bb89d2453b1afa",
       "publishJobId": "publish_adhoc_job_update_68236f4263bb89d2453b1afa",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -862,9 +863,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_3c095fe9323a0850380dc157",
       "publishJobId": "publish_adhoc_job_update_3c095fe9323a0850380dc157",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -883,9 +884,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_5dca5f419762e4012fc61ff4",
       "publishJobId": "publish_adhoc_job_update_5dca5f419762e4012fc61ff4",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -904,9 +905,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_186679b1044f5f53ccd53032",
       "publishJobId": "publish_adhoc_job_update_186679b1044f5f53ccd53032",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -925,9 +926,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_5da12bb91a72f0798f65bd33",
       "publishJobId": "publish_adhoc_job_update_5da12bb91a72f0798f65bd33",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -946,8 +947,8 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_5acb8b3e410fdf6024e045fe",
       "publishJobId": "publish_adhoc_job_update_5acb8b3e410fdf6024e045fe",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -967,8 +968,8 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_6cb6f16a30204f395b93a4c1",
       "publishJobId": "publish_adhoc_job_update_6cb6f16a30204f395b93a4c1",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -988,7 +989,7 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_309d914d3c964f038fae42f2",
       "publishJobId": "publish_adhoc_job_update_309d914d3c964f038fae42f2",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -1282,8 +1283,8 @@
       "generateJobId": "generate_adhoc_update_cb3e4d7ae86f608396139562",
       "publishJobId": "publish_adhoc_job_update_cb3e4d7ae86f608396139562",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1302,9 +1303,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_d1e55069cacebdc31647e2d1",
       "publishJobId": "publish_adhoc_job_update_d1e55069cacebdc31647e2d1",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1323,9 +1324,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_d5e8f443f0cd5dab54dc1cde",
       "publishJobId": "publish_adhoc_job_update_d5e8f443f0cd5dab54dc1cde",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1344,9 +1345,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_2bdf359da7768c4e5f002a67",
       "publishJobId": "publish_adhoc_job_update_2bdf359da7768c4e5f002a67",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1365,9 +1366,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_e8dc97f6aab8d6a6ea9b8a1d",
       "publishJobId": "publish_adhoc_job_update_e8dc97f6aab8d6a6ea9b8a1d",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1386,9 +1387,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_671c7085ad4ad5f990d48734",
       "publishJobId": "publish_adhoc_job_update_671c7085ad4ad5f990d48734",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1406,9 +1407,9 @@
       "publishQueueName": "publish_dhtksk1p",
       "generateJobId": "generate_adhoc_update_47bbf09f1d670c9d768e820f",
       "publishJobId": "publish_adhoc_job_update_47bbf09f1d670c9d768e820f",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1784,9 +1785,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_88acc371327ebca14fd4c18e",
       "publishJobId": "publish_adhoc_job_update_88acc371327ebca14fd4c18e",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1805,9 +1806,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_e0fac842debcb6d4c5cbe12c",
       "publishJobId": "publish_adhoc_job_update_e0fac842debcb6d4c5cbe12c",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1826,9 +1827,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_d0342c39c7afb49e1373a7cc",
       "publishJobId": "publish_adhoc_job_update_d0342c39c7afb49e1373a7cc",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1847,9 +1848,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_52f09bd5c8f30d90ec9c908d",
       "publishJobId": "publish_adhoc_job_update_52f09bd5c8f30d90ec9c908d",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1868,9 +1869,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_42317631b3f5a7806b4f1cf4",
       "publishJobId": "publish_adhoc_job_update_42317631b3f5a7806b4f1cf4",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1889,9 +1890,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_97df68af31eea3756127637b",
       "publishJobId": "publish_adhoc_job_update_97df68af31eea3756127637b",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1910,9 +1911,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_39a1e2748429718fecbad42d",
       "publishJobId": "publish_adhoc_job_update_39a1e2748429718fecbad42d",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1931,9 +1932,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_b911a8162d62b5ab1d96b695",
       "publishJobId": "publish_adhoc_job_update_b911a8162d62b5ab1d96b695",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1952,9 +1953,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_f5df9306f345371b9662857c",
       "publishJobId": "publish_adhoc_job_update_f5df9306f345371b9662857c",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1973,9 +1974,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_b23af4e59f01385ee2ed2785",
       "publishJobId": "publish_adhoc_job_update_b23af4e59f01385ee2ed2785",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -1994,9 +1995,9 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_a8e37c8d232c99292e40c480",
       "publishJobId": "publish_adhoc_job_update_a8e37c8d232c99292e40c480",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2015,8 +2016,8 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_17adc70abab7b4532d88d9ba",
       "publishJobId": "publish_adhoc_job_update_17adc70abab7b4532d88d9ba",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -2036,7 +2037,7 @@
       "publishQueueName": "publish_eghfsa5478",
       "generateJobId": "generate_adhoc_update_512a84fdffd96c8eaa74bfe6",
       "publishJobId": "publish_adhoc_job_update_512a84fdffd96c8eaa74bfe6",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -2331,8 +2332,8 @@
       "generateJobId": "generate_adhoc_update_0785736ba4ac794d7e21801c",
       "publishJobId": "publish_adhoc_job_update_0785736ba4ac794d7e21801c",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2352,8 +2353,8 @@
       "generateJobId": "generate_adhoc_update_8721de5fcf175dea599ea448",
       "publishJobId": "publish_adhoc_job_update_8721de5fcf175dea599ea448",
       "generateState": "completed",
-      "publishState": "waiting",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2372,8 +2373,8 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_4f4afa284f459c2e260c38c6",
       "publishJobId": "publish_adhoc_job_update_4f4afa284f459c2e260c38c6",
-      "generateState": "active",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -2393,9 +2394,9 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_842c503dc0ef3416e2250125",
       "publishJobId": "publish_adhoc_job_update_842c503dc0ef3416e2250125",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2414,9 +2415,9 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_c206e64b2794e567472eefbb",
       "publishJobId": "publish_adhoc_job_update_c206e64b2794e567472eefbb",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2435,9 +2436,9 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_5c3cc4366d9ed4fb4e851757",
       "publishJobId": "publish_adhoc_job_update_5c3cc4366d9ed4fb4e851757",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2456,9 +2457,9 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_f9c5e1087ca5652176a5d486",
       "publishJobId": "publish_adhoc_job_update_f9c5e1087ca5652176a5d486",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -2477,8 +2478,8 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_0fc1c65adb7bedfd23a0557f",
       "publishJobId": "publish_adhoc_job_update_0fc1c65adb7bedfd23a0557f",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -2498,8 +2499,8 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_5a48e00efb48d8be4982a271",
       "publishJobId": "publish_adhoc_job_update_5a48e00efb48d8be4982a271",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -2519,7 +2520,7 @@
       "publishQueueName": "publish_laghunter8",
       "generateJobId": "generate_adhoc_update_9c3eef3cd51e84b4621ad06b",
       "publishJobId": "publish_adhoc_job_update_9c3eef3cd51e84b4621ad06b",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -4701,9 +4702,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_8ec6aaa1cb4604c9ec664e32",
       "publishJobId": "publish_adhoc_job_update_8ec6aaa1cb4604c9ec664e32",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -4722,9 +4723,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_b7ee1f3cfeb74074e76ed49d",
       "publishJobId": "publish_adhoc_job_update_b7ee1f3cfeb74074e76ed49d",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -4743,8 +4744,8 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_a79b5b4b9fd4165f79da1559",
       "publishJobId": "publish_adhoc_job_update_a79b5b4b9fd4165f79da1559",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -4764,8 +4765,8 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_0120538eddd788c485a6a5a8",
       "publishJobId": "publish_adhoc_job_update_0120538eddd788c485a6a5a8",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -4785,7 +4786,7 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_61f3b718f49a797633ed463d",
       "publishJobId": "publish_adhoc_job_update_61f3b718f49a797633ed463d",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -4996,8 +4997,8 @@
       "generateJobId": "generate_adhoc_update_a55a0f1ed85979654043af0f",
       "publishJobId": "publish_adhoc_job_update_a55a0f1ed85979654043af0f",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5080,8 +5081,8 @@
       "generateJobId": "generate_adhoc_update_2a35d5a998eb6602d9a9890a",
       "publishJobId": "publish_adhoc_job_update_2a35d5a998eb6602d9a9890a",
       "generateState": "completed",
-      "publishState": "waiting",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5099,9 +5100,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_c978ebf271bd38fdf9e63a38",
       "publishJobId": "publish_adhoc_job_update_c978ebf271bd38fdf9e63a38",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5120,9 +5121,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_02a4010047ee025509556ceb",
       "publishJobId": "publish_adhoc_job_update_02a4010047ee025509556ceb",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5140,9 +5141,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_80b3444b42bed7c0ea4fb9f3",
       "publishJobId": "publish_adhoc_job_update_80b3444b42bed7c0ea4fb9f3",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5161,9 +5162,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_b0f1145db97d33129377efc6",
       "publishJobId": "publish_adhoc_job_update_b0f1145db97d33129377efc6",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5182,9 +5183,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_9f9ce8d1f660aca88bc2b615",
       "publishJobId": "publish_adhoc_job_update_9f9ce8d1f660aca88bc2b615",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5203,9 +5204,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_7313045c76dd183ddbee0639",
       "publishJobId": "publish_adhoc_job_update_7313045c76dd183ddbee0639",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5224,9 +5225,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_2f4f47bd874169015a289d99",
       "publishJobId": "publish_adhoc_job_update_2f4f47bd874169015a289d99",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5245,9 +5246,9 @@
       "publishQueueName": "publish_pixelninja3",
       "generateJobId": "generate_adhoc_update_644c1bd6cf757c1cde9878d3",
       "publishJobId": "publish_adhoc_job_update_644c1bd6cf757c1cde9878d3",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5476,8 +5477,8 @@
       "generateJobId": "generate_adhoc_update_e7e4619a82e5e34bb6f1620a",
       "publishJobId": "publish_adhoc_job_update_e7e4619a82e5e34bb6f1620a",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5496,9 +5497,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_4c1666c4972702ba695d0e24",
       "publishJobId": "publish_adhoc_job_update_4c1666c4972702ba695d0e24",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5517,9 +5518,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_0e38491963cf1189e21fdb7e",
       "publishJobId": "publish_adhoc_job_update_0e38491963cf1189e21fdb7e",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5538,9 +5539,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_07972df3138044ca04f28522",
       "publishJobId": "publish_adhoc_job_update_07972df3138044ca04f28522",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5559,9 +5560,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_05ef92d93467db9eab5ab1f2",
       "publishJobId": "publish_adhoc_job_update_05ef92d93467db9eab5ab1f2",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5580,9 +5581,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_80d22c367cbe5599fe6dfb68",
       "publishJobId": "publish_adhoc_job_update_80d22c367cbe5599fe6dfb68",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5601,8 +5602,8 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_32acc6819e0a4d0e845be631",
       "publishJobId": "publish_adhoc_job_update_32acc6819e0a4d0e845be631",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -5643,9 +5644,9 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_32a53cbf391f36e6cdeed671",
       "publishJobId": "publish_adhoc_job_update_32a53cbf391f36e6cdeed671",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -5664,8 +5665,8 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_3d8de856befb392352c1a5e9",
       "publishJobId": "publish_adhoc_job_update_3d8de856befb392352c1a5e9",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "delayed",
       "done": false,
       "failed": false
     },
@@ -5685,7 +5686,7 @@
       "publishQueueName": "publish_q9v3m7a2",
       "generateJobId": "generate_adhoc_update_a99f7f8a81fd904188c9dafa",
       "publishJobId": "publish_adhoc_job_update_a99f7f8a81fd904188c9dafa",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false
@@ -6081,8 +6082,8 @@
       "generateJobId": "generate_adhoc_update_dbf7a7e5ec28e991e4d8e616",
       "publishJobId": "publish_adhoc_job_update_dbf7a7e5ec28e991e4d8e616",
       "generateState": "completed",
-      "publishState": "active",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6165,8 +6166,8 @@
       "generateJobId": "generate_adhoc_update_eba1b2973c3980406b2c717d",
       "publishJobId": "publish_adhoc_job_update_eba1b2973c3980406b2c717d",
       "generateState": "completed",
-      "publishState": "waiting",
-      "done": false,
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6185,9 +6186,9 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_93616c3dcc74b64d7cc17a0a",
       "publishJobId": "publish_adhoc_job_update_93616c3dcc74b64d7cc17a0a",
-      "generateState": "active",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6206,9 +6207,9 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_c549cd824647c754514e9b61",
       "publishJobId": "publish_adhoc_job_update_c549cd824647c754514e9b61",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6227,9 +6228,9 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_3c4c43a46635367c454c6b68",
       "publishJobId": "publish_adhoc_job_update_3c4c43a46635367c454c6b68",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6248,9 +6249,9 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_f7673f64ca17ccb1efbefca4",
       "publishJobId": "publish_adhoc_job_update_f7673f64ca17ccb1efbefca4",
-      "generateState": "waiting",
-      "publishState": "missing",
-      "done": false,
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
       "failed": false
     },
     {
@@ -6269,8 +6270,8 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_535114e9bb2921df593545fc",
       "publishJobId": "publish_adhoc_job_update_535114e9bb2921df593545fc",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "waiting",
       "done": false,
       "failed": false
     },
@@ -6290,8 +6291,8 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_6adca6377474593de8b4656a",
       "publishJobId": "publish_adhoc_job_update_6adca6377474593de8b4656a",
-      "generateState": "waiting",
-      "publishState": "missing",
+      "generateState": "completed",
+      "publishState": "active",
       "done": false,
       "failed": false
     },
@@ -6332,7 +6333,7 @@
       "publishQueueName": "publish_regular14631",
       "generateJobId": "generate_adhoc_update_37ebde1b61addd857bfb3b44",
       "publishJobId": "publish_adhoc_job_update_37ebde1b61addd857bfb3b44",
-      "generateState": "waiting",
+      "generateState": "active",
       "publishState": "missing",
       "done": false,
       "failed": false

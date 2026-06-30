@@ -1,6 +1,8 @@
 import axios from 'axios';
-import { mkdir, writeFile } from 'fs/promises';
+import { execFile } from 'child_process';
+import { access, mkdir, rename, rm, stat, writeFile } from 'fs/promises';
 import path from 'path';
+import { promisify } from 'util';
 import { env } from '../config/env.js';
 import { logger } from '../lib/logging/logger.js';
 import { ProgressBar } from '../lib/utils/progress.js';
@@ -15,6 +17,11 @@ const DOWNLOAD_ATTEMPTS = 3;
 const DOWNLOAD_RETRY_DELAY_MS = 1000;
 const PRODUCT_DATA_ATTEMPTS = 3;
 const PRODUCT_DATA_RETRY_DELAY_MS = 3000;
+const NAVER_UPLOAD_SAFE_IMAGE_BYTES = 4_500_000;
+const MAGICK_CANDIDATES = ['/opt/homebrew/bin/magick', 'magick'];
+
+const execFileAsync = promisify(execFile);
+let cachedMagickPath: string | null | undefined;
 
 export interface ImageData {
   url: string;
@@ -48,6 +55,50 @@ const sanitizeParam = (value: string): string =>
 
 const sleep = async (ms: number): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const resolveMagickPath = async (): Promise<string | null> => {
+  if (cachedMagickPath !== undefined) return cachedMagickPath;
+
+  for (const candidate of MAGICK_CANDIDATES) {
+    try {
+      await access(candidate);
+      cachedMagickPath = candidate;
+      return candidate;
+    } catch {
+      // Try the next candidate.
+    }
+  }
+
+  cachedMagickPath = null;
+  return null;
+};
+
+const shrinkImageForNaverUpload = async (filePath: string, filename: string): Promise<void> => {
+  const before = await stat(filePath);
+  if (before.size <= NAVER_UPLOAD_SAFE_IMAGE_BYTES) return;
+
+  const magickPath = await resolveMagickPath();
+  if (!magickPath) {
+    imageLog.warn('image.compress.skip', { filename, bytes: before.size, reason: 'magick_not_found' });
+    return;
+  }
+
+  const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp.webp`;
+  try {
+    await execFileAsync(magickPath, [filePath, '-resize', '1800x1800>', '-quality', '80', tmpPath], { timeout: 60_000 });
+    const after = await stat(tmpPath);
+    if (after.size > 0 && after.size < before.size) {
+      await rename(tmpPath, filePath);
+      imageLog.info('image.compressed', { filename, beforeBytes: before.size, afterBytes: after.size });
+      return;
+    }
+    await rm(tmpPath, { force: true });
+  } catch (error) {
+    await rm(tmpPath, { force: true });
+    const message = error instanceof Error ? error.message : String(error);
+    imageLog.warn('image.compress.failed', { filename, bytes: before.size, message });
+  }
 };
 
 export interface ProductImageRequestConfig {
@@ -231,6 +282,7 @@ export const downloadImagesToDir = async (
         const filePath = path.join(imagesDir, finalFilename);
 
         await writeFile(filePath, buffer);
+        await shrinkImageForNaverUpload(filePath, finalFilename);
         saved.push(filePath);
         savedImage = true;
         imageLog.info(progress.tick('ok'), { filename: finalFilename, attempt });
