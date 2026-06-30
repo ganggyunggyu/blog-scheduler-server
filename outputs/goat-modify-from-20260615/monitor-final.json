@@ -1,0 +1,30 @@
+{
+  "service": "goat-modify-from-20260615",
+  "ref": "all-public-posts-from-20260615-r3",
+  "counts": {
+    "done": 1
+  },
+  "rows": [
+    {
+      "accountId": "ahffkekd12",
+      "blogId": "ahffkekd12",
+      "nickname": "긍정이백퍼  1",
+      "logNo": "224331360905",
+      "link": "https://blog.naver.com/ahffkekd12/224331360905",
+      "title": "임신준비 흑염소, 임신 전 먹어야 할까? 영양과 주의점",
+      "addDate": "40분 전",
+      "date": "2026-06-30",
+      "oldKeyword": "임신준비흑염소",
+      "newKeyword": "임산부좋은음식",
+      "newRoot": "임신임산부",
+      "generateQueueName": "generate_ahffkekd12",
+      "publishQueueName": "publish_ahffkekd12",
+      "generateJobId": "generate_adhoc_update_c9983754fe2b5a4ae7256c36",
+      "publishJobId": "publish_adhoc_job_update_c9983754fe2b5a4ae7256c36",
+      "generateState": "completed",
+      "publishState": "completed",
+      "done": true,
+      "failed": false
+    }
+  ]
+}

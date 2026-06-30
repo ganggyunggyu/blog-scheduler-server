@@ -1,0 +1,27 @@
+{
+  "service": "goat-modify-from-20260615",
+  "ref": "all-public-posts-from-20260615-r3",
+  "total": 1,
+  "verified": 1,
+  "failed": 0,
+  "rows": [
+    {
+      "accountId": "ahffkekd12",
+      "blogId": "ahffkekd12",
+      "nickname": "긍정이백퍼  1",
+      "logNo": "224331360905",
+      "link": "https://blog.naver.com/ahffkekd12/224331360905",
+      "title": "임산부 좋은 음식 권장량 기준으로 골라보기",
+      "addDate": "40분 전",
+      "date": "2026-06-30",
+      "oldKeyword": "임신준비흑염소",
+      "newKeyword": "임산부좋은음식",
+      "newRoot": "임신임산부",
+      "titleOk": true,
+      "keywordOk": true,
+      "brandOk": true,
+      "imageCount": 17,
+      "verified": true
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import {
   buildScheduleTimingOptions,
   calculateSchedule,
   createSchedule,
+  formatKst,
   parseKeywordWithCategory,
   resolveScheduleMode,
 } from '../services/schedule.service.js';
@@ -785,7 +786,7 @@ const linkUpdateSchema = z.object({
       }
       const account = { id: matchedAccount.id, password: matchedAccount.password, blogId };
       const accountGenerateQueue = getGenerateQueue(account.id);
-      const scheduledAt = new Date().toISOString();
+      const scheduledAt = formatKst(new Date());
       const preparedPairs = prepareLinkUpdatePairs(accountPairs, scheduledAt);
 
       const jobsList: Array<{ keyword: string; logNo: string }> = [];
