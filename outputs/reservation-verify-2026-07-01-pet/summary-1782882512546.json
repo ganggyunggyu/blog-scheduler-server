@@ -1,0 +1,142 @@
+{
+  "targetDate": "2026-07-01",
+  "services": [
+    "pet-sheet-daily"
+  ],
+  "totalJobs": 16,
+  "verifyResults": [
+    {
+      "accountId": "respawnking9",
+      "blogId": "respawnking9",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/respawnking9-1782882416425.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/respawnking9-1782882416425.png"
+    },
+    {
+      "accountId": "k7d9x2m4",
+      "blogId": "k7d9x2m4",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/k7d9x2m4-1782882416425.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/k7d9x2m4-1782882416425.png"
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "blogId": "ahsxkfldk12",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahsxkfldk12-1782882440540.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahsxkfldk12-1782882440540.png"
+    },
+    {
+      "accountId": "ahfflwl123",
+      "blogId": "ahfflwl123",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahfflwl123-1782882440544.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahfflwl123-1782882440544.png"
+    },
+    {
+      "accountId": "fail5644",
+      "blogId": "fail5644",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/fail5644-1782882462759.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/fail5644-1782882462759.png"
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "blogId": "ahffkdlek12",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "프렌치불독"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahffkdlek12-1782882462827.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ahffkdlek12-1782882462827.png"
+    },
+    {
+      "accountId": "ghostrush7",
+      "blogId": "ghostrush7",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ghostrush7-1782882485608.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/ghostrush7-1782882485608.png"
+    },
+    {
+      "accountId": "compare14310",
+      "blogId": "compare14310",
+      "reserveButtonText": "예약 발행 2건",
+      "popupTotalText": "총2개",
+      "keywordHits": [
+        "강아지종류",
+        "아비시니안"
+      ],
+      "timeHits": [
+        "14:51",
+        "15:51"
+      ],
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/compare14310-1782882485662.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/reservation-verify-2026-07-01-pet/compare14310-1782882485662.png"
+    }
+  ],
+  "sheetResult": {
+    "spreadsheetId": "1oUo85a9m3MTTzWeX8FGnKZqCDfPRNdGZFxr4-vZqSrM",
+    "updatedRange": "'발행현황'!A303:L318",
+    "updatedRows": 16
+  }
+}

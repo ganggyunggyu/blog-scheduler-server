@@ -1,0 +1,378 @@
+{
+  "generatedAt": "2026-07-01T04:51:47.415Z",
+  "executed": true,
+  "scheduleDate": "2026-07-01",
+  "scheduleMode": "2",
+  "sheet": {
+    "id": "1c9TJ1gETtunuCmzfzap-2lyqXj1cwzITOb1k8W4tL8c",
+    "gid": "1960709235",
+    "sourceRows": 40,
+    "candidateCount": 34
+  },
+  "accounts": {
+    "total": 12,
+    "queued": 8,
+    "blocked": 4
+  },
+  "queues": [
+    {
+      "accountId": "k7d9x2m4",
+      "blogId": "k7d9x2m4",
+      "blogName": "강아지강하지1",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "fail5644",
+      "blogId": "fail5644",
+      "blogName": "고구마스틱2(10개)1",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "compare14310",
+      "blogId": "compare14310",
+      "blogName": "룰루랄라2(12개)1",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "ghostrush7",
+      "blogId": "ghostrush7",
+      "blogName": "실눈캐",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "respawnking9",
+      "blogId": "respawnking9",
+      "blogName": "리스팩식스팩1",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종류",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "ahffkdlek12",
+      "blogId": "ahffkdlek12",
+      "blogName": "바삭바삭해1",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종류",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "프렌치불독",
+          "category": "강아지품종",
+          "folder": "프렌치불독",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "ahsxkfldk12",
+      "blogId": "ahsxkfldk12",
+      "blogName": "쉽고간단하게",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종류",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "ahfflwl123",
+      "blogId": "ahfflwl123",
+      "blogName": "햄부기",
+      "keywords": [
+        {
+          "keyword": "강아지종류",
+          "category": "강아지품종",
+          "folder": "강아지종류",
+          "libraryCount": 2
+        },
+        {
+          "keyword": "아비시니안",
+          "category": "고양이품종",
+          "folder": "아비시니안",
+          "libraryCount": 2
+        }
+      ],
+      "currentGoodCount": 0
+    }
+  ],
+  "blocked": [
+    {
+      "accountId": "b6x2k9w3",
+      "blogId": "b6x2k9w3",
+      "nickname": "b6x2k9w3",
+      "category": "도그마루 글밥",
+      "reason": "missing_runtime_password",
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "loand3324",
+      "blogId": "loand3324",
+      "nickname": "라우드 2 (5개) 1",
+      "category": "도그마루 글밥",
+      "reason": "credential_error",
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "8ua1womn",
+      "blogId": "8ua1womn",
+      "nickname": "8ua1womn",
+      "category": "서리펫",
+      "reason": "missing_runtime_password",
+      "currentGoodCount": 0
+    },
+    {
+      "accountId": "n7c3w8z2",
+      "blogId": "n7c3w8z2",
+      "nickname": "고양이밥 1",
+      "category": "서리펫",
+      "reason": "missing_runtime_password",
+      "currentGoodCount": 0
+    }
+  ],
+  "submission": {
+    "totalJobs": 16,
+    "schedules": [
+      {
+        "account": "k7d***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_c6f19e39-95a4-4531-b368-9a6f9105c2ee",
+        "jobs": [
+          {
+            "id": "job_2ce79062-553d-4a80-9256-25d5d794b583",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_927269dd-2b10-433c-ab45-78e1e96f1407",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "fai***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_6a045345-646c-46e8-9394-cc067d203b27",
+        "jobs": [
+          {
+            "id": "job_8f9ca732-1c08-487c-b3cf-cd1a5415e7c4",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_c8793046-5a41-4f6c-9c92-0a406d90d921",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "com***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_e08eaa40-aaf4-4065-8089-cd5f7f3af9ca",
+        "jobs": [
+          {
+            "id": "job_fd73cebf-1ff1-431f-b8cc-23b6c79c3eb1",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_1c3d0516-1571-474c-93e9-a5084716c7ac",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "gho***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_6d02f290-e130-445e-92cb-807f3d3fe9c1",
+        "jobs": [
+          {
+            "id": "job_fb621699-0ac8-4923-94a1-3176ec703588",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_a4b1f52b-18e6-42da-97a1-751bf22cf7a1",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "res***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_b2b3483a-fa90-4f4d-8baa-c876585b2b37",
+        "jobs": [
+          {
+            "id": "job_1420bf13-2211-4207-9027-907fe3f220a9",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_03ae5beb-85b8-4960-a30e-ade1e84a68e4",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "ahf***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_ea6cd206-713d-4716-b0be-3520e3dddd54",
+        "jobs": [
+          {
+            "id": "job_d8d0a77a-e262-4731-95ea-f37232498c74",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_e93743ab-51f7-43f5-93df-47a11d967b1b",
+            "keyword": "프렌치불독",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "ahs***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_570c23ef-8a8f-45f6-97d7-2803796e803c",
+        "jobs": [
+          {
+            "id": "job_368bc05c-40b6-4d6a-97e2-78a81907a6ea",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_91f5223b-2a93-462f-9c46-1f39b7bf2b10",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "account": "ahf***",
+        "reused": false,
+        "totalJobs": 2,
+        "scheduleId": "sch_a8ea55ac-0085-4230-8bbb-e3b811ec0fb8",
+        "jobs": [
+          {
+            "id": "job_76addd62-fa04-472a-9df1-721cb85d39b8",
+            "keyword": "강아지종류",
+            "scheduledAt": "2026-07-01T14:51:45+09:00",
+            "slot": 1
+          },
+          {
+            "id": "job_4ef6cd45-7a69-4927-84c1-5269c06b11d0",
+            "keyword": "아비시니안",
+            "scheduledAt": "2026-07-01T15:51:45+09:00",
+            "slot": 2
+          }
+        ]
+      }
+    ]
+  }
+}

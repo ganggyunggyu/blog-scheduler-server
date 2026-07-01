@@ -1,0 +1,5 @@
+account=ahfflwl123
+blog=ahfflwl123
+expected=강아지종류, 아비시니안
+
+page.waitForTimeout: Target page, context or browser has been closed
