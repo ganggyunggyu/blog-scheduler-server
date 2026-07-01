@@ -275,6 +275,9 @@ export const typeContentWithImages = async (
     if (shouldInsertLink) {
       const inserted = await insertLink(page, frame, line);
       log.info('content.link.inserted', { success: inserted, url: line });
+      if (!inserted) {
+        throw new Error(`eye brand link insertion failed: ${line}`);
+      }
     } else if (shouldTypeLine) {
       await typeLineAvoidingAutoList(page, line);
     }

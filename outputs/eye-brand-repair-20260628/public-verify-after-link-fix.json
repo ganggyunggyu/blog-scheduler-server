@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-07-01T01:37:30.132Z",
+  "rows": [
+    {
+      "logNo": "224329239137",
+      "url": "https://blog.naver.com/adplan3th/224329239137",
+      "httpStatus": 200,
+      "title": "각막강화술 검사 전 확인할 기준",
+      "keyword": "각막강화술",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329240966",
+      "url": "https://blog.naver.com/adplan3th/224329240966",
+      "httpStatus": 200,
+      "title": "노안수술 선택 전 알아둘 내용",
+      "keyword": "노안수술",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329240988",
+      "url": "https://blog.naver.com/adplan3th/224329240988",
+      "httpStatus": 200,
+      "title": "스마일라식수술비용 구성과 비교 방법",
+      "keyword": "스마일라식수술비용",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329746798",
+      "url": "https://blog.naver.com/adplan3th/224329746798",
+      "httpStatus": 200,
+      "title": "백내장수술후 방법과 주의사항 정리",
+      "keyword": "백내장수술후",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329743934",
+      "url": "https://blog.naver.com/adplan3th/224329743934",
+      "httpStatus": 200,
+      "title": "IPL레이저 비교할 때 보는 기준",
+      "keyword": "IPL레이저",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329759628",
+      "url": "https://blog.naver.com/adplan3th/224329759628",
+      "httpStatus": 200,
+      "title": "스마일라섹 정밀검사가 필요한 이유",
+      "keyword": "스마일라섹",
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    }
+  ],
+  "allOk": true
+}

@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-07-01T01:36:03.321Z",
+  "execute": true,
+  "targetCount": 4,
+  "items": [
+    {
+      "logNo": "224329240988",
+      "keyword": "스마일라식수술비용",
+      "title": "스마일라식수술비용 구성과 비교 방법",
+      "source": "final-package",
+      "slides": [
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_01.png",
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_02.png",
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_03.png",
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_04.png",
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_05.png",
+        "/Users/ganggyunggyu/Downloads/2_브랜드블로그_최종/10월/11.스마일라식수술비용/11.스마일라식수술비용_slides/slide_06.png"
+      ]
+    },
+    {
+      "logNo": "224329746798",
+      "keyword": "백내장수술후",
+      "title": "백내장수술후 방법과 주의사항 정리",
+      "source": "generated-repair",
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/04_백내장수술후/slide_06.png"
+      ]
+    },
+    {
+      "logNo": "224329743934",
+      "keyword": "IPL레이저",
+      "title": "IPL레이저 비교할 때 보는 기준",
+      "source": "generated-repair",
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/05_IPL레이저/slide_06.png"
+      ]
+    },
+    {
+      "logNo": "224329759628",
+      "keyword": "스마일라섹",
+      "title": "스마일라섹 정밀검사가 필요한 이유",
+      "source": "generated-repair",
+      "slides": [
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_01.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_02.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_03.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_04.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_05.png",
+        "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-repair-20260628/slides/06_스마일라섹/slide_06.png"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "logNo": "224329240988",
+      "keyword": "스마일라식수술비용",
+      "title": "스마일라식수술비용 구성과 비교 방법",
+      "source": "final-package",
+      "success": true,
+      "postUrl": "https://blog.naver.com/adplan3th/224329240988",
+      "message": "Update success"
+    },
+    {
+      "logNo": "224329746798",
+      "keyword": "백내장수술후",
+      "title": "백내장수술후 방법과 주의사항 정리",
+      "source": "generated-repair",
+      "success": true,
+      "postUrl": "https://blog.naver.com/adplan3th/224329746798",
+      "message": "Update success"
+    },
+    {
+      "logNo": "224329743934",
+      "keyword": "IPL레이저",
+      "title": "IPL레이저 비교할 때 보는 기준",
+      "source": "generated-repair",
+      "success": true,
+      "postUrl": "https://blog.naver.com/adplan3th/224329743934",
+      "message": "Update success"
+    },
+    {
+      "logNo": "224329759628",
+      "keyword": "스마일라섹",
+      "title": "스마일라섹 정밀검사가 필요한 이유",
+      "source": "generated-repair",
+      "success": true,
+      "postUrl": "https://blog.naver.com/adplan3th/224329759628",
+      "message": "Update success"
+    }
+  ],
+  "verify": [
+    {
+      "logNo": "224329240988",
+      "url": "https://blog.naver.com/adplan3th/224329240988",
+      "source": "final-package",
+      "httpStatus": 200,
+      "expectedTitle": "스마일라식수술비용 구성과 비교 방법",
+      "title": "스마일라식수술비용 구성과 비교 방법",
+      "titleOk": true,
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329746798",
+      "url": "https://blog.naver.com/adplan3th/224329746798",
+      "source": "generated-repair",
+      "httpStatus": 200,
+      "expectedTitle": "백내장수술후 방법과 주의사항 정리",
+      "title": "백내장수술후 방법과 주의사항 정리",
+      "titleOk": true,
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329743934",
+      "url": "https://blog.naver.com/adplan3th/224329743934",
+      "source": "generated-repair",
+      "httpStatus": 200,
+      "expectedTitle": "IPL레이저 비교할 때 보는 기준",
+      "title": "IPL레이저 비교할 때 보는 기준",
+      "titleOk": true,
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    },
+    {
+      "logNo": "224329759628",
+      "url": "https://blog.naver.com/adplan3th/224329759628",
+      "source": "generated-repair",
+      "httpStatus": 200,
+      "expectedTitle": "스마일라섹 정밀검사가 필요한 이유",
+      "title": "스마일라섹 정밀검사가 필요한 이유",
+      "titleOk": true,
+      "keywordOk": true,
+      "brandOk": true,
+      "topLinkOk": true,
+      "bottomLinkOk": true,
+      "linkOk": true,
+      "uniqueSlides": [
+        "slide_01.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_05.png",
+        "slide_06.png"
+      ],
+      "hasAllSixSlides": true
+    }
+  ]
+}

@@ -27,7 +27,11 @@ const createMockPage = () => {
   };
 };
 
-const createMockFrame = (events: string[]) => {
+const createMockFrame = (
+  events: string[],
+  options: { linkButtonAvailable?: boolean } = {},
+) => {
+  const { linkButtonAvailable = true } = options;
   const alignDropdown = {
     click: mock.fn(async () => {
       events.push('click:align-dropdown');
@@ -101,7 +105,7 @@ const createMockFrame = (events: string[]) => {
       if (selector === SELECTORS.editor.bold) return boldButton;
       if (selector === SELECTORS.editor.fontSizeDropdown) return fontSizeDropdown;
       if (selector === SELECTORS.editor.fontSize15) return fontSize15;
-      if (selector === 'button[data-name="oglink"]') return linkButton;
+      if (selector === 'button[data-name="oglink"]') return linkButtonAvailable ? linkButton : null;
       if (selector === 'input.se-popup-oglink-input') return linkInput;
       if (selector === 'button.se-popup-oglink-button') return linkSearchButton;
       if (selector === 'button.se-popup-button-confirm') return linkConfirmButton;
@@ -310,6 +314,26 @@ test('typeContentWithImages: 안과브랜드는 IMG 자리표시자는 건너뛰
   assert.ok(events.includes('click:link-confirm'));
   assert.equal(events.some((event) => event.includes('[IMG]')), false);
   assert.equal(events.some((event) => event === 'type:https://blog.naver.com/adplan3th/224094493829'), false);
+});
+
+test('typeContentWithImages: 안과브랜드 단독 URL 링크 삽입 실패 시 예외를 던짐', async () => {
+  const page = createMockPage();
+  const frame = createMockFrame(page.getEvents(), { linkButtonAvailable: false });
+
+  await assert.rejects(
+    typeContentWithImages(
+      page as never,
+      frame as never,
+      [
+        '고도근시 라식 가능할까 각막 얇을 때 시력교정 방법',
+        'https://blog.naver.com/adplan3th/224094493829',
+        '본문 첫줄',
+      ].join('\n'),
+      [],
+      { imagePlacement: 'eyeBrand' },
+    ),
+    /eye brand link insertion failed: https:\/\/blog\.naver\.com\/adplan3th\/224094493829/,
+  );
 });
 
 test('buildEyeBrandImageParagraphMap: 소제목보다 이미지가 많으면 남은 문단에 추가 매핑함', () => {

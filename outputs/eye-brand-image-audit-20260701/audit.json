@@ -249,21 +249,12 @@
     ],
     "refinedAt": "2026-07-01T00:38:51.817Z",
     "resourceStatusCounts": {
-      "current-slide-resource": 53,
-      "timeout-review-needed": 1,
-      "legacy-brandblog-resource": 25,
-      "other-snb-resource": 1
+      "current-slide-resource": 55,
+      "legacy-brandblog-resource": 25
     },
-    "repairTargets": [
-      {
-        "logNo": "224319247750",
-        "title": "라식라섹수술비용 구성과 비교 기준",
-        "addDate": "2026. 6. 21.",
-        "resourceStatus": "timeout-review-needed",
-        "error": "The operation was aborted due to timeout",
-        "url": "https://blog.naver.com/adplan3th/224319247750"
-      }
-    ]
+    "repairTargets": [],
+    "refreshedAt": "2026-07-01T00:46:58.684Z",
+    "remainingRepairTargets": 0
   },
   "rows": [
     {
@@ -811,9 +802,27 @@
       "title": "라식라섹수술비용 구성과 비교 기준",
       "addDate": "2026. 6. 21.",
       "url": "https://blog.naver.com/adplan3th/224319247750",
-      "error": "The operation was aborted due to timeout",
-      "needsImageRepair": true,
-      "resourceStatus": "timeout-review-needed"
+      "needsImageRepair": false,
+      "resourceStatus": "current-slide-resource",
+      "httpStatus": 200,
+      "brandPhraseOk": true,
+      "slideCount": 19,
+      "nonSlideCount": 1,
+      "firstContentImage": "slide_02.png",
+      "filenames": [
+        "slide_02.png",
+        "%EC%97%90%EC%8A%A4%EC%95%A4%EB%B9%84%EC%95%88%EA%B3%BC_251201_%EB%B8%94%EB%A1%9C%EA%B7%B8_%EC%8A%A4%ED%82%A8_PC_v9.png",
+        "slide_02.png",
+        "slide_02.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_03.png",
+        "slide_03.png",
+        "slide_04.png",
+        "slide_04.png",
+        "slide_04.png",
+        "slide_05.png"
+      ]
     },
     {
       "logNo": "224319253420",
@@ -1730,7 +1739,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_12.EVO ICL_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_12.EVO ICL_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1757,7 +1766,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_11.40대_라식_노안_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_11.40대_라식_노안_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1784,7 +1793,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_10.취업_전_시력교정_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_10.취업_전_시력교정_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1811,7 +1820,7 @@
         "SB안과_브랜드블로그_10월_20241011.jpg",
         "SB안과_브랜드블로그_10월_20241011_하단_배너2.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1838,7 +1847,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_8.고도근시_시력교정_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_8.고도근시_시력교정_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1865,7 +1874,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_7.라식_수술_조건_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_7.라식_수술_조건_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1892,7 +1901,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_6.스마일라식_후_주의사항_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_6.스마일라식_후_주의사항_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1919,7 +1928,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_5.안구건조증_치료_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_5.안구건조증_치료_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1946,7 +1955,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_4.라식_vs_라섹_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_4.라식_vs_라섹_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -1973,7 +1982,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_3.백내장_초기_증상_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_3.백내장_초기_증상_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2000,7 +2009,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_2.스마일라식_비용_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_2.스마일라식_비용_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2027,7 +2036,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_12.마이봄샘_치료_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_12.마이봄샘_치료_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2054,7 +2063,7 @@
         "에스앤비안과_260423_브랜드블로그_5월_V1_1.황금연휴의_스마일라식_4.jpg",
         "에스앤비안과_260423_브랜드블로그_5월_V1_1.황금연휴의_스마일라식_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2081,7 +2090,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_1.군인_스마일라식_3.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_1.군인_스마일라식_3.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2108,7 +2117,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_10.결막모반_제거_3.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_10.결막모반_제거_3.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2135,7 +2144,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_9.눈_뻑뻑함_원인_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_9.눈_뻑뻑함_원인_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2162,7 +2171,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_8.안구건조증_치료_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_8.안구건조증_치료_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2189,7 +2198,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_7.노안_백내장_차이_5.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_7.노안_백내장_차이_5.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2216,7 +2225,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_6.백내장_수술시기_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_6.백내장_수술시기_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2243,7 +2252,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_5.렌즈삽입술_비용_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_5.렌즈삽입술_비용_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2270,7 +2279,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_4.라식라섹차이_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_4.라식라섹차이_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2280,20 +2289,25 @@
       "url": "https://blog.naver.com/adplan3th/224246516373",
       "httpStatus": 200,
       "brandPhraseOk": true,
-      "slideCount": 0,
-      "nonSlideCount": 7,
-      "firstContentImage": "%BF%A1%BD%BA%BE%D8%BA%F1%BE%C8%B0%FA_260402_%C0%CE%BD%BA%C5%B8%B1%D7%B7%A5_%B0%D4%BD%C3%B9%B0_5%BF%F9_V1_1.15%C1%D6%B3%E2_2.jpg",
+      "slideCount": 19,
+      "nonSlideCount": 1,
+      "firstContentImage": "slide_01.png",
       "filenames": [
-        "%BF%A1%BD%BA%BE%D8%BA%F1%BE%C8%B0%FA_260402_%C0%CE%BD%BA%C5%B8%B1%D7%B7%A5_%B0%D4%BD%C3%B9%B0_5%BF%F9_V1_1.15%C1%D6%B3%E2_2.jpg",
-        "에스앤비안과_260402_인스타그램_게시물_5월_V1_1.15주년_2.jpg",
-        "에스앤비안과_260402_인스타그램_게시물_5월_V1_1.15주년_2.jpg",
-        "에스앤비안과_260402_인스타그램_게시물_5월_V1_1.15주년_2.jpg",
-        "image.png",
-        "image.png",
-        "image.png"
+        "slide_01.png",
+        "%EC%97%90%EC%8A%A4%EC%95%A4%EB%B9%84%EC%95%88%EA%B3%BC_251201_%EB%B8%94%EB%A1%9C%EA%B7%B8_%EC%8A%A4%ED%82%A8_PC_v9.png",
+        "slide_01.png",
+        "slide_01.png",
+        "slide_01.png",
+        "slide_02.png",
+        "slide_02.png",
+        "slide_02.png",
+        "slide_03.png",
+        "slide_03.png",
+        "slide_03.png",
+        "slide_04.png"
       ],
-      "needsImageRepair": true,
-      "resourceStatus": "other-snb-resource"
+      "needsImageRepair": false,
+      "resourceStatus": "current-slide-resource"
     },
     {
       "logNo": "224238244705",
@@ -2319,7 +2333,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_3.라섹회복기간_4.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_3.라섹회복기간_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2346,7 +2360,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_2.스마일라식_부작용_3.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_2.스마일라식_부작용_3.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2373,7 +2387,7 @@
         "에스앤비안과_260312_브랜드블로그_4월_V1_1.군인_스마일라식_3.jpg",
         "에스앤비안과_260312_브랜드블로그_4월_V1_1.군인_스마일라식_3.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     },
     {
@@ -2400,7 +2414,7 @@
         "에스앤비안과_260118_브랜드블로그_3월_V1_12.눈_건강_관리_방법_4.jpg",
         "에스앤비안과_260118_브랜드블로그_3월_V1_12.눈_건강_관리_방법_4.jpg"
       ],
-      "needsImageRepair": true,
+      "needsImageRepair": false,
       "resourceStatus": "legacy-brandblog-resource"
     }
   ]

@@ -1,0 +1,175 @@
+{
+  "targetDate": "2026-07-01",
+  "ref": "core-daily-alibaba-cycle-2026-07-01",
+  "service": "alibaba",
+  "publishedAccounts": 5,
+  "publishedJobs": 15,
+  "failedJobs": [
+    {
+      "accountId": "rqr1io45",
+      "keyword": "중국무역",
+      "status": "failed",
+      "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }",
+      "scheduleId": "sch_d33f9549-a3db-4e97-ac1a-df6569b9be0a",
+      "jobId": "job_d13e03a5-db74-4d93-8a8c-8fe949e1023d"
+    },
+    {
+      "accountId": "rqr1io45",
+      "keyword": "상해박람회",
+      "status": "failed",
+      "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }",
+      "scheduleId": "sch_d33f9549-a3db-4e97-ac1a-df6569b9be0a",
+      "jobId": "job_7099e880-4c6b-4f79-ab1f-fc5ce3d23530"
+    },
+    {
+      "accountId": "rqr1io45",
+      "keyword": "중국도매쇼핑몰",
+      "status": "failed",
+      "error": "로그인 실패: NAVER English 한국어 회원님의 아이디를 보호하고 있습니다. 개인정보보호 및 도용으로 인한 피해를 예방하기 위해 아이디(rqr1io45)를 보호하고 있습니다. 더 자세한 내용이 궁금하세요? 아이디는 언제 보호되나요? 아이디/비밀번호 판매사이트 등에서 정보노출이 확인된 경우 스팸메일 발송, 불법 게시물 작성 등의 행위가 신고 또는 발견된 경우 그 외, 타인에 의한 가입 또는 로그인이 의심되는 경우 보다 안전한 계정관리를 위해 간단한 본인 확인 후, 비밀번호를 변경해 주세요. 보호조치 해제 아이디 찾기 | 비밀번호 찾기 | 회원가입 이용약관 개인정보처리방침 책임의 한계와 법적 고지 회원정보 고객센터 naver Copyright © NAVER Corp. All Rights Reserved. var ua = window.navigator.userAgent.toLowerCase(); var cur_container_height = Number(document.getElementById('container').clientHeight); // container 높이 var min_container_height = 647; var header_height = 147; var footer_height = 85; var space_height = 170; window.onload = changeContentSize; // Window 창 로드시 window.onresize = changeContentSize; // Window 창 크기를 조정할때마다 function changeContentSize() { var container_height = min_container_height; var window_height = Number(document.documentElement.clientHeight) - header_height - footer_height; // Window 창 높이 if (window_height > cur_container_height) { if (window_height > min_container_height) { container_height = window_height; } } else { if (cur_container_height > min_container_height) { container_height = cur_container_height; } } container_height = container_height - space_height; if (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) { // ie11 추가 document.getElementById(\"container\").style.height = container_height + \"px\"; }else if (window.navigator.userAgent.indexOf(\"MSIE\") == -1 || (document.all && window.XMLHttpRequest)) { // ie6 제외 document.getElementById(\"container\").style.height = container_height + \"px\"; } else { document.getElementById(\"container\").style.height =\"100%\"; } } function setContainerHeight(height) { if (height >= 0) { cur_container_height = height; } else { cur_container_height = Number(document.getElementById(\"container\").clientHeight); } if(height == -9 || height == 0 || height == \"undefined\"){ //공지사항 예외처리 //ie7대응 document.getElementById(\"container\").style.height =\"100%\"; }else{ changeContentSize(); } } // IE7,8,9 분기 처리 var ieVersion = \"\"; if (window.navigator.userAgent.indexOf(\"MSIE 7\") != -1){ ieVersion = \"ie7\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 8\") != -1){ ieVersion = \"ie8\"; }else if (window.navigator.userAgent.indexOf(\"MSIE 9\") != -1){ ieVersion = \"ie9\"; } //pop up 여부 체크 : popup이라 명기된 경우에만 popup으로 처리 //if(window.opener){ if('' == 'popup'){ //if(screen.height <= 768) { // document.getElementById(\"divFind\").style.display = \"none\"; //} height = document.getElementById('content').clientHeight + 100; resizePopup(750, height); document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"popup popup_scroll\"; }else{ document.getElementById(\"mainBody\").className = ieVersion + \" \" + \"\" + \" \" + \"\"; }",
+      "scheduleId": "sch_d33f9549-a3db-4e97-ac1a-df6569b9be0a",
+      "jobId": "job_1ba1d4b8-93a2-4cd4-a96c-6df46ba2ca35"
+    }
+  ],
+  "accounts": [
+    {
+      "accountId": "individual14144",
+      "blogId": "individual14144",
+      "blogName": "알리바바 신규6",
+      "expectedKeywords": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "keywordHits": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "allKeywordsHit": true,
+      "titlesByKeyword": {
+        "중국무역": "중국무역 고민이라면 꼭 읽어보세요",
+        "상해박람회": "상해박람회 관람 효과 5가지 완벽 정리",
+        "중국도매쇼핑몰": "중국도매쇼핑몰 1688닷컴 알리바바닷컴 차이점 분석"
+      },
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/individual14144-1782869615370.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/individual14144-1782869615370.png",
+      "error": null
+    },
+    {
+      "accountId": "mad1651",
+      "blogId": "mad1651",
+      "blogName": "알리바바 신규2",
+      "expectedKeywords": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "keywordHits": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "allKeywordsHit": true,
+      "titlesByKeyword": {
+        "중국무역": "중국 무역 본격 시작이라면 꼭 알아야 할 핵심 가이드",
+        "상해박람회": "중국 상해박람회 완벽 가이드",
+        "중국도매쇼핑몰": "중국도매쇼핑몰 활용법 5가지 핵심"
+      },
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/mad1651-1782869615370.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/mad1651-1782869615370.png",
+      "error": null
+    },
+    {
+      "accountId": "weed3122",
+      "blogId": "weed3122",
+      "blogName": "알리바바 신규4",
+      "expectedKeywords": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "keywordHits": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "allKeywordsHit": true,
+      "titlesByKeyword": {
+        "중국무역": "중국무역 대행 고민이라면 꼭 읽어보세요",
+        "상해박람회": "알리바바 닷컴 상해박람회 직구자들이 놓치는 핵심 팁",
+        "중국도매쇼핑몰": "중국도매쇼핑몰 지금 시작해야 하는 이유"
+      },
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/weed3122-1782869615370.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/weed3122-1782869615370.png",
+      "error": null
+    },
+    {
+      "accountId": "crvfwy7062",
+      "blogId": "crvfwy7062",
+      "blogName": "알리바바 신규1",
+      "expectedKeywords": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "keywordHits": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "allKeywordsHit": true,
+      "titlesByKeyword": {
+        "중국무역": "중국무역 A부터 Z까지 총정리",
+        "상해박람회": "상해박람회 관람 준비 체크리스트",
+        "중국도매쇼핑몰": "중국도매쇼핑몰 차이점부터 주의사항까지 총정리"
+      },
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/crvfwy7062-1782869615370.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/crvfwy7062-1782869615370.png",
+      "error": null
+    },
+    {
+      "accountId": "heavymouse448",
+      "blogId": "heavymouse448",
+      "blogName": "알리바바 신규3",
+      "expectedKeywords": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "keywordHits": [
+        "중국무역",
+        "상해박람회",
+        "중국도매쇼핑몰"
+      ],
+      "allKeywordsHit": true,
+      "titlesByKeyword": {
+        "중국무역": "중국무역 7가지 핵심 체크포인트 총정리",
+        "상해박람회": "상해박람회 참관 가이드 준비부터 관람 팁까지 총정리",
+        "중국도매쇼핑몰": "중국도매쇼핑몰 알리바바 닷컴을 선택해야 하는 3가지 이유"
+      },
+      "debugTextPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/heavymouse448-1782869615370.txt",
+      "screenshotPath": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/alibaba-schedule-verify-2026-07-01/heavymouse448-1782869615370.png",
+      "error": null
+    }
+  ],
+  "sheet": {
+    "updatedRows": 15,
+    "updatedRanges": [
+      "'시트1'!A310:L310",
+      "'시트1'!A311:L311",
+      "'시트1'!A312:L312",
+      "'시트1'!A313:L313",
+      "'시트1'!A314:L314",
+      "'시트1'!A315:L315",
+      "'시트1'!A316:L316",
+      "'시트1'!A317:L317",
+      "'시트1'!A318:L318",
+      "'시트1'!A319:L319",
+      "'시트1'!A320:L320",
+      "'시트1'!A321:L321",
+      "'시트1'!A322:L322",
+      "'시트1'!A323:L323",
+      "'시트1'!A324:L324"
+    ]
+  }
+}

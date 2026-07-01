@@ -1,0 +1,50 @@
+{
+  "item": {
+    "logNo": "224246516373",
+    "keyword": "스마일라식 할인",
+    "title": "스마일라식 할인 15주년 이벤트",
+    "content": "스마일라식 할인 15주년 이벤트\n\n안녕하십니까, 시력교정술 국내 도입 1세대\n압구정 에스앤비안과입니다.\n\nhttps://blog.naver.com/adplan3th/224094493829\n\n스마일라식을 알아볼 때 이벤트 문구만 보고\n결정하기보다 내 눈 조건에 맞는 검사와 상담이\n함께 진행되는지 확인하는 과정이 필요합니다.\n\n정밀검사로 각막과 시력 조건을 먼저 확인하는 압구정 에스앤비안과 기준으로 정리했습니다.\n\n1. 스마일라식 할인 전 먼저 볼 기준\n\n[IMG] 이벤트 확인 전 검사 기준\n할인이나 이벤트는 진료 선택의 참고 요소일 수 있지만\n수술 가능 여부를 대신 판단해 주지는 않습니다.\n\n각막 두께, 난시 방향, 눈물막 상태, 야간 동공 크기처럼\n개인별 조건을 먼저 확인해야 안전한 방향을 정할 수 있습니다.\n\n2. 정밀검사가 필요한 이유\n\n[IMG] 정밀검사로 확인하는 항목\n스마일라식은 각막을 다루는 시력교정술이기 때문에\n검사 결과에 따라 적합 여부가 달라질 수 있습니다.\n\n단순 시력 수치뿐 아니라 회복 과정에서 불편해질 수 있는\n건조감, 빛 번짐, 직업상 필요한 시야 조건도 함께 봐야 합니다.\n\n3. 비용보다 중요한 구성\n\n[IMG] 비용과 함께 비교할 항목\n같은 이벤트처럼 보여도 검사 항목, 장비, 의료진 상담,\n수술 후 검진 범위가 어디까지 포함되는지에 따라\n실제 구성은 달라질 수 있습니다.\n\n가격만 따로 비교하기보다 진료 흐름 전체를 확인하는 편이\n시력교정 계획을 세우는 데 더 도움이 됩니다.\n\n4. 상담 전 준비하면 좋은 내용\n\n[IMG] 상담 전 준비 리스트\n렌즈 착용 시간, 불편한 시간대, 운전 여부, 모니터 사용량,\n회복에 쓸 수 있는 날짜를 미리 정리하면 상담이 구체적입니다.\n\n압구정 에스앤비안과는 검사 결과를 바탕으로 가능한 방법과\n보류해야 할 조건을 구분해 안내합니다.\n\n5. 이벤트를 볼 때의 기준\n\n[IMG] 이벤트 확인 체크포인트\n스마일라식 이벤트를 확인할 때도 내 눈에 맞는 수술인지,\n사후 검진은 어떻게 이어지는지, 회복 일정은 무리 없는지까지\n함께 확인하는 것이 좋습니다.\n\nhttps://snbeye.com/sb-review/\n\n스마일라식 할인 정보를 보고 계신다면 먼저 정밀검사로\n내 눈에 맞는 기준부터 확인해 보시기 바랍니다.",
+    "slides": [
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_01.png",
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_02.png",
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_03.png",
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_04.png",
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_05.png",
+      "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/work/eye-brand-nonbrand-image-fix-20260701/slides/01_스마일라식_15주년/slide_06.png"
+    ]
+  },
+  "result": {
+    "success": true,
+    "postUrl": "https://blog.naver.com/adplan3th/224246516373",
+    "message": "Update success"
+  },
+  "verify": {
+    "logNo": "224246516373",
+    "url": "https://blog.naver.com/adplan3th/224246516373",
+    "httpStatus": 200,
+    "expectedTitle": "스마일라식 할인 15주년 이벤트",
+    "title": "스마일라식 할인 15주년 이벤트",
+    "titleOk": true,
+    "keywordOk": true,
+    "brandOk": true,
+    "topLinkOk": true,
+    "bottomLinkOk": true,
+    "linkOk": true,
+    "slideCount": 19,
+    "firstContentImage": "slide_01.png",
+    "imageNames": [
+      "slide_01.png",
+      "%EC%97%90%EC%8A%A4%EC%95%A4%EB%B9%84%EC%95%88%EA%B3%BC_251201_%EB%B8%94%EB%A1%9C%EA%B7%B8_%EC%8A%A4%ED%82%A8_PC_v9.png",
+      "slide_01.png",
+      "slide_01.png",
+      "slide_01.png",
+      "slide_02.png",
+      "slide_02.png",
+      "slide_02.png",
+      "slide_03.png",
+      "slide_03.png",
+      "slide_03.png",
+      "slide_04.png"
+    ]
+  }
+}
