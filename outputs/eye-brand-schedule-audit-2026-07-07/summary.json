@@ -1,0 +1,27 @@
+{
+  "accountId": "adplan3th",
+  "fromCache": false,
+  "reserveButtonText": "",
+  "reserveButtonClicked": false,
+  "popupTotalText": "",
+  "popupUrl": "",
+  "writeTextHasLogin": true,
+  "publicLatestTitles": [
+    "백내장수술가격 궁금할 때 확인할 점",
+    "노안백내장수술비용 검사 기준과 선택 방법",
+    "난시치료 상담 전 알아둘 내용",
+    "라섹가격 방법과 주의할 점",
+    "라식후렌즈 전 확인할 기준",
+    "백내장수술가격 궁금할 때 확인할 점",
+    "노안백내장수술비용 검사 기준과 선택 방법",
+    "난시치료 상담 전 알아둘 내용"
+  ],
+  "paths": {
+    "writeText": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/write-page.txt",
+    "writeScreenshot": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/write-page.png",
+    "reservationText": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/reservation-popup.txt",
+    "reservationScreenshot": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/reservation-popup.png",
+    "publicText": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/post-list.txt",
+    "publicScreenshot": "/Users/ganggyunggyu/Programing/21lab/blog-bot/scheduler-server/outputs/eye-brand-schedule-audit-2026-07-07/post-list.png"
+  }
+}
