@@ -2,7 +2,7 @@ export const SELECTORS = {
   login: {
     id: '#id',
     pw: '#pw',
-    btn: ".btn_login, #log\\.login, button[type='submit']",
+    btn: "#loginBtn_column, #loginBtn_row, .btn_login, #log\\.login, button[type='submit']",
     captcha: '#captcha',
   },
 
