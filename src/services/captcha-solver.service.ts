@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Page } from 'playwright';
 import { env } from '../config/env.js';
+import { SELECTORS } from '../constants/selectors.js';
 import { logger } from '../lib/logging/logger.js';
 
 const log = logger.child({ scope: 'Captcha' });
@@ -11,9 +12,12 @@ const CAPTCHA_INPUT_DELAY_MS = 200;
 const PW_INPUT_DELAY_MS = 150;
 const LOGIN_CLICK_WAIT_MS = 3000;
 
-const LOGIN_BTN_SELECTOR = ".btn_login, #log\\.login, button[type='submit']";
-
 let geminiClient: GoogleGenAI | null = null;
+
+const clickVisibleLoginButton = async (page: Page): Promise<void> => {
+  const button = page.locator(SELECTORS.login.btn).filter({ visible: true }).first();
+  await button.click();
+};
 
 const getGeminiClient = (): GoogleGenAI => {
   if (geminiClient) return geminiClient;
@@ -105,34 +109,43 @@ export const attemptCaptchaSolve = async (page: Page, password?: string): Promis
         continue;
       }
 
-      // 답 입력
+      // 캡차 답 입력
       await page.fill('#captcha', answer);
       await page.waitForTimeout(CAPTCHA_INPUT_DELAY_MS);
 
-      // 비밀번호 항상 재입력 (캡차 페이지에서 비워질 수 있음)
-      if (password) {
-        log.info('pw.refill', { attempt });
+      // 구형 통합 화면(캡차+비번이 같은 화면)이면 비번도 채움
+      if (password && (await page.$('#pw'))) {
+        log.info('pw.refill', { attempt, phase: 'captcha' });
         await page.fill('#pw', password);
         await page.waitForTimeout(PW_INPUT_DELAY_MS);
       }
 
-      log.info('submit', { answer, attempt });
-      await page.click(LOGIN_BTN_SELECTOR);
+      // 캡차 확인 버튼 클릭
+      log.info('captcha.submit', { answer, attempt });
+      await clickVisibleLoginButton(page);
       await page.waitForTimeout(LOGIN_CLICK_WAIT_MS);
 
-      // 성공 확인
+      // 신형 흐름: 캡차 통과 후 로그인 폼으로 복귀하며 비번이 비워짐
+      // → 비번을 다시 채우고 로그인 버튼을 재클릭해야 최종 로그인됨
+      if (password && page.url().includes('nidlogin')) {
+        const captchaGone = !(await detectCaptcha(page)).detected;
+        const hasPwField = Boolean(await page.$('#pw'));
+        if (captchaGone && hasPwField) {
+          log.info('relogin.after-captcha', { attempt });
+          await page.fill('#pw', password);
+          await page.waitForTimeout(PW_INPUT_DELAY_MS);
+          await clickVisibleLoginButton(page);
+          await page.waitForTimeout(LOGIN_CLICK_WAIT_MS);
+        }
+      }
+
+      // 로그인 페이지를 벗어났으면 성공
       if (!page.url().includes('nidlogin')) {
         log.info('solved', { attempt });
         return true;
       }
 
-      // 캡차가 여전히 있는지 확인
-      const stillHasCaptcha = await detectCaptcha(page);
-      if (!stillHasCaptcha.detected) {
-        log.info('solved', { attempt });
-        return true;
-      }
-
+      // 여전히 로그인 페이지 → 캡차 재출현/실패, 다음 attempt 에서 재감지
       log.warn('attempt.failed', { attempt });
     } catch (error) {
       log.error('attempt.error', {
