@@ -30,6 +30,8 @@ interface PlanAccount {
 interface PlanFile {
   scheduleDate?: string;
   scheduleMode?: '1' | '2' | '3' | '2121';
+  /** 맛집 기본값은 google(실사진). 이미지 서버가 죽었을 때만 ai 로 내려서 씀. */
+  imageSource?: 'ai' | 'google' | 'keyword' | 'product' | 'local';
   accounts: PlanAccount[];
 }
 
@@ -55,6 +57,7 @@ const main = async (): Promise<void> => {
 
   const plan = JSON.parse(await readFile(planPath, 'utf8')) as PlanFile;
   const scheduleMode = plan.scheduleMode ?? '2';
+  const imageSource = plan.imageSource ?? 'google';
 
   const accountPlans: RestaurantAccountPlan[] = plan.accounts.map((account, index) => ({
     accountId: account.accountId,
@@ -66,7 +69,7 @@ const main = async (): Promise<void> => {
   assertRestaurantPlan(accountPlans);
 
   const totalItems = accountPlans.reduce((sum, accountPlan) => sum + accountPlan.items.length, 0);
-  console.log(`[plan] 계정 ${accountPlans.length}개 / 글 ${totalItems}개 / 모드 ${scheduleMode} / 시작일 ${plan.scheduleDate ?? '오늘'}`);
+  console.log(`[plan] 계정 ${accountPlans.length}개 / 글 ${totalItems}개 / 모드 ${scheduleMode} / 이미지 ${imageSource} / 시작일 ${plan.scheduleDate ?? '오늘'}`);
 
   accountPlans.forEach((accountPlan) => {
     console.log(`\n[${accountPlan.accountId}] ${accountPlan.region} (맛집2 캐릭터: ${accountPlan.blogCharacter})`);
@@ -102,7 +105,7 @@ const main = async (): Promise<void> => {
       service: 'restaurant',
       generate_images: true,
       image_count: 5,
-      image_source: 'google',
+      image_source: imageSource,
       manuscript_type: 'restaurant1',
       delay_between_posts: 10,
       keyword_category: '맛집',
