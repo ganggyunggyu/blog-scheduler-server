@@ -23,7 +23,7 @@ export const createScheduleSchema = z.object({
   generateImages: z.boolean().default(true),
   imageCount: z.number().min(1).max(10).default(5),
   imageSource: z.enum(['ai', 'google', 'keyword', 'product', 'local']).default('ai'),
-  manuscriptType: z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default'),
+  manuscriptType: z.enum(['default', 'update-restaurant', 'restaurant', 'restaurant/v1', 'restaurant/v2', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default'),
   delayBetweenPostsSeconds: z.number().min(0).max(600).default(10),
   keywordCategory: z.string().optional(),
 });

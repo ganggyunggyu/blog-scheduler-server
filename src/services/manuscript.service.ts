@@ -45,7 +45,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product' | 'local';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'restaurant/v1' | 'restaurant/v2' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
 
 interface ManuscriptEndpoint {
   path: string;
@@ -57,6 +57,8 @@ const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   default: { path: '/generate/blog-filler' },
   'update-restaurant': { path: '/generate/update-restaurant' },
   restaurant: { path: '/generate/blog-filler-restaurant' },
+  'restaurant/v1': { path: '/generate/restaurant/v1' },
+  'restaurant/v2': { path: '/generate/restaurant/v2' },
   pet: { path: '/generate/blog-filler-pet' },
   grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
   keigo: { path: '/generate/keigo', engine: 'keigo' },
@@ -114,8 +116,23 @@ export const callManuscriptAPI = async (
 
   const raw = response.data;
   const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
+  let title: string;
+  let content: string;
+
+  if (type === 'restaurant/v2') {
+    // 맛집2 출력 형식: 1줄 "[제목] ...", 2줄 구분선(----...), 3줄 빈줄, 4줄부터 본문.
+    // 다른 엔진처럼 1줄=제목/나머지=본문으로 그냥 자르면 "[제목] " 접두사와
+    // 구분선이 그대로 남으므로 따로 벗겨낸다.
+    title = (lines[0] ?? '').trim().replace(/^\[제목\]\s*/, '') || keyword;
+    content = lines
+      .slice(1)
+      .join('\n')
+      .replace(/^-{3,}\s*\n+/, '')
+      .trim();
+  } else {
+    title = (lines[0] ?? '').trim() || keyword;
+    content = lines.slice(1).join('\n').trim();
+  }
 
   manuscriptLog.info(progress.done('done'), {
     id: raw._id ?? '',
