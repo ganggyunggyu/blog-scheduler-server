@@ -217,6 +217,48 @@ export const calculateSchedule = (
 export const formatKst = (date: Date): string =>
   format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
+export interface ScheduleQueueJob {
+  _id: unknown;
+  keyword: string;
+  category?: string;
+  businessName?: string;
+  manuscriptType?: string;
+  scheduledAt: string;
+  slot: number;
+  status: string;
+}
+
+export interface ScheduleJobDocument {
+  _id: unknown;
+  keyword: string;
+  category?: string | null;
+  businessName?: string | null;
+  manuscriptType?: string | null;
+  scheduledAt: string;
+  slot: number;
+}
+
+/**
+ * ScheduleJob 문서를 큐 페이로드로 옮김.
+ *
+ * 예전에는 호출부마다 필드를 직접 나열했는데, 필드를 새로 추가해도 전부 optional 이라
+ * 빠뜨린 호출부가 타입 에러 없이 그냥 값을 잃었음(업체명/원고 타입이 통째로 누락돼서
+ * 맛집2가 안 나오고 업체 고정도 안 걸린 사고가 실제로 남). 매핑을 여기 한 곳으로 모음.
+ */
+export const toScheduleQueueJob = (
+  jobDocument: ScheduleJobDocument,
+  status: string,
+): ScheduleQueueJob => ({
+  _id: jobDocument._id,
+  keyword: jobDocument.keyword,
+  category: jobDocument.category ?? undefined,
+  businessName: jobDocument.businessName ?? undefined,
+  manuscriptType: jobDocument.manuscriptType ?? undefined,
+  scheduledAt: jobDocument.scheduledAt,
+  slot: jobDocument.slot,
+  status,
+});
+
 export const createSchedule = async (input: CreateScheduleInput) => {
   const timingOptions = buildScheduleTimingOptions({
     manuscriptType: input.manuscriptType,

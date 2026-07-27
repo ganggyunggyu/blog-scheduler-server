@@ -14,7 +14,9 @@ import {
   formatKst,
   parseKeywordWithCategory,
   resolveScheduleMode,
+  toScheduleQueueJob,
   type ScheduleItem,
+  type ScheduleQueueJob,
 } from '../services/schedule.service.js';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
@@ -131,17 +133,6 @@ const resolveQueueAccount = async (
     blogName: matchedAccount?.name,
   };
 };
-
-interface ScheduleQueueJob {
-  _id: unknown;
-  keyword: string;
-  category?: string;
-  businessName?: string;
-  manuscriptType?: string;
-  scheduledAt: string;
-  slot: number;
-  status: string;
-}
 
 interface EnqueueScheduleGenerateJobInput {
   accountGenerateQueue: Queue;
@@ -309,14 +300,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         await enqueueScheduleGenerateJob({
           accountGenerateQueue,
           scheduleId: String(schedule._id),
-          jobItem: {
-            _id: jobItem._id,
-            keyword: jobItem.keyword,
-            category: jobItem.category ?? undefined,
-            scheduledAt: jobItem.scheduledAt,
-            slot: jobItem.slot,
-            status: jobItem.status,
-          },
+          jobItem: toScheduleQueueJob(jobItem, jobItem.status),
           account: queue.account,
           service: body.service,
           ref: body.ref,
@@ -446,14 +430,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       await enqueueScheduleGenerateJob({
         accountGenerateQueue,
         scheduleId: String(schedule._id),
-        jobItem: {
-          _id: jobItem._id,
-          keyword: jobItem.keyword,
-          category: jobItem.category ?? undefined,
-          scheduledAt: jobItem.scheduledAt,
-          slot: jobItem.slot,
-          status: executableStatus,
-        },
+        jobItem: toScheduleQueueJob(jobItem, executableStatus),
         account,
         service: schedule.service,
         ref: schedule.ref,
@@ -566,14 +543,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         await enqueueScheduleGenerateJob({
           accountGenerateQueue,
           scheduleId: String(schedule._id),
-          jobItem: {
-            _id: jobItem._id,
-            keyword: jobItem.keyword,
-            category: jobItem.category ?? undefined,
-            scheduledAt: jobItem.scheduledAt,
-            slot: jobItem.slot,
-            status: jobItem.status,
-          },
+          jobItem: toScheduleQueueJob(jobItem, jobItem.status),
           account,
           service: body.service,
           ref: body.ref,

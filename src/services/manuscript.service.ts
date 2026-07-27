@@ -134,6 +134,37 @@ export const parseManuscriptContent = (
   return { title, content: body.join('\n').trim() };
 };
 
+/**
+ * 원고 대신 "정보가 없어서 못 쓰겠다"는 거절문이 돌아오는 경우가 있음.
+ * 맛집1/맛집2 는 업체 참고자료가 비면 사실을 지어내지 않는 대신 이런 응답을 내는데,
+ * 그대로 두면 거절문이 블로그에 그대로 발행됨(실제로 발행된 적 있음).
+ * 길이와 문구를 같이 봐서 거절문이면 생성 단계에서 실패시킴.
+ */
+const REFUSAL_PATTERNS = [
+  /검색을?\s*직접\s*(실행|수행)할\s*수\s*(없|있는\s*환경이\s*아)/,
+  /사실처럼\s*작성하면\s*안\s*됩니다/,
+  /제공\s*(자료|정보)에\s*없어/,
+  /(주시면|알려주시면)[^.\n]{0,60}(작성|완성)할\s*수\s*있습니다/,
+  /검증을\s*완료할\s*수\s*없습니다/,
+];
+
+const MIN_MANUSCRIPT_LENGTH = 700;
+
+export const findManuscriptRejection = (content: string): string | undefined => {
+  const compact = content.replace(/\s/g, '');
+
+  const matched = REFUSAL_PATTERNS.find((pattern) => pattern.test(content));
+  if (matched) {
+    return `생성기가 원고 대신 거절문을 반환함 (${compact.length}자)`;
+  }
+
+  if (compact.length < MIN_MANUSCRIPT_LENGTH) {
+    return `원고가 너무 짧음 (${compact.length}자 < ${MIN_MANUSCRIPT_LENGTH}자)`;
+  }
+
+  return undefined;
+};
+
 export const callManuscriptAPI = async (
   type: ManuscriptType,
   keyword: string,
@@ -157,6 +188,12 @@ export const callManuscriptAPI = async (
 
   const raw = response.data;
   const { title, content } = parseManuscriptContent(raw.content ?? '', keyword);
+
+  const rejection = findManuscriptRejection(content);
+  if (rejection) {
+    manuscriptLog.error('manuscript.rejected', { keyword, type, reason: rejection });
+    throw new Error(`원고 생성 실패: ${rejection} (keyword=${keyword})`);
+  }
 
   manuscriptLog.info(progress.done('done'), {
     id: raw._id ?? '',
