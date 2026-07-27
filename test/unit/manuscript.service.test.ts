@@ -2,7 +2,89 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import axios from 'axios';
-import { buildManuscriptRequest, generateImageUrls, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+import { buildManuscriptRequest, generateImageUrls, parseManuscriptContent, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+
+test('buildManuscriptRequest: restaurant1 은 맛집1 엔드포인트로 업체명을 고정해서 보냄', () => {
+  const result = buildManuscriptRequest('restaurant1', '부천중동맛집', 'restaurant', '', undefined, {
+    businessName: '베코',
+    blogName: '블루망고',
+  });
+
+  assert.equal(result.url, 'http://localhost:8000/generate/restaurant/v1');
+  assert.deepEqual(result.body, {
+    service: 'restaurant',
+    keyword: '부천중동맛집',
+    ref: '',
+    business_name: '베코',
+    blog_name: '블루망고',
+  });
+});
+
+test('buildManuscriptRequest: restaurant2 는 맛집2 엔드포인트를 씀', () => {
+  const result = buildManuscriptRequest('restaurant2', '송도맛집', 'restaurant', '', undefined, {
+    businessName: '이터스 현대프리미엄아울렛송도점',
+    blogName: '제이제이',
+  });
+
+  assert.equal(result.url, 'http://localhost:8000/generate/restaurant/v2');
+  assert.equal(result.body.business_name, '이터스 현대프리미엄아울렛송도점');
+  assert.equal(result.body.blog_name, '제이제이');
+});
+
+test('buildManuscriptRequest: 업체명을 안 주면 빈 문자열로 보내 생성기 자유 선택에 맡김', () => {
+  const result = buildManuscriptRequest('restaurant1', '청라맛집', 'restaurant');
+
+  assert.equal(result.body.business_name, '');
+  assert.equal(result.body.blog_name, '');
+});
+
+test('buildManuscriptRequest: 기존 restaurant 는 글밥 엔드포인트 그대로이고 업체명을 안 보냄', () => {
+  const result = buildManuscriptRequest('restaurant', '수원맛집', 'restaurant', '', undefined, {
+    businessName: '무시돼야 함',
+  });
+
+  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler-restaurant');
+  assert.deepEqual(result.body, {
+    service: 'restaurant',
+    keyword: '수원맛집',
+    ref: '',
+  });
+});
+
+test('parseManuscriptContent: 맛집2 의 [제목] 접두어와 구분선을 걷어냄', () => {
+  const raw = [
+    '[제목] 일산 웨스턴돔 맛집 동경규카츠, 개인 화로에서 익혀 먹는 규카츠 정식',
+    '------------------------------------------------------------',
+    '',
+    '평일 저녁, 친구와 웨스턴돔에서',
+    '따뜻한 고기 한 접시를 찾았습니다.',
+  ].join('\n');
+
+  const { title, content } = parseManuscriptContent(raw, '일산웨스턴돔맛집');
+
+  assert.equal(title, '일산 웨스턴돔 맛집 동경규카츠, 개인 화로에서 익혀 먹는 규카츠 정식');
+  assert.ok(content.startsWith('평일 저녁, 친구와 웨스턴돔에서'));
+  assert.ok(!content.includes('---'));
+});
+
+test('parseManuscriptContent: 맛집1 처럼 접두어 없는 원고는 그대로 둠', () => {
+  const raw = [
+    '보글보글 즉석떡볶이 나눠 먹기 좋은 부천 중동 맛집 추천',
+    '',
+    '떡볶이가 생각날 때마다 조용히 들르던',
+  ].join('\n');
+
+  const { title, content } = parseManuscriptContent(raw, '부천중동맛집');
+
+  assert.equal(title, '보글보글 즉석떡볶이 나눠 먹기 좋은 부천 중동 맛집 추천');
+  assert.equal(content, '떡볶이가 생각날 때마다 조용히 들르던');
+});
+
+test('parseManuscriptContent: 제목 줄이 비면 키워드를 제목으로 씀', () => {
+  const { title } = parseManuscriptContent('\n본문만 있음', '청라맛집');
+
+  assert.equal(title, '청라맛집');
+});
 
 test('buildManuscriptRequest: default 는 blog-filler 엔드포인트를 사용함', () => {
   const result = buildManuscriptRequest('default', '강아지 산책', 'default', '');

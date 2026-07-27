@@ -45,18 +45,22 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product' | 'local';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'restaurant1' | 'restaurant2' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
 
 interface ManuscriptEndpoint {
   path: string;
   engine?: string;
   sendCategory?: boolean;
+  /** 맛집1/맛집2 전용. 업체를 고정해서 같은 식당이 반복되는 걸 막을 때 씀. */
+  sendBusinessName?: boolean;
 }
 
 const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   default: { path: '/generate/blog-filler' },
   'update-restaurant': { path: '/generate/update-restaurant' },
   restaurant: { path: '/generate/blog-filler-restaurant' },
+  restaurant1: { path: '/generate/restaurant/v1', sendBusinessName: true },
+  restaurant2: { path: '/generate/restaurant/v2', sendBusinessName: true },
   pet: { path: '/generate/blog-filler-pet' },
   grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
   keigo: { path: '/generate/keigo', engine: 'keigo' },
@@ -72,18 +76,31 @@ export interface ManuscriptRequestConfig {
   engine?: string;
 }
 
+export interface ManuscriptExtraOptions {
+  /** 고정할 업체 상호명. 비우면 생성기가 키워드만 보고 알아서 고름. */
+  businessName?: string;
+  /** 맛집2 캐릭터명. 다른 원고 타입에서는 무시됨. */
+  blogName?: string;
+}
+
 export const buildManuscriptRequest = (
   type: ManuscriptType,
   keyword: string,
   service: string,
   ref: string = '',
   category?: string,
+  extras: ManuscriptExtraOptions = {},
 ): ManuscriptRequestConfig => {
   const endpoint = MANUSCRIPT_ENDPOINTS[type];
   const body: Record<string, string> = { service, keyword, ref };
 
   if (endpoint.sendCategory && category) {
     body.category = category;
+  }
+
+  if (endpoint.sendBusinessName) {
+    body.business_name = extras.businessName ?? '';
+    body.blog_name = extras.blogName ?? '';
   }
 
   return {
@@ -93,29 +110,53 @@ export const buildManuscriptRequest = (
   };
 };
 
+/** `[제목] ...` 같은 라벨 접두어. 맛집2 출력이 이 형태로 나옴. */
+const TITLE_LABEL_PREFIX = /^\[?\s*제목\s*\]?\s*[:：]?\s*/;
+/** 제목 바로 아래 구분선. 맛집2 포맷이 `------...` 한 줄을 끼워 넣음. */
+const DIVIDER_LINE = /^[-—–_=*]{5,}$/;
+
+export const parseManuscriptContent = (
+  raw: string,
+  fallbackTitle: string,
+): { title: string; content: string } => {
+  const lines = (raw ?? '').split('\n');
+  const title = (lines[0] ?? '').replace(TITLE_LABEL_PREFIX, '').trim() || fallbackTitle;
+
+  const body = lines.slice(1);
+  while (body.length > 0) {
+    const head = body[0].trim();
+    if (head.length > 0 && !DIVIDER_LINE.test(head)) {
+      break;
+    }
+    body.shift();
+  }
+
+  return { title, content: body.join('\n').trim() };
+};
+
 export const callManuscriptAPI = async (
   type: ManuscriptType,
   keyword: string,
   service: string,
   ref: string = '',
   category?: string,
+  extras: ManuscriptExtraOptions = {},
 ): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const { url, body, engine } = buildManuscriptRequest(type, keyword, service, ref, category);
+  const { url, body, engine } = buildManuscriptRequest(type, keyword, service, ref, category, extras);
   const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
   manuscriptLog.info(progress.start('request'), {
     url,
     keyword,
     service,
     ref,
+    ...(extras.businessName && { businessName: extras.businessName }),
     ...(engine && { engine }),
   });
 
   const response = await axios.post<Manuscript>(url, body, { timeout: 300000 });
 
   const raw = response.data;
-  const lines = (raw.content ?? '').split('\n');
-  const title = (lines[0] ?? '').trim() || keyword;
-  const content = lines.slice(1).join('\n').trim();
+  const { title, content } = parseManuscriptContent(raw.content ?? '', keyword);
 
   manuscriptLog.info(progress.done('done'), {
     id: raw._id ?? '',
@@ -438,11 +479,12 @@ export const prepareJob = async (
   imageSource: ImageSource = 'ai',
   manuscriptType: ManuscriptType = 'default',
   category?: string,
+  extras: ManuscriptExtraOptions = {},
 ): Promise<PreparedJob> => {
   const { dir, imagesDir } = await createJobDir(keyword);
   manuscriptLog.info('job.dir.created', { dir, manuscriptType });
 
-  const manuscript = await callManuscriptAPI(manuscriptType, keyword, service, ref, category);
+  const manuscript = await callManuscriptAPI(manuscriptType, keyword, service, ref, category, extras);
   await writePreparedJobFiles(
     dir,
     manuscript,
