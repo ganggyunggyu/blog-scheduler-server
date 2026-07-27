@@ -5,7 +5,7 @@ import type { ManuscriptType } from '../src/services/manuscript.service.js';
 const main = async (): Promise<void> => {
   const [manuscriptType, keyword, businessName, blogName = ''] = process.argv.slice(2);
   if (!manuscriptType || !keyword || !businessName) {
-    throw new Error('사용법: tsx scripts/_restaurant-generate-check.ts <restaurant1|restaurant2> <키워드> <업체명> [캐릭터명]');
+    throw new Error('사용법: tsx scripts/_restaurant-generate-check.ts <restaurant/v1|restaurant/v2> <키워드> <업체명> [캐릭터명]');
   }
 
   const prepared = await prepareJob(

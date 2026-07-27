@@ -12,7 +12,7 @@
  * 비운 항목은 아예 플랜 검증에서 막음.
  */
 
-export const RESTAURANT_MANUSCRIPT_TYPES = ['restaurant1', 'restaurant2'] as const;
+export const RESTAURANT_MANUSCRIPT_TYPES = ['restaurant/v1', 'restaurant/v2'] as const;
 
 export type RestaurantManuscriptType = (typeof RESTAURANT_MANUSCRIPT_TYPES)[number];
 
@@ -56,7 +56,7 @@ export const buildRestaurantPlanItems = (
   targets.map((target, index) => ({
     keyword: target.keyword.trim(),
     businessName: target.businessName.trim(),
-    manuscriptType: (startOffset + index) % 2 === 0 ? 'restaurant1' : 'restaurant2',
+    manuscriptType: (startOffset + index) % 2 === 0 ? 'restaurant/v1' : 'restaurant/v2',
   }));
 
 export const findDuplicateBusinessNames = (plans: RestaurantAccountPlan[]): string[] => {

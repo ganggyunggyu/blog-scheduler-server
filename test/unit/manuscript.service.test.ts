@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 import axios from 'axios';
 import { buildManuscriptRequest, generateImageUrls, parseManuscriptContent, prepareProvidedJob } from '../../src/services/manuscript.service.js';
 
-test('buildManuscriptRequest: restaurant1 은 맛집1 엔드포인트로 업체명을 고정해서 보냄', () => {
-  const result = buildManuscriptRequest('restaurant1', '부천중동맛집', 'restaurant', '', undefined, {
+test('buildManuscriptRequest: restaurant/v1 은 맛집1 엔드포인트로 업체명을 고정해서 보냄', () => {
+  const result = buildManuscriptRequest('restaurant/v1', '부천중동맛집', 'restaurant', '', undefined, {
     businessName: '베코',
     blogName: '블루망고',
   });
@@ -20,8 +20,8 @@ test('buildManuscriptRequest: restaurant1 은 맛집1 엔드포인트로 업체�
   });
 });
 
-test('buildManuscriptRequest: restaurant2 는 맛집2 엔드포인트를 씀', () => {
-  const result = buildManuscriptRequest('restaurant2', '송도맛집', 'restaurant', '', undefined, {
+test('buildManuscriptRequest: restaurant/v2 는 맛집2 엔드포인트를 씀', () => {
+  const result = buildManuscriptRequest('restaurant/v2', '송도맛집', 'restaurant', '', undefined, {
     businessName: '이터스 현대프리미엄아울렛송도점',
     blogName: '제이제이',
   });
@@ -32,7 +32,7 @@ test('buildManuscriptRequest: restaurant2 는 맛집2 엔드포인트를 씀', (
 });
 
 test('buildManuscriptRequest: 업체명을 안 주면 빈 문자열로 보내 생성기 자유 선택에 맡김', () => {
-  const result = buildManuscriptRequest('restaurant1', '청라맛집', 'restaurant');
+  const result = buildManuscriptRequest('restaurant/v1', '청라맛집', 'restaurant');
 
   assert.equal(result.body.business_name, '');
   assert.equal(result.body.blog_name, '');

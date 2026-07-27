@@ -45,7 +45,7 @@ const createJobDir = async (keyword: string): Promise<JobDir> => {
 };
 
 export type ImageSource = 'ai' | 'google' | 'keyword' | 'product' | 'local';
-export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'restaurant1' | 'restaurant2' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
+export type ManuscriptType = 'default' | 'update-restaurant' | 'restaurant' | 'restaurant/v1' | 'restaurant/v2' | 'pet' | 'grok' | 'keigo' | 'hanryeodamwon' | 'nyangnyang' | 'kimdongpal' | 'alibaba';
 
 interface ManuscriptEndpoint {
   path: string;
@@ -59,8 +59,8 @@ const MANUSCRIPT_ENDPOINTS: Record<ManuscriptType, ManuscriptEndpoint> = {
   default: { path: '/generate/blog-filler' },
   'update-restaurant': { path: '/generate/update-restaurant' },
   restaurant: { path: '/generate/blog-filler-restaurant' },
-  restaurant1: { path: '/generate/restaurant/v1', sendBusinessName: true },
-  restaurant2: { path: '/generate/restaurant/v2', sendBusinessName: true },
+  'restaurant/v1': { path: '/generate/restaurant/v1', sendBusinessName: true },
+  'restaurant/v2': { path: '/generate/restaurant/v2', sendBusinessName: true },
   pet: { path: '/generate/blog-filler-pet' },
   grok: { path: '/generate/grok', engine: 'grok', sendCategory: true },
   keigo: { path: '/generate/keigo', engine: 'keigo' },

@@ -34,7 +34,7 @@ test('buildRestaurantPlanItems: 맛집1 / 맛집2 를 번갈아 배정함', () =
 
   assert.deepEqual(
     items.map((item) => item.manuscriptType),
-    ['restaurant1', 'restaurant2', 'restaurant1', 'restaurant2'],
+    ['restaurant/v1', 'restaurant/v2', 'restaurant/v1', 'restaurant/v2'],
   );
 });
 
@@ -49,7 +49,7 @@ test('buildRestaurantPlanItems: startOffset 이 홀수면 맛집2 부터 시작�
 
   assert.deepEqual(
     items.map((item) => item.manuscriptType),
-    ['restaurant2', 'restaurant1'],
+    ['restaurant/v2', 'restaurant/v1'],
   );
 });
 

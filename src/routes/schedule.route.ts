@@ -29,7 +29,7 @@ import {
 import type { MultiImageData } from '../lib/naver-editor/image.js';
 
 const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product', 'local']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'restaurant1', 'restaurant2', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'restaurant/v1', 'restaurant/v2', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
 const scheduleItemSchema = z.object({

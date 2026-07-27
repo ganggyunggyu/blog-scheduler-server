@@ -74,7 +74,7 @@ const main = async (): Promise<void> => {
   accountPlans.forEach((accountPlan) => {
     console.log(`\n[${accountPlan.accountId}] ${accountPlan.region} (맛집2 캐릭터: ${accountPlan.blogCharacter})`);
     accountPlan.items.forEach((item, index) => {
-      const label = item.manuscriptType === 'restaurant1' ? '맛집1' : '맛집2';
+      const label = item.manuscriptType === 'restaurant/v1' ? '맛집1' : '맛집2';
       console.log(`  ${String(index + 1).padStart(2)}. ${label} | ${item.keyword} | ${item.businessName}`);
     });
   });
@@ -106,7 +106,7 @@ const main = async (): Promise<void> => {
       generate_images: true,
       image_count: 5,
       image_source: imageSource,
-      manuscript_type: 'restaurant1',
+      manuscript_type: 'restaurant/v1',
       delay_between_posts: 10,
       keyword_category: '맛집',
     };

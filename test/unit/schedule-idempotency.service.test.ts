@@ -53,7 +53,7 @@ test('buildScheduleRequestFingerprint: 키워드가 같아도 업체명이 다�
     delayBetweenPostsSeconds: 10,
     keywords: ['동탄맛집'],
     imageSource: 'google',
-    manuscriptType: 'restaurant1',
+    manuscriptType: 'restaurant/v1',
     keywordCategory: '맛집',
   };
 

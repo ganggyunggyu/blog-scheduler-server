@@ -6,14 +6,14 @@
 
 | 항목 | 값 |
 |------|-----|
-| manuscript_type | `restaurant1` / `restaurant2` (항목별로 번갈아) |
+| manuscript_type | `restaurant/v1` / `restaurant/v2` (항목별로 번갈아) |
 | image_source | `google` |
 | service | `restaurant` |
 | keyword_category | `맛집` |
 
 ## 대윤기획 운영 규칙 (필수)
 
-1. **맛집1 / 맛집2 번갈아 작성** — `restaurant1`(`/generate/restaurant/v1`), `restaurant2`(`/generate/restaurant/v2`) 를 한 계정 안에서 교대로 씁니다.
+1. **맛집1 / 맛집2 번갈아 작성** — `restaurant/v1`(`/generate/restaurant/v1`), `restaurant/v2`(`/generate/restaurant/v2`) 를 한 계정 안에서 교대로 씁니다.
 2. **블로그 하나 = 같은 권역** — 계정마다 권역을 고정합니다. 현재 배분은 아래 5권역입니다.
    - 인천/부천
    - 서울 전체
@@ -104,8 +104,8 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
       "account": { "id": "{계정ID}", "password": "{비밀번호}" },
       "keywords": ["부천상동맛집", "인천부평맛집"],
       "item_options": [
-        { "businessName": "긴꼬리초밥", "manuscriptType": "restaurant1" },
-        { "businessName": "복화루", "manuscriptType": "restaurant2" }
+        { "businessName": "긴꼬리초밥", "manuscriptType": "restaurant/v1" },
+        { "businessName": "복화루", "manuscriptType": "restaurant/v2" }
       ],
       "blog_name": "블루망고"
     }
@@ -116,7 +116,7 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
   "generate_images": true,
   "image_count": 5,
   "image_source": "google",
-  "manuscript_type": "restaurant1",
+  "manuscript_type": "restaurant/v1",
   "delay_between_posts": 10,
   "keyword_category": "맛집"
 }'
