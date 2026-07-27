@@ -6,9 +6,35 @@ import { logger } from '../logging/logger.js';
 const log = logger.child({ scope: 'Publish' });
 const ACTION_TIMEOUT_MS = env.PLAYWRIGHT_ACTION_TIMEOUT_MS;
 
+/**
+ * 에디터 우측 도움말/사이드 패널이 열려 있으면 발행 버튼을 덮어버림.
+ * force 클릭은 성공한 것처럼 보이지만 실제로는 발행 레이어가 안 열리므로
+ * 발행 진입 전에 반드시 먼저 닫음.
+ */
+const SIDE_PANEL_CLOSE_SELECTORS = [
+  '.se-help-panel-close-button',
+  '.se-sidebar-close-button',
+  '.se-flayer-unified-fold-button',
+];
+
+export const closeSidePanels = async (frame: Frame): Promise<void> => {
+  for (const selector of SIDE_PANEL_CLOSE_SELECTORS) {
+    const closed = await frame
+      .locator(selector)
+      .filter({ visible: true })
+      .first()
+      .click({ timeout: 1500 })
+      .then(() => true)
+      .catch(() => false);
+    if (closed) log.info('sidePanel.closed', { selector });
+  }
+};
+
 export const openPublishDialog = async (page: Page, frame: Frame): Promise<void> => {
+  await closeSidePanels(frame);
+  await page.waitForTimeout(600);
+
   await frame.click(SELECTORS.publish.btn, {
-    force: true,
     timeout: ACTION_TIMEOUT_MS,
   });
   await page.waitForTimeout(3000);
