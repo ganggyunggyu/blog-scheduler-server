@@ -1,6 +1,6 @@
 import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScheduleTimingOptions, calculateSchedule, parseKeywordWithCategory, resolveScheduleMode, type ScheduleMode } from '../../src/services/schedule.service';
+import { buildScheduleTimingOptions, calculateSchedule, parseKeywordWithCategory, resolveScheduleMode, toScheduleQueueJob, type ScheduleMode } from '../../src/services/schedule.service';
 
 process.env.TZ = 'Asia/Seoul';
 
@@ -184,4 +184,36 @@ test('parseKeywordWithCategory: 카테고리 파싱', () => {
     keyword: '스마일라식회복',
     category: '안과',
   });
+});
+
+test('toScheduleQueueJob: 업체명과 항목별 원고 타입을 큐 페이로드로 그대로 옮김', () => {
+  const queueJob = toScheduleQueueJob(
+    {
+      _id: 'job_1',
+      keyword: '수원인계동맛집',
+      category: null,
+      businessName: '쏘삼208 인계나혜석거리점',
+      manuscriptType: 'restaurant/v2',
+      scheduledAt: '2026-07-27T19:28:02+09:00',
+      slot: 1,
+    },
+    'pending',
+  );
+
+  assert.equal(queueJob.businessName, '쏘삼208 인계나혜석거리점');
+  assert.equal(queueJob.manuscriptType, 'restaurant/v2');
+  assert.equal(queueJob.category, undefined);
+  assert.equal(queueJob.status, 'pending');
+  assert.equal(queueJob.scheduledAt, '2026-07-27T19:28:02+09:00');
+});
+
+test('toScheduleQueueJob: 업체명이 없으면 undefined 로 두고 status 는 인자를 따름', () => {
+  const queueJob = toScheduleQueueJob(
+    { _id: 'job_2', keyword: '터키시앙고라', scheduledAt: '2026-04-09T10:00:00+09:00', slot: 2 },
+    'generating',
+  );
+
+  assert.equal(queueJob.businessName, undefined);
+  assert.equal(queueJob.manuscriptType, undefined);
+  assert.equal(queueJob.status, 'generating');
 });

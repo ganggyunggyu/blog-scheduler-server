@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import axios from 'axios';
-import { buildManuscriptRequest, generateImageUrls, parseManuscriptContent, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+import { buildManuscriptRequest, findManuscriptRejection, generateImageUrls, parseManuscriptContent, prepareProvidedJob } from '../../src/services/manuscript.service.js';
 
 test('buildManuscriptRequest: restaurant/v1 은 맛집1 엔드포인트로 업체명을 고정해서 보냄', () => {
   const result = buildManuscriptRequest('restaurant/v1', '부천중동맛집', 'restaurant', '', undefined, {
@@ -186,4 +186,25 @@ test('generateImageUrls: AI 생성 요청에 count 를 싣고 부족분을 보�
   } finally {
     axios.post = originalPost;
   }
+});
+
+test('findManuscriptRejection: 실제로 발행돼버린 거절문을 잡아냄', () => {
+  const refusal = [
+    '네이버 검색을 직접 실행할 수 있는 환경이 아니라서, 지침상 필수인 지식인,블로그,쇼핑 검색 검증을 완료할 수 없습니다.',
+    '특히 메뉴별 가격, 실제 웨이팅 시간은 제공 자료에 없어 사실처럼 작성하면 안 됩니다.',
+    '',
+    '네이버 플레이스 링크 또는 메뉴판 사진을 주시면 완성 원고로 작성할 수 있습니다.',
+  ].join('\n');
+
+  assert.match(findManuscriptRejection(refusal) ?? '', /거절문/);
+});
+
+test('findManuscriptRejection: 정상 길이의 맛집 원고는 통과시킴', () => {
+  const article = `${'부천 상동에서 초밥이 당길 때 자주 가는 집을 소개합니다. '.repeat(40)}`;
+
+  assert.equal(findManuscriptRejection(article), undefined);
+});
+
+test('findManuscriptRejection: 거절 문구가 없어도 너무 짧으면 막음', () => {
+  assert.match(findManuscriptRejection('짧은 본문입니다.') ?? '', /너무 짧음/);
 });
