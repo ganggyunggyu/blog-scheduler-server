@@ -76,7 +76,11 @@ const CITATION_PATTERNS = [
   /가이드라인/,
 ];
 
-const QUESTION_TAIL = /(까요|나요|인가요|은가요|을까|일까|무엇|어떻게|왜|얼마)/;
+/**
+ * 소제목이 물음표 없이 "…어디까지인가", "…몇 분이 적당한가" 처럼 끝나는 경우가 많아서
+ * 어미뿐 아니라 의문사(어디/몇/언제/누가)까지 같이 봄.
+ */
+const QUESTION_TAIL = /(까요|나요|인가|은가|는가|을까|일까|무엇|어떻게|왜|얼마|어디|몇|언제|누가)/;
 
 const stripTags = (html: string): string =>
   html
@@ -251,21 +255,32 @@ export const analyzeGeoArticle = ({ title, html, keyword }: GeoArticleInput): Ge
   return { score, grade: resolveGrade(score), signals, suggestions };
 };
 
+/** `1) 첫 방문은 몇 분이 적당한가요?` 처럼 FAQ 문단 안에 번호로 들어간 질문 줄 */
+const NUMBERED_QUESTION = /^\d+[).]\s*\S.*[?？]$/;
+
 export const extractFaqPairs = (html: string): FaqPair[] => {
   const blocks = parseArticleBlocks(html);
   const pairs: FaqPair[] = [];
 
   blocks.forEach((block, index) => {
-    if (block.type !== 'heading' || !isQuestion(block.text)) return;
+    const isHeadingQuestion = block.type === 'heading' && isQuestion(block.text);
+    const isInlineQuestion = block.type === 'paragraph' && NUMBERED_QUESTION.test(block.text);
+    if (!isHeadingQuestion && !isInlineQuestion) return;
 
     const answerParts: string[] = [];
     for (let cursor = index + 1; cursor < blocks.length; cursor += 1) {
-      if (blocks[cursor].type === 'heading') break;
-      answerParts.push(blocks[cursor].text);
+      const next = blocks[cursor];
+      if (next.type === 'heading') break;
+      if (next.type === 'paragraph' && NUMBERED_QUESTION.test(next.text)) break;
+      answerParts.push(next.text);
+      if (isInlineQuestion) break;
     }
 
     const answer = answerParts.join(' ').trim();
-    if (answer.length > 0) pairs.push({ question: block.text, answer });
+    if (answer.length === 0) return;
+
+    const question = isInlineQuestion ? block.text.replace(/^\d+[).]\s*/, '') : block.text;
+    pairs.push({ question, answer });
   });
 
   return pairs;

@@ -73,6 +73,26 @@ test('extractFaqPairs: 질문형 소제목이 없으면 빈 배열을 돌려줌'
   assert.deepEqual(extractFaqPairs(poorHtml), []);
 });
 
+test('extractFaqPairs: FAQ 문단 안의 "1) 질문?" 형식도 Q/A 로 뽑음', () => {
+  const faqHtml = [
+    '<blockquote style="font-weight:800;"><div>7. 자주 묻는 질문</div></blockquote>',
+    '<div>1) 첫 방문은 몇 분이 적당한가요?</div>',
+    '<br>',
+    '<div>처음이라면 60분이 무난합니다.</div>',
+    '<br>',
+    '<div>2) 멍이 들면 효과가 좋은 것인가요?</div>',
+    '<br>',
+    '<div>아닙니다. 압박이 과했다는 신호일 수 있습니다.</div>',
+  ].join('');
+
+  const pairs = extractFaqPairs(faqHtml);
+
+  assert.equal(pairs.length, 2);
+  assert.equal(pairs[0].question, '첫 방문은 몇 분이 적당한가요?');
+  assert.equal(pairs[0].answer, '처음이라면 60분이 무난합니다.');
+  assert.equal(pairs[1].question, '멍이 들면 효과가 좋은 것인가요?');
+});
+
 test('buildArticleJsonLd: Article 스키마 필수 필드를 채움', () => {
   const jsonLd = JSON.parse(
     buildArticleJsonLd({
