@@ -588,6 +588,9 @@ const updateCompatSchema = z.object({
       update_count: z.number().min(1).optional(),
       start_index: z.number().min(0).optional(),
       end_index: z.number().min(0).optional(),
+      /** 정확한 대상 글을 찍어서 고칠 때 씀. keywords 와 같은 길이여야 함. */
+      log_nos: z.array(z.string().min(1)).optional(),
+      item_options: z.array(scheduleItemOptionSchema).optional(),
     })
   ),
     service: z.string().default('default'),
@@ -625,7 +628,16 @@ const updateCompatSchema = z.object({
       let posts: Array<{ logNo: string; title: string; index: number }>;
       let blogId: string;
 
-      if (queue.start_index !== undefined && queue.end_index !== undefined) {
+      if (queue.log_nos !== undefined) {
+        if (queue.log_nos.length !== queue.keywords.length) {
+          throw new Error(
+            `account=${queue.account.id} log_nos(${queue.log_nos.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`,
+          );
+        }
+        const result = await getPostList(auth.cookies, 1);
+        blogId = result.blogId;
+        posts = queue.log_nos.map((logNo, index) => ({ logNo, title: '', index }));
+      } else if (queue.start_index !== undefined && queue.end_index !== undefined) {
         const result = await getPostsByRange(auth.cookies, queue.start_index, queue.end_index);
         posts = result.posts;
         blogId = result.blogId;
@@ -643,6 +655,12 @@ const updateCompatSchema = z.object({
           posts: [],
         });
         continue;
+      }
+
+      if (queue.item_options && queue.item_options.length !== queue.keywords.length) {
+        throw new Error(
+          `account=${queue.account.id} item_options(${queue.item_options.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`,
+        );
       }
 
       const keywordsToUse = queue.keywords.slice(0, posts.length);
@@ -664,7 +682,7 @@ const updateCompatSchema = z.object({
           service: body.service,
           ref: body.ref,
           imageSource: body.image_source,
-          manuscriptType: body.manuscript_type,
+          manuscriptType: queue.item_options?.[i]?.manuscriptType ?? body.manuscript_type,
           keywordCategory: body.keyword_category,
           providedManuscript: queue.manuscripts?.[i],
         });
@@ -680,7 +698,8 @@ const updateCompatSchema = z.object({
           generateImages: body.generate_images,
           imageCount: body.image_count,
           imageSource: body.image_source,
-          manuscriptType: body.manuscript_type,
+          manuscriptType: queue.item_options?.[i]?.manuscriptType ?? body.manuscript_type,
+          businessName: queue.item_options?.[i]?.businessName,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: new Date().toISOString(),
           mode: 'update' as const,
