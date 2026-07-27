@@ -1,15 +1,65 @@
 # 맛집 예약발행 스케쥴
 
-맛집 도메인 예약발행 curl 명령어를 생성합니다.
+맛집 도메인 예약발행을 등록합니다.
 
 ## 도메인 설정 (고정)
 
 | 항목 | 값 |
 |------|-----|
-| manuscript_type | `restaurant` |
+| manuscript_type | `restaurant/v1` / `restaurant/v2` (항목별로 번갈아) |
 | image_source | `google` |
 | service | `restaurant` |
 | keyword_category | `맛집` |
+
+## 대윤기획 운영 규칙 (필수)
+
+1. **맛집1 / 맛집2 번갈아 작성** — `restaurant/v1`(`/generate/restaurant/v1`), `restaurant/v2`(`/generate/restaurant/v2`) 를 한 계정 안에서 교대로 씁니다.
+2. **블로그 하나 = 같은 권역** — 계정마다 권역을 고정합니다. 현재 배분은 아래 5권역입니다.
+   - 인천/부천
+   - 서울 전체
+   - 일산/파주
+   - 수원/동탄/광교/용인/분당
+   - 대구/포항/경산/구미/경주
+3. **업체명은 전체에서 한 번도 겹치면 안 됨** — 글마다 다른 식당이어야 합니다.
+4. **하루 2개** (`schedule_mode: "2"`).
+
+### 업체명을 반드시 지정하는 이유
+
+`business_name` 을 비우면 dabut 쪽 `resolve_restaurant_ref` 가 키워드만 보고 업체를 자유 선택하는데, 같은 상권 키워드는 계속 같은 식당으로 수렴합니다. 실제로 "식당 똑같은 애만 적음" 컴플레인이 여기서 나왔습니다. 그래서 항목마다 **웹검색으로 실존이 확인된** 업체명을 고정해서 넣습니다.
+
+맛집2는 `blog_name` 으로 캐릭터를 고정합니다 (`블루망고`, `제이제이`, `삼남매`, `사랑채`, `호이호이`, `바글바글` 중 하나). 계정마다 하나로 고정해서 화자가 흔들리지 않게 합니다. 맛집1은 이 값을 무시합니다.
+
+## 등록 방법 (권장)
+
+플랜 JSON 을 만들고 `scripts/restaurant-schedule.ts` 로 등록합니다. 이 스크립트는 등록 전에 업체명 중복/누락과 캐릭터명을 검증해서, 규칙을 어기면 등록 자체를 중단합니다. 비밀번호가 들어가므로 플랜 파일은 레포 밖(스크래치패드)에 둡니다.
+
+```bash
+npx tsx scripts/restaurant-schedule.ts <plan.json> --dry-run   # 배정 확인
+npx tsx scripts/restaurant-schedule.ts <plan.json>             # 실제 등록
+```
+
+플랜 JSON 형식:
+
+```json
+{
+  "scheduleDate": "2026-07-27",
+  "scheduleMode": "2",
+  "accounts": [
+    {
+      "accountId": "{계정ID}",
+      "password": "{비밀번호}",
+      "region": "인천/부천",
+      "blogCharacter": "블루망고",
+      "startOffset": 0,
+      "targets": [
+        { "keyword": "부천상동맛집", "businessName": "긴꼬리초밥" }
+      ]
+    }
+  ]
+}
+```
+
+`startOffset` 이 0이면 맛집1부터, 1이면 맛집2부터 시작합니다.
 
 ## 실행 흐름
 
@@ -41,7 +91,9 @@
 - DB 매칭 실패 시 사용자에게 알려주고 DB 레코드 확인 또는 올바른 계정이름을 다시 요청
 - `src/constants/account-presets.ts` 같은 로컬 preset 파일은 더 이상 계정 source of truth로 사용하지 않음
 
-### 3단계: curl 명령어 생성
+### 3단계: 요청 페이로드 (스크립트를 안 쓰고 직접 부를 때)
+
+`item_options` 는 `keywords` 와 같은 길이여야 하고, 길이가 다르면 400 으로 막힙니다.
 
 ```bash
 curl -X POST http://localhost:8001/bot/auto-schedule \
@@ -50,16 +102,21 @@ curl -X POST http://localhost:8001/bot/auto-schedule \
   "queues": [
     {
       "account": { "id": "{계정ID}", "password": "{비밀번호}" },
-      "keywords": ["{키워드1}", "{키워드2}", ...]
+      "keywords": ["부천상동맛집", "인천부평맛집"],
+      "item_options": [
+        { "businessName": "긴꼬리초밥", "manuscriptType": "restaurant/v1" },
+        { "businessName": "복화루", "manuscriptType": "restaurant/v2" }
+      ],
+      "blog_name": "블루망고"
     }
   ],
   "schedule_date": "{날짜 또는 생략}",
-  "schedule_mode": "{모드}",
+  "schedule_mode": "2",
   "service": "restaurant",
   "generate_images": true,
   "image_count": 5,
   "image_source": "google",
-  "manuscript_type": "restaurant",
+  "manuscript_type": "restaurant/v1",
   "delay_between_posts": 10,
   "keyword_category": "맛집"
 }'

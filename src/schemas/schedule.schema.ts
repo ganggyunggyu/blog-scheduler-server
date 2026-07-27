@@ -31,6 +31,8 @@ export const scheduleJobSchema = new Schema(
     scheduleId: { type: String, required: true, index: true },
     keyword: { type: String, required: true },
     category: { type: String },
+    businessName: { type: String },
+    manuscriptType: { type: String },
     scheduledAt: { type: String, required: true, index: true },
     slot: { type: Number, required: true },
     generateJobId: { type: String },

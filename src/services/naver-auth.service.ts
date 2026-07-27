@@ -228,7 +228,8 @@ export const naverLogin = async (
       await page.waitForTimeout(500);
 
       log.info('submit', { account: maskedAccount });
-      await page.click(SELECTORS.login.btn);
+      const loginButton = page.locator(SELECTORS.login.btn).filter({ visible: true }).first();
+      await loginButton.click();
 
       log.info('result.wait', { account: maskedAccount });
       try {
