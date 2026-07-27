@@ -38,6 +38,10 @@ const getPostsPerDay = (mode: ScheduleMode, dayOffset: number): number => {
 export interface ScheduleItem {
   keyword: string;
   category?: string;
+  /** 맛집1/맛집2 에서 고정할 업체 상호명. */
+  businessName?: string;
+  /** 항목별 원고 타입 override. 맛집1/맛집2 를 번갈아 쓸 때 사용함. */
+  manuscriptType?: string;
   scheduledAt: Date;
   slot: number;
 }
@@ -239,6 +243,11 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     scheduleTimingKey: buildScheduleTimingKey(timingOptions),
     manuscripts: input.manuscripts,
     providedMultiImages: input.providedMultiImages,
+    itemOverrides: items.map((item) => ({
+      keyword: item.keyword,
+      businessName: item.businessName,
+      manuscriptType: item.manuscriptType,
+    })),
   });
 
   const existingSchedule = await ScheduleModel.findOne({
@@ -252,6 +261,8 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     const existingItems = jobs.map((job) => ({
       keyword: job.keyword,
       category: job.category,
+      businessName: job.businessName,
+      manuscriptType: job.manuscriptType,
       scheduledAt: new Date(job.scheduledAt),
       slot: job.slot,
     }));
@@ -277,6 +288,8 @@ export const createSchedule = async (input: CreateScheduleInput) => {
       scheduleId: schedule._id,
       keyword: item.keyword,
       category: item.category,
+      businessName: item.businessName,
+      manuscriptType: item.manuscriptType,
       scheduledAt: formatKst(item.scheduledAt),
       slot: item.slot,
       status: 'pending',

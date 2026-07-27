@@ -20,6 +20,12 @@ interface ScheduleRequestFingerprintInput {
     slide?: string[];
     collage?: string[];
   }>;
+  /**
+   * 항목별 override(업체명/원고 타입). 키워드가 같아도 업체가 다르면 다른 스케쥴이라
+   * fingerprint 에 반영해야 함. 값이 없을 때는 키 자체를 빼서 기존 스케쥴의
+   * fingerprint 와 호환을 유지함.
+   */
+  itemOverrides?: Array<{ keyword: string; businessName?: string; manuscriptType?: string }>;
 }
 
 interface AdhocGenerateIdentityInput {
@@ -63,10 +69,23 @@ const normalizeMultiImages = (
 const buildBullJobId = (...parts: string[]): string =>
   parts.map((part) => part.trim()).filter(Boolean).join('_');
 
+const normalizeItemOverrides = (
+  itemOverrides: ScheduleRequestFingerprintInput['itemOverrides'] = [],
+): Array<{ keyword: string; businessName: string; manuscriptType: string }> =>
+  itemOverrides
+    .map((item) => ({
+      keyword: item.keyword.trim(),
+      businessName: item.businessName?.trim() ?? '',
+      manuscriptType: item.manuscriptType?.trim() ?? '',
+    }))
+    .filter((item) => item.businessName.length > 0 || item.manuscriptType.length > 0);
+
 export const buildScheduleRequestFingerprint = (
   input: ScheduleRequestFingerprintInput,
 ): string => {
+  const itemOverrides = normalizeItemOverrides(input.itemOverrides);
   const normalized = {
+    ...(itemOverrides.length > 0 && { itemOverrides }),
     accountId: input.accountId,
     service: input.service,
     ref: input.ref,

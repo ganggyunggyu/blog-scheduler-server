@@ -14,6 +14,7 @@ import {
   formatKst,
   parseKeywordWithCategory,
   resolveScheduleMode,
+  type ScheduleItem,
 } from '../services/schedule.service.js';
 import { getGenerateQueue, removeJobFromQueue } from '../queues/queue-manager.js';
 import { getPostList, getPostsByRange } from '../services/naver-blog.service.js';
@@ -28,14 +29,21 @@ import {
 import type { MultiImageData } from '../lib/naver-editor/image.js';
 
 const imageSourceSchema = z.enum(['ai', 'google', 'keyword', 'product', 'local']).default('ai');
-const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
+const manuscriptTypeSchema = z.enum(['default', 'update-restaurant', 'restaurant', 'restaurant1', 'restaurant2', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default');
 
 const scheduleModeSchema = z.enum(['1', '2', '3', '2121']).default('2');
 const scheduleItemSchema = z.object({
   keyword: z.string(),
   category: z.string().optional(),
+  businessName: z.string().optional(),
+  manuscriptType: manuscriptTypeSchema.optional(),
   scheduledAt: z.string(),
   slot: z.number().int().min(1),
+});
+/** keywords 와 같은 길이로 주는 항목별 override. 시각 계산은 서버 로직을 그대로 씀. */
+const scheduleItemOptionSchema = z.object({
+  businessName: z.string().optional(),
+  manuscriptType: manuscriptTypeSchema.optional(),
 });
 const providedManuscriptSchema = z.object({
   title: z.string().min(1),
@@ -55,6 +63,7 @@ const pythonCompatSchema = z.object({
       manuscripts: z.array(providedManuscriptSchema).optional(),
       multi_images: z.array(multiImageDataSchema).optional(),
       items: z.array(scheduleItemSchema).optional(),
+      item_options: z.array(scheduleItemOptionSchema).optional(),
       blog_name: z.string().optional(),
     })
   ),
@@ -84,6 +93,25 @@ interface QueueAccount {
   blogId?: string;
 }
 
+/**
+ * keywords 와 같은 순서로 들어온 항목별 override 를 계산된 스케쥴 항목에 얹음.
+ * 시각 계산(랜덤 시작 시각/간격)은 서버 로직을 그대로 두고 업체명/원고 타입만 덮어씀.
+ */
+const applyItemOptions = (
+  items: ScheduleItem[],
+  itemOptions?: Array<{ businessName?: string; manuscriptType?: string }>,
+): ScheduleItem[] => {
+  if (!itemOptions?.length) {
+    return items;
+  }
+
+  return items.map((item, index) => ({
+    ...item,
+    businessName: itemOptions[index]?.businessName ?? item.businessName,
+    manuscriptType: itemOptions[index]?.manuscriptType ?? item.manuscriptType,
+  }));
+};
+
 const resolveQueueAccount = async (
   account: { id: string; password?: string; blogId?: string },
 ): Promise<{ account: QueueAccount; blogName?: string }> => {
@@ -108,6 +136,8 @@ interface ScheduleQueueJob {
   _id: unknown;
   keyword: string;
   category?: string;
+  businessName?: string;
+  manuscriptType?: string;
   scheduledAt: string;
   slot: number;
   status: string;
@@ -167,10 +197,11 @@ const enqueueScheduleGenerateJob = async ({
     generateImages,
     imageCount,
     imageSource,
-    manuscriptType,
+    manuscriptType: jobItem.manuscriptType ?? manuscriptType,
     delayBetweenPostsSeconds,
     scheduledAt: jobItem.scheduledAt,
     blogName,
+    businessName: jobItem.businessName,
     providedManuscript,
     providedMultiImages,
   }, {
@@ -458,11 +489,16 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       if (queue.multi_images && queue.multi_images.length !== queue.keywords.length) {
         throw new Error(`account=${queue.account.id} multi_images(${queue.multi_images.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`);
       }
+      if (queue.item_options && queue.item_options.length !== queue.keywords.length) {
+        throw new Error(`account=${queue.account.id} item_options(${queue.item_options.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`);
+      }
 
       const resolved = await resolveQueueAccount(queue.account);
-      const items = queue.items?.map((item) => ({
+      const baseItems = queue.items?.map((item) => ({
         keyword: item.keyword,
         category: item.category,
+        businessName: item.businessName,
+        manuscriptType: item.manuscriptType,
         scheduledAt: new Date(item.scheduledAt),
         slot: item.slot,
       })) ?? calculateSchedule(
@@ -471,6 +507,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         effectiveMode,
         timingOptions,
       );
+      const items = applyItemOptions(baseItems, queue.item_options);
 
       return {
         queue,

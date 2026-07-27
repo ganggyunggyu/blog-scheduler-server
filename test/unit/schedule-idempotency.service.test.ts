@@ -41,6 +41,59 @@ test('buildScheduleRequestFingerprint: 동일 요청은 같은 fingerprint를 �
   assert.equal(first, second);
 });
 
+test('buildScheduleRequestFingerprint: 키워드가 같아도 업체명이 다르면 다른 fingerprint 임', () => {
+  const base = {
+    accountId: 'e4f-l',
+    service: 'restaurant',
+    ref: '',
+    scheduleDate: '2026-07-28',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['동탄맛집'],
+    imageSource: 'google',
+    manuscriptType: 'restaurant1',
+    keywordCategory: '맛집',
+  };
+
+  const first = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소 동탄센트럴파크점' }],
+  });
+  const second = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '상무초밥 동탄호수공원점' }],
+  });
+
+  assert.notEqual(first, second);
+});
+
+test('buildScheduleRequestFingerprint: 항목 override 가 없으면 기존 fingerprint 와 같음', () => {
+  const base = {
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['터키시앙고라'],
+    imageSource: 'product',
+    manuscriptType: 'pet',
+    keywordCategory: '애견',
+  };
+
+  const withoutField = buildScheduleRequestFingerprint(base);
+  const withEmptyOverrides = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '터키시앙고라' }],
+  });
+
+  assert.equal(withoutField, withEmptyOverrides);
+});
+
 test('buildScheduleRequestFingerprint: 공백 차이는 무시하지만 모드 차이는 반영함', () => {
   const trimmed = buildScheduleRequestFingerprint({
     accountId: 'fail5644',
