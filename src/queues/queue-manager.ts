@@ -108,10 +108,15 @@ const scheduleAccountTurnReleaseCheck = (
   });
 };
 
-const getQueueName = (type: 'generate' | 'publish', accountId: string): string => {
-  const safeAccountId = accountId.replace(/[^a-zA-Z0-9]/g, '_');
-  return `${type}_${safeAccountId}`;
-};
+/*
+  Redis 큐 이름은 영숫자만 남기므로 `e4f-l` 과 `e4f_l` 이 같은 큐가 된다.
+  맵 키를 원본 accountId 로 두면 같은 큐에 Queue/Worker 가 두 벌 생겨 lock 을 두고 경합하고,
+  잡이 active 에 물린 채 아무도 처리하지 않는 상태가 된다. 그래서 맵 키도 같은 규칙으로 정규화한다.
+*/
+const normalizeAccountKey = (accountId: string): string => accountId.replace(/[^a-zA-Z0-9]/g, '_');
+
+const getQueueName = (type: 'generate' | 'publish', accountId: string): string =>
+  `${type}_${normalizeAccountKey(accountId)}`;
 
 const extractAccountIdFromQueueName = (queueName: string): string | null => {
   const match = queueName.match(/^(generate|publish)_(.+)$/);
@@ -154,13 +159,14 @@ export const initializeExistingQueues = async (): Promise<void> => {
 };
 
 export const getGenerateQueue = (accountId: string): Queue => {
-  const existing = generateQueues.get(accountId);
+  const key = normalizeAccountKey(accountId);
+  const existing = generateQueues.get(key);
   if (existing) return existing;
 
   const queueName = getQueueName('generate', accountId);
   const queue = new Queue(queueName, { connection, defaultJobOptions });
 
-  generateQueues.set(accountId, queue);
+  generateQueues.set(key, queue);
   log.info('queue.created', { type: 'generate', accountId: maskAccountId(accountId) });
   if (areQueueWorkersDisabled()) {
     log.warn('worker.skipped', { type: 'generate', accountId: maskAccountId(accountId) });
@@ -173,13 +179,14 @@ export const getGenerateQueue = (accountId: string): Queue => {
 };
 
 export const getPublishQueue = (accountId: string): Queue => {
-  const existing = publishQueues.get(accountId);
+  const key = normalizeAccountKey(accountId);
+  const existing = publishQueues.get(key);
   if (existing) return existing;
 
   const queueName = getQueueName('publish', accountId);
   const queue = new Queue(queueName, { connection, defaultJobOptions });
 
-  publishQueues.set(accountId, queue);
+  publishQueues.set(key, queue);
   log.info('queue.created', { type: 'publish', accountId: maskAccountId(accountId) });
   if (areQueueWorkersDisabled()) {
     log.warn('worker.skipped', { type: 'publish', accountId: maskAccountId(accountId) });
