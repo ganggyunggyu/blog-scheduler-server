@@ -36,6 +36,10 @@ const envSchema = z.object({
 
   POSTS_PER_DAY: z.coerce.number().default(3),
 
+  /* 운영 UI 인증. 설정하면 API 전체가 Bearer 토큰을 요구한다. 없으면 인증이 꺼진다. */
+  WEB_AUTH_SECRET: z.string().optional(),
+  WEB_USERS: z.string().optional(),
+
   GEMINI_API_KEY: z.string().optional(),
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().email().optional(),
   GOOGLE_PRIVATE_KEY: z.string().optional(),
