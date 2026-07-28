@@ -585,6 +585,9 @@ const updateCompatSchema = z.object({
         title: z.string().min(1),
         content: z.string().min(1),
       })).optional(),
+      /** keywords 와 같은 길이로 주는 항목별 override. auto-schedule 과 같은 형식. */
+      item_options: z.array(scheduleItemOptionSchema).optional(),
+      blog_name: z.string().optional(),
       update_count: z.number().min(1).optional(),
       start_index: z.number().min(0).optional(),
       end_index: z.number().min(0).optional(),
@@ -654,6 +657,9 @@ const updateCompatSchema = z.object({
         const post = posts[i];
         const parsedKeyword = parseKeywordWithCategory(keywordsToUse[i]);
         const keyword = parsedKeyword.keyword;
+        // 맛집처럼 업체명을 고정해야 하는 도메인은 항목별 override 를 그대로 워커로 넘긴다.
+        const itemOption = queue.item_options?.[i];
+        const manuscriptType = itemOption?.manuscriptType ?? body.manuscript_type;
         const identity = buildAdhocGenerateIdentity({
           mode: 'update',
           accountId: resolved.account.id,
@@ -664,7 +670,7 @@ const updateCompatSchema = z.object({
           service: body.service,
           ref: body.ref,
           imageSource: body.image_source,
-          manuscriptType: body.manuscript_type,
+          manuscriptType,
           keywordCategory: body.keyword_category,
           providedManuscript: queue.manuscripts?.[i],
         });
@@ -680,7 +686,9 @@ const updateCompatSchema = z.object({
           generateImages: body.generate_images,
           imageCount: body.image_count,
           imageSource: body.image_source,
-          manuscriptType: body.manuscript_type,
+          manuscriptType,
+          businessName: itemOption?.businessName,
+          blogName: queue.blog_name ?? resolved.blogName,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: new Date().toISOString(),
           mode: 'update' as const,
