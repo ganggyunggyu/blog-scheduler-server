@@ -66,13 +66,18 @@ const accountExecution = createAccountExecutionCoordinator({
   },
 });
 
+/*
+  턴 확보는 잡 데이터의 원본 account.id 로, 반납은 워커 생성 시 이름으로 하고 있었다.
+  `e4f-l` 로 잡고 `e4f_l` 로 반납을 시도하면 턴이 영원히 안 풀려서 다음 잡이 무한 대기한다.
+  양쪽 다 같은 키로 정규화한다.
+*/
 const processGenerateWithAccountTurn = async (job: Job<GenerateJobData>): Promise<unknown> => {
-  await accountExecution.waitForAccountTurn(job.data.account.id);
+  await accountExecution.waitForAccountTurn(normalizeAccountKey(job.data.account.id));
   return processGenerate(job);
 };
 
 const processPublishWithAccountTurn = async (job: Job<PublishJobData>): Promise<unknown> => {
-  await accountExecution.waitForAccountTurn(job.data.account.id);
+  await accountExecution.waitForAccountTurn(normalizeAccountKey(job.data.account.id));
   return processPublish(job);
 };
 
@@ -81,7 +86,7 @@ const releaseAccountTurnAfterSettledJob = async (
   accountId: string,
   jobId?: string
 ): Promise<void> => {
-  const released = await accountExecution.releaseAccountTurnIfIdle(accountId);
+  const released = await accountExecution.releaseAccountTurnIfIdle(normalizeAccountKey(accountId));
   if (!released) {
     return;
   }
@@ -199,7 +204,8 @@ export const getPublishQueue = (accountId: string): Queue => {
 };
 
 const ensureGenerateWorker = (accountId: string): Worker<GenerateJobData> => {
-  const existing = generateWorkers.get(accountId);
+  const workerKey = normalizeAccountKey(accountId);
+  const existing = generateWorkers.get(workerKey);
   if (existing) return existing;
 
   const queueName = getQueueName('generate', accountId);
@@ -228,14 +234,15 @@ const ensureGenerateWorker = (accountId: string): Worker<GenerateJobData> => {
     scheduleAccountTurnReleaseCheck('generate', accountId, job?.id);
   });
 
-  generateWorkers.set(accountId, worker);
+  generateWorkers.set(workerKey, worker);
   log.info('worker.created', { type: 'generate', accountId: maskAccountId(accountId) });
 
   return worker;
 };
 
 const ensurePublishWorker = (accountId: string): Worker<PublishJobData> => {
-  const existing = publishWorkers.get(accountId);
+  const workerKey = normalizeAccountKey(accountId);
+  const existing = publishWorkers.get(workerKey);
   if (existing) return existing;
 
   const queueName = getQueueName('publish', accountId);
@@ -264,7 +271,7 @@ const ensurePublishWorker = (accountId: string): Worker<PublishJobData> => {
     scheduleAccountTurnReleaseCheck('publish', accountId, job?.id);
   });
 
-  publishWorkers.set(accountId, worker);
+  publishWorkers.set(workerKey, worker);
   log.info('worker.created', { type: 'publish', accountId: maskAccountId(accountId) });
 
   return worker;
