@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { AccountQueueStatus } from '@/entities/queue';
-import { ProgressLine, StateBadge } from '@/shared/ui';
+import { ProgressLine } from '@/shared/ui';
 import { cn } from '@/shared/lib/cn';
 
 interface Props {
@@ -15,11 +15,13 @@ const emit = defineEmits<{ toggle: [accountId: string] }>();
 const totalOf = (counts: { waiting: number; active: number; completed: number }) =>
   counts.waiting + counts.active + counts.completed;
 
-const generateTotal = computed(() => totalOf(props.account.generate));
 const publishTotal = computed(() => totalOf(props.account.publish));
-
 const failedTotal = computed(() => props.account.generate.failed + props.account.publish.failed);
 const isRunning = computed(() => props.account.generate.active + props.account.publish.active > 0);
+
+/* 0 은 흐리게 깔아두고 값이 있을 때만 색을 준다. 행이 100개 넘어가면 이게 유일한 단서다. */
+const numberClass = (value: number, tone: string) =>
+  cn('tnum text-[12px]', value > 0 ? tone : 'text-ink-faint/40');
 
 const handleToggle = () => {
   emit('toggle', props.account.accountId);
@@ -27,58 +29,58 @@ const handleToggle = () => {
 </script>
 
 <template>
-  <div class="px-4 py-3 transition-colors duration-150 hover:bg-surface-overlay/40">
+  <div class="transition-colors duration-150 hover:bg-surface-overlay/40">
     <button
       type="button"
-      class="flex w-full items-center gap-4 text-left"
+      class="grid w-full grid-cols-[minmax(0,1fr)_repeat(6,44px)_minmax(80px,120px)] items-center gap-x-2 px-4 py-2 text-left"
       @click="handleToggle"
     >
       <span
         :class="
           cn(
-            'w-[164px] shrink-0 truncate text-[13px]',
+            'flex min-w-0 items-center gap-2 truncate text-[13px]',
             isRunning ? 'text-ink' : 'text-ink-muted',
           )
         "
-        >{{ props.account.accountId }}</span
       >
-
-      <span class="flex w-[210px] shrink-0 items-baseline gap-3">
-        <span class="w-8 text-[11px] text-ink-faint">생성</span>
-        <StateBadge state="active" :count="props.account.generate.active" />
-        <StateBadge state="waiting" :count="props.account.generate.waiting" />
-        <span class="tnum text-[12px] text-ink-faint"
-          >{{ props.account.generate.completed }}/{{ generateTotal }}</span
-        >
+        <span
+          v-if="isRunning"
+          class="size-1.5 shrink-0 rounded-full bg-state-active"
+          aria-label="진행 중"
+        />
+        <span class="truncate">{{ props.account.accountId }}</span>
       </span>
 
-      <span class="flex w-[210px] shrink-0 items-baseline gap-3">
-        <span class="w-8 text-[11px] text-ink-faint">발행</span>
-        <StateBadge state="active" :count="props.account.publish.active" />
-        <StateBadge state="waiting" :count="props.account.publish.waiting" />
-        <span class="tnum text-[12px] text-ink-faint"
-          >{{ props.account.publish.completed }}/{{ publishTotal }}</span
-        >
+      <span :class="[numberClass(props.account.generate.active, 'text-state-active'), 'text-right']">
+        {{ props.account.generate.active }}
+      </span>
+      <span :class="[numberClass(props.account.generate.waiting, 'text-ink'), 'text-right']">
+        {{ props.account.generate.waiting }}
+      </span>
+      <span :class="[numberClass(props.account.generate.completed, 'text-ink-muted'), 'text-right']">
+        {{ props.account.generate.completed }}
       </span>
 
-      <span class="min-w-0 flex-1">
+      <span :class="[numberClass(props.account.publish.active, 'text-state-active'), 'text-right']">
+        {{ props.account.publish.active }}
+      </span>
+      <span :class="[numberClass(props.account.publish.waiting, 'text-ink'), 'text-right']">
+        {{ props.account.publish.waiting }}
+      </span>
+      <span :class="[numberClass(failedTotal, 'text-state-failed'), 'text-right']">
+        {{ failedTotal }}
+      </span>
+
+      <span class="pl-3">
         <ProgressLine
           :done="props.account.publish.completed"
           :total="Math.max(publishTotal, 1)"
           :failed="props.account.publish.failed"
         />
       </span>
-
-      <StateBadge
-        v-if="failedTotal > 0"
-        state="failed"
-        :count="failedTotal"
-        class="shrink-0"
-      />
-      <span v-else class="w-10 shrink-0" />
     </button>
 
-    <div v-if="props.expanded" class="mt-3 border-t border-line pt-3">
+    <div v-if="props.expanded" class="border-t border-line px-4 py-3">
       <slot name="detail" />
     </div>
   </div>

@@ -4,6 +4,7 @@ import { useScheduleList, useScheduleMutations } from '@/entities/schedule';
 import { AppButton, AppPanel, EmptyState, SkeletonRows, StateBadge } from '@/shared/ui';
 import { formatKstDateTime } from '@/shared/lib/format';
 import { INPUT_CLASS } from '@/shared/ui';
+import { cn } from '@/shared/lib/cn';
 
 const STATUS_FILTERS = [
   { value: '', label: '전체' },
@@ -26,8 +27,8 @@ const handleApplyAccount = () => {
   accountId.value = accountInput.value.trim();
 };
 
-const handleStatusChange = (event: Event) => {
-  status.value = (event.target as HTMLSelectElement).value;
+const handleStatusSelect = (next: string) => {
+  status.value = next;
 };
 
 const handleCancel = (id: string) => {
@@ -38,27 +39,36 @@ const handleCancel = (id: string) => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
-    <AppPanel title="스케줄" :hint="`${schedules.length}건`">
-      <template #actions>
-        <input
-          v-model="accountInput"
-          :class="[INPUT_CLASS, 'h-7 w-44 py-0 text-[12px]']"
-          type="text"
-          placeholder="계정 ID로 필터"
-          @keyup.enter="handleApplyAccount"
-        />
-        <select
-          :value="status"
-          class="h-7 rounded-[6px] border border-line bg-surface px-2 text-[12px] text-ink-muted hover:border-line-strong focus:border-accent focus:outline-none"
-          @change="handleStatusChange"
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <input
+        v-model="accountInput"
+        :class="[INPUT_CLASS, 'h-8 w-56 py-0 text-[12px]']"
+        type="text"
+        placeholder="계정 ID로 필터 (Enter)"
+        @keyup.enter="handleApplyAccount"
+      />
+      <div class="flex items-center gap-0.5">
+        <button
+          v-for="item in STATUS_FILTERS"
+          :key="item.value"
+          type="button"
+          :class="
+            cn(
+              'rounded-[6px] px-2.5 py-1.5 text-[12px] transition-colors duration-150',
+              status === item.value
+                ? 'bg-surface-overlay text-ink'
+                : 'text-ink-faint hover:text-ink-muted',
+            )
+          "
+          @click="handleStatusSelect(item.value)"
         >
-          <option v-for="item in STATUS_FILTERS" :key="item.value" :value="item.value">
-            {{ item.label }}
-          </option>
-        </select>
-      </template>
+          {{ item.label }}
+        </button>
+      </div>
+    </div>
 
+    <AppPanel title="스케줄" :hint="`${schedules.length}건`">
       <SkeletonRows v-if="isPending" :rows="6" />
 
       <p v-else-if="isError" class="px-4 py-10 text-center text-[13px] text-state-failed">

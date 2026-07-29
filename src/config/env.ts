@@ -44,7 +44,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string().optional(),
   API_KEY_ENC_SECRET: z.string().optional(),
   DABUT_APP_MONGO_URI: z.string().optional(),
-  DABUT_APP_DB_NAME: z.string().default('dabut'),
+  DABUT_APP_DB_NAME: z.string().default('dabut_app'),
   DABUT_API_URL: z.string().default('http://localhost:8000'),
 
   GEMINI_API_KEY: z.string().optional(),

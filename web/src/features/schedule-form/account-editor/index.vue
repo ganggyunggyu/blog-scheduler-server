@@ -12,6 +12,7 @@ interface Props {
   removable: boolean;
   blogAccounts: BlogAccount[];
   blogAccountsLoading: boolean;
+  expanded: boolean;
 }
 
 const props = defineProps<Props>();
@@ -19,7 +20,12 @@ const emit = defineEmits<{
   update: [block: AccountBlock];
   remove: [uid: string];
   testLogin: [block: AccountBlock];
+  toggle: [uid: string];
 }>();
+
+const handleToggle = () => {
+  emit('toggle', props.block.uid);
+};
 
 const targets = computed(() => parseTargets(props.block, props.preset));
 
@@ -77,9 +83,28 @@ const handleTestLogin = () => {
 
 <template>
   <div class="rounded-[10px] border border-line bg-surface-raised">
-    <header class="flex h-10 items-center justify-between border-b border-line px-3">
-      <span class="tnum text-[12px] text-ink-faint">계정 {{ props.index + 1 }}</span>
-      <div class="flex items-center gap-1.5">
+    <header class="flex h-10 items-center gap-3 px-3" :class="props.expanded && 'border-b border-line'">
+      <button
+        type="button"
+        class="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+        @click="handleToggle"
+      >
+        <span class="tnum shrink-0 text-[11px] text-ink-faint">{{ props.index + 1 }}</span>
+        <span class="truncate text-[13px] text-ink">
+          {{ selectedBlogAccount?.name || props.block.accountId || '블로그 미지정' }}
+        </span>
+        <span
+          v-if="targets.length"
+          class="tnum shrink-0 rounded-full bg-surface-overlay px-2 py-0.5 text-[11px] text-ink-muted"
+        >
+          {{ targets.length }}건
+        </span>
+        <span v-if="props.block.blogName" class="shrink-0 text-[11px] text-ink-faint">
+          {{ props.block.blogName }}
+        </span>
+      </button>
+
+      <div class="flex shrink-0 items-center gap-1.5">
         <AppButton
           size="sm"
           variant="ghost"
@@ -94,7 +119,7 @@ const handleTestLogin = () => {
       </div>
     </header>
 
-    <div class="grid gap-4 p-3 md:grid-cols-2">
+    <div v-if="props.expanded" class="grid gap-4 p-3 md:grid-cols-2">
       <AppField
         label="블로그"
         class-name="md:col-span-2"
@@ -205,7 +230,7 @@ const handleTestLogin = () => {
       </AppField>
     </div>
 
-    <div v-if="targets.length" class="border-t border-line px-3 py-2.5">
+    <div v-if="props.expanded && targets.length" class="border-t border-line px-3 py-2.5">
       <ul class="flex flex-col gap-1">
         <li
           v-for="(target, targetIndex) in targets"

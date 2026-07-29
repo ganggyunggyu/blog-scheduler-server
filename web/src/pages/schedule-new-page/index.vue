@@ -41,6 +41,7 @@ const imageCount = ref(5);
 const delayBetweenPosts = ref(10);
 const blockSeed = ref(1);
 const blocks = ref<AccountBlock[]>([createAccountBlock('block-0')]);
+const expandedUid = ref('block-0');
 const loginResult = ref('');
 const submitError = ref('');
 
@@ -84,8 +85,15 @@ const handleBlockRemove = (uid: string) => {
 };
 
 const handleAddBlock = () => {
-  blocks.value = [...blocks.value, createAccountBlock(`block-${blockSeed.value}`)];
+  const uid = `block-${blockSeed.value}`;
+  blocks.value = [...blocks.value, createAccountBlock(uid)];
+  expandedUid.value = uid;
   blockSeed.value += 1;
+};
+
+/** 한 번에 하나만 펼친다. 계정이 늘어나면 세로로 감당이 안 된다. */
+const handleBlockToggle = (uid: string) => {
+  expandedUid.value = expandedUid.value === uid ? '' : uid;
 };
 
 const handleTestLogin = async (block: AccountBlock) => {
@@ -167,8 +175,8 @@ const handleSubmit = async () => {
 
 <template>
   <div class="flex flex-col gap-5">
-    <AppPanel title="도메인" :hint="preset.note">
-      <div class="flex flex-wrap gap-1.5 p-3">
+    <AppPanel title="발행 설정" :hint="preset.note">
+      <div class="flex flex-wrap gap-1.5 border-b border-line p-3">
         <button
           v-for="item in DOMAIN_PRESETS"
           :key="item.id"
@@ -187,29 +195,8 @@ const handleSubmit = async () => {
         </button>
       </div>
 
-      <dl class="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-line px-4 py-3 md:grid-cols-4">
-        <div class="flex items-baseline justify-between gap-2">
-          <dt class="text-[11px] text-ink-faint">원고</dt>
-          <dd class="font-mono text-[12px] text-ink">{{ preset.manuscriptType }}</dd>
-        </div>
-        <div class="flex items-baseline justify-between gap-2">
-          <dt class="text-[11px] text-ink-faint">이미지</dt>
-          <dd class="font-mono text-[12px] text-ink">{{ preset.imageSource }}</dd>
-        </div>
-        <div class="flex items-baseline justify-between gap-2">
-          <dt class="text-[11px] text-ink-faint">서비스</dt>
-          <dd class="font-mono text-[12px] text-ink">{{ preset.service }}</dd>
-        </div>
-        <div class="flex items-baseline justify-between gap-2">
-          <dt class="text-[11px] text-ink-faint">카테고리</dt>
-          <dd class="font-mono text-[12px] text-ink">{{ preset.keywordCategory || '계정 설정' }}</dd>
-        </div>
-      </dl>
-    </AppPanel>
-
-    <AppPanel title="발행 조건">
       <div class="grid gap-4 p-3 md:grid-cols-4">
-        <AppField label="시작 날짜" hint="비우면 오늘부터 시작합니다.">
+        <AppField label="시작 날짜" hint="비우면 오늘부터">
           <input v-model="scheduleDate" :class="INPUT_CLASS" type="date" />
         </AppField>
 
@@ -225,7 +212,7 @@ const handleSubmit = async () => {
           <input v-model.number="imageCount" :class="INPUT_CLASS" type="number" min="1" max="20" />
         </AppField>
 
-        <AppField label="글 사이 간격(분)">
+        <AppField label="글 간격(분)">
           <input
             v-model.number="delayBetweenPosts"
             :class="INPUT_CLASS"
@@ -235,6 +222,19 @@ const handleSubmit = async () => {
           />
         </AppField>
       </div>
+
+      <!-- 프리셋이 확정한 값은 읽기 전용이라 한 줄 메타로만 깐다. -->
+      <p
+        class="flex flex-wrap items-baseline gap-x-5 gap-y-1 border-t border-line px-4 py-2 text-[11px] text-ink-faint"
+      >
+        <span>원고 <span class="font-mono text-ink-muted">{{ preset.manuscriptType }}</span></span>
+        <span>이미지 <span class="font-mono text-ink-muted">{{ preset.imageSource }}</span></span>
+        <span>서비스 <span class="font-mono text-ink-muted">{{ preset.service }}</span></span>
+        <span>
+          카테고리
+          <span class="font-mono text-ink-muted">{{ preset.keywordCategory || '계정 설정' }}</span>
+        </span>
+      </p>
     </AppPanel>
 
     <div class="flex flex-col gap-3">
@@ -247,6 +247,8 @@ const handleSubmit = async () => {
         :removable="blocks.length > 1"
         :blog-accounts="blogAccounts"
         :blog-accounts-loading="isBlogAccountsLoading"
+        :expanded="expandedUid === block.uid"
+        @toggle="handleBlockToggle"
         @update="handleBlockUpdate"
         @remove="handleBlockRemove"
         @test-login="handleTestLogin"
@@ -259,23 +261,8 @@ const handleSubmit = async () => {
       <p v-if="loginResult" class="text-[12px] text-ink-muted">{{ loginResult }}</p>
     </div>
 
-    <AppPanel title="확인">
-      <div class="flex flex-wrap items-end gap-8 px-4 py-3">
-        <div class="flex flex-col gap-1">
-          <span class="text-[11px] text-ink-faint">계정</span>
-          <span class="tnum text-[20px] leading-none text-ink">{{ blocks.length }}</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-[11px] text-ink-faint">총 키워드</span>
-          <span class="tnum text-[20px] leading-none text-ink">{{ totalKeywords }}</span>
-        </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-[11px] text-ink-faint">예상 소요일</span>
-          <span class="tnum text-[20px] leading-none text-ink">{{ estimatedDays }}</span>
-        </div>
-      </div>
-
-      <ul v-if="errors.length" class="border-t border-line px-4 py-3">
+    <div class="sticky bottom-0 -mx-5 mt-1 border-t border-line bg-surface/95 px-5 py-3 backdrop-blur-md">
+      <ul v-if="errors.length" class="mb-2.5 flex max-h-24 flex-col overflow-y-auto">
         <li
           v-for="(issue, index) in errors"
           :key="index"
@@ -285,10 +272,20 @@ const handleSubmit = async () => {
         </li>
       </ul>
 
-      <div class="flex items-center justify-between gap-4 border-t border-line px-4 py-3">
-        <p class="text-[11px] leading-relaxed text-ink-faint">
-          등록하면 계정별 큐에 바로 들어갑니다. 실제 예약 여부는 네이버에서 다시 확인해야 합니다.
-        </p>
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-baseline gap-6">
+          <span class="text-[12px] text-ink-muted">
+            계정 <span class="tnum text-ink">{{ blocks.length }}</span>
+          </span>
+          <span class="text-[12px] text-ink-muted">
+            키워드 <span class="tnum text-ink">{{ totalKeywords }}</span>
+          </span>
+          <span class="text-[12px] text-ink-muted">
+            예상 <span class="tnum text-ink">{{ estimatedDays }}</span>일
+          </span>
+          <span v-if="submitError" class="text-[12px] text-state-failed">{{ submitError }}</span>
+        </div>
+
         <AppButton
           variant="primary"
           :disabled="!canSubmit"
@@ -298,10 +295,7 @@ const handleSubmit = async () => {
           스케줄 등록
         </AppButton>
       </div>
+    </div>
 
-      <p v-if="submitError" class="border-t border-line px-4 py-2.5 text-[12px] text-state-failed">
-        {{ submitError }}
-      </p>
-    </AppPanel>
   </div>
 </template>

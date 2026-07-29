@@ -77,14 +77,14 @@ const handleDrainAll = () => {
 <template>
   <div class="flex flex-col gap-5">
     <section class="flex flex-wrap items-end justify-between gap-4">
-      <div class="flex items-end gap-8">
-        <div
-          v-for="cell in summaryCells"
-          :key="cell.label"
-          class="flex flex-col gap-1"
-        >
+      <div class="flex items-end gap-7">
+        <div v-for="cell in summaryCells" :key="cell.label" class="flex flex-col gap-1">
           <span class="text-[11px] text-ink-faint">{{ cell.label }}</span>
-          <span :class="cn('tnum text-[22px] leading-none', cell.tone)">{{ cell.value }}</span>
+          <span
+            :class="cn('tnum text-[20px] leading-none', cell.value > 0 ? cell.tone : 'text-ink-faint/40')"
+          >
+            {{ cell.value }}
+          </span>
         </div>
       </div>
 
@@ -132,7 +132,21 @@ const handleDrainAll = () => {
         "
       />
 
-      <div v-else class="divide-y divide-line">
+      <div
+        v-else
+        class="grid grid-cols-[minmax(0,1fr)_repeat(6,44px)_minmax(80px,120px)] gap-x-2 border-b border-line px-4 py-1.5 text-[11px] text-ink-faint"
+      >
+        <span>계정</span>
+        <span class="text-right">생성<br />진행</span>
+        <span class="text-right">생성<br />대기</span>
+        <span class="text-right">생성<br />완료</span>
+        <span class="text-right">발행<br />진행</span>
+        <span class="text-right">발행<br />대기</span>
+        <span class="text-right text-state-failed">실패</span>
+        <span class="pl-3">발행 진행률</span>
+      </div>
+
+      <div v-if="!isPending && !isError && visibleAccounts.length" class="divide-y divide-line">
         <AccountRow
           v-for="account in visibleAccounts"
           :key="account.accountId"
