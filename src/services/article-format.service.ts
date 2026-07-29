@@ -43,6 +43,31 @@ const resolveImageMarker = (text: string): number | undefined => {
   return match ? Number(match[1]) : undefined;
 };
 
+/** 첫 행을 헤더로 보고 GFM 파이프 표로 옮김. */
+const toPipeTable = (rows: string[][]): string => {
+  const width = Math.max(...rows.map((row) => row.length));
+  const pad = (row: string[]): string =>
+    `| ${[...row, ...Array(width - row.length).fill('')].join(' | ')} |`;
+
+  const [header, ...body] = rows;
+  const divider = `| ${Array(width).fill('---').join(' | ')} |`;
+
+  return [pad(header), divider, ...body.map(pad)].join('\n');
+};
+
+const toHtmlTable = (rows: string[][]): string => {
+  const [header, ...body] = rows;
+  const cells = (row: string[], tag: 'th' | 'td'): string =>
+    row.map((cell) => `<${tag}>${escapeHtml(cell)}</${tag}>`).join('');
+
+  return [
+    '<table>',
+    `<thead><tr>${cells(header, 'th')}</tr></thead>`,
+    `<tbody>${body.map((row) => `<tr>${cells(row, 'td')}</tr>`).join('')}</tbody>`,
+    '</table>',
+  ].join('');
+};
+
 export const toMarkdown = (html: string, options: MarkdownOptions = {}): string => {
   const { imageUrls = [], imageAltPrefix = '이미지' } = options;
   const blocks = parseArticleBlocks(protectBold(html));
@@ -56,6 +81,14 @@ export const toMarkdown = (html: string, options: MarkdownOptions = {}): string 
         const url = imageUrls[markerIndex - 1];
         return url ? `![${imageAltPrefix} ${markerIndex}](${url})` : '';
       }
+
+      if (block.image) {
+        const { src, alt, caption } = block.image;
+        const picture = `![${alt || imageAltPrefix}](${src})`;
+        return caption ? `${picture}\n\n*${caption}*` : picture;
+      }
+
+      if (block.rows) return toPipeTable(block.rows);
 
       if (block.type === 'heading') return `## ${text}`;
       if (block.type === 'quote') return `> ${text}`;
@@ -79,6 +112,15 @@ export const toSemanticHtml = (html: string, options: SemanticHtmlOptions): stri
         const url = imageUrls[markerIndex - 1];
         return url ? `<figure><img src="${url}" alt="${imageAltPrefix} ${markerIndex}" loading="lazy"></figure>` : '';
       }
+
+      if (block.image) {
+        const { src, alt, caption } = block.image;
+        const picture = `<img src="${src}" alt="${escapeHtml(alt || imageAltPrefix)}" loading="lazy">`;
+        const figcaption = caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : '';
+        return `<figure>${picture}${figcaption}</figure>`;
+      }
+
+      if (block.rows) return toHtmlTable(block.rows);
 
       if (block.type === 'heading') return `<h2>${text}</h2>`;
       if (block.type === 'quote') return `<blockquote><p>${text}</p></blockquote>`;
