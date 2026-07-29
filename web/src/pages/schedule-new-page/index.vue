@@ -8,6 +8,7 @@ import {
   type AutoSchedulePayload,
   type ScheduleMode,
 } from '@/entities/schedule';
+import { useBlogAccounts, checkBlogCredential } from '@/entities/blog-account';
 import {
   AccountEditor,
   createAccountBlock,
@@ -27,6 +28,9 @@ const MODE_OPTIONS: Array<{ value: ScheduleMode; label: string }> = [
 
 const router = useRouter();
 const { create, checkLogin } = useScheduleMutations();
+const { data: blogAccountData, isPending: isBlogAccountsLoading } = useBlogAccounts();
+
+const blogAccounts = computed(() => blogAccountData.value ?? []);
 
 const defaultPreset = findPreset('');
 
@@ -86,6 +90,19 @@ const handleAddBlock = () => {
 
 const handleTestLogin = async (block: AccountBlock) => {
   loginResult.value = '';
+
+  if (block.dabutAccountId) {
+    try {
+      const result = await checkBlogCredential(block.dabutAccountId);
+      loginResult.value = result.ok
+        ? `${result.loginId} 크리덴셜 확인됨`
+        : `크리덴셜 확인 실패: ${result.message ?? '사유 없음'}`;
+    } catch {
+      loginResult.value = '크리덴셜 확인 요청이 실패했습니다.';
+    }
+    return;
+  }
+
   try {
     const result = await checkLogin.mutateAsync({
       id: block.accountId.trim(),
@@ -104,8 +121,12 @@ const buildPayload = (): AutoSchedulePayload => {
   return {
     queues: blocks.value.map((block) => {
       const targets = parseTargets(block, current);
+      const account = block.dabutAccountId
+        ? { dabutAccountId: block.dabutAccountId }
+        : { id: block.accountId.trim(), password: block.password };
+
       return {
-        account: { id: block.accountId.trim(), password: block.password },
+        account,
         keywords: targets.map((target) => target.keyword),
         item_options: targets.map((target) => ({
           businessName: target.businessName || undefined,
@@ -224,6 +245,8 @@ const handleSubmit = async () => {
         :preset="preset"
         :index="index"
         :removable="blocks.length > 1"
+        :blog-accounts="blogAccounts"
+        :blog-accounts-loading="isBlogAccountsLoading"
         @update="handleBlockUpdate"
         @remove="handleBlockRemove"
         @test-login="handleTestLogin"

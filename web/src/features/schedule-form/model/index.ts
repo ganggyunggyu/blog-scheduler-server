@@ -8,6 +8,8 @@ export interface ParsedTarget {
 
 export interface AccountBlock {
   uid: string;
+  /** dabut 에 등록된 네이버 계정 id. 비어 있으면 아이디/비밀번호를 직접 넣는 모드. */
+  dabutAccountId: string;
   accountId: string;
   password: string;
   blogName: string;
@@ -17,6 +19,7 @@ export interface AccountBlock {
 
 export const createAccountBlock = (uid: string): AccountBlock => ({
   uid,
+  dabutAccountId: '',
   accountId: '',
   password: '',
   blogName: '',
@@ -63,14 +66,20 @@ export const validateBlocks = (
   const seenBusinessNames = new Map<string, string>();
 
   blocks.forEach((block, blockIndex) => {
-    const label = block.accountId || `${blockIndex + 1}번 계정`;
+    const label = block.accountId || block.blogName || `${blockIndex + 1}번 계정`;
     const targets = parseTargets(block, preset);
 
-    if (!block.accountId.trim()) {
-      issues.push({ level: 'error', message: `${blockIndex + 1}번 계정: 계정 ID가 비어 있습니다.` });
-    }
-    if (!block.password) {
-      issues.push({ level: 'error', message: `${label}: 비밀번호가 비어 있습니다.` });
+    // dabut 계정을 고른 경우엔 서버가 비밀번호를 꺼내 쓰므로 직접 입력을 요구하지 않는다.
+    if (!block.dabutAccountId) {
+      if (!block.accountId.trim()) {
+        issues.push({
+          level: 'error',
+          message: `${blockIndex + 1}번 계정: 블로그를 고르거나 계정 ID를 넣어주세요.`,
+        });
+      }
+      if (!block.password) {
+        issues.push({ level: 'error', message: `${label}: 비밀번호가 비어 있습니다.` });
+      }
     }
     if (!targets.length) {
       issues.push({ level: 'error', message: `${label}: 키워드가 없습니다.` });

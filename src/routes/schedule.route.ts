@@ -23,6 +23,8 @@ import { getPostList, getPostsByRange } from '../services/naver-blog.service.js'
 import { getValidCookies } from '../services/naver-auth.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { findAccountById } from '../services/account-directory.service.js';
+import { listDabutBlogAccounts, resolveDabutBlogCredential } from '../services/dabut-app.service.js';
+import { getRequestOwnerId } from './auth.route.js';
 import { resolvePublishCategory } from '../services/publish-category.service.js';
 import {
   buildAdhocGenerateIdentity,
@@ -60,7 +62,7 @@ const multiImageDataSchema = z.object({
 const pythonCompatSchema = z.object({
   queues: z.array(
     z.object({
-      account: z.object({ id: z.string(), password: z.string().optional(), blogId: z.string().optional() }),
+      account: z.object({ id: z.string().optional(), password: z.string().optional(), blogId: z.string().optional(), dabutAccountId: z.string().optional() }),
       keywords: z.array(z.string()),
       manuscripts: z.array(providedManuscriptSchema).optional(),
       multi_images: z.array(multiImageDataSchema).optional(),
@@ -114,9 +116,45 @@ const applyItemOptions = (
   }));
 };
 
+/**
+ * 큐에 넣을 계정 크리덴셜을 확정한다.
+ * dabutAccountId 가 오면 로그인한 계정이 dabut 에 등록해둔 네이버 계정에서 꺼내 쓰고,
+ * 아니면 기존처럼 요청 payload 나 계정 디렉토리에서 찾는다.
+ */
 const resolveQueueAccount = async (
-  account: { id: string; password?: string; blogId?: string },
+  account: { id?: string; password?: string; blogId?: string; dabutAccountId?: string },
+  ownerId?: string,
 ): Promise<{ account: QueueAccount; blogName?: string }> => {
+  if (account.dabutAccountId) {
+    if (!ownerId) {
+      throw new Error('dabutAccountId 를 쓰려면 로그인이 필요합니다.');
+    }
+
+    const credential = await resolveDabutBlogCredential({
+      ownerId,
+      accountId: account.dabutAccountId,
+    });
+    if (!credential) {
+      throw new Error(`dabut 계정을 찾을 수 없거나 비밀번호 복호화에 실패했습니다: ${account.dabutAccountId}`);
+    }
+
+    const blogAccounts = await listDabutBlogAccounts(ownerId);
+    const matched = blogAccounts.find((item) => item.id === account.dabutAccountId);
+
+    return {
+      account: {
+        id: credential.loginId,
+        password: credential.password,
+        blogId: credential.blogId || account.blogId,
+      },
+      blogName: matched?.name,
+    };
+  }
+
+  if (!account.id) {
+    throw new Error('account.id 또는 account.dabutAccountId 가 필요합니다.');
+  }
+
   const matchedAccount = await findAccountById(account.id);
   const password = account.password ?? matchedAccount?.password;
 
@@ -444,7 +482,8 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   });
 
   // Python 호환 라우트 (/bot/auto-schedule)
-  app.post('/bot/auto-schedule', async (req: { body: unknown }) => {
+  app.post('/bot/auto-schedule', async (req) => {
+    const ownerId = getRequestOwnerId(req);
     const body = pythonCompatSchema.parse(req.body);
     const effectiveMode = resolveScheduleMode(body.schedule_mode, body.manuscript_type);
     const timingOptions = buildScheduleTimingOptions({
@@ -470,7 +509,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         throw new Error(`account=${queue.account.id} item_options(${queue.item_options.length})와 keywords(${queue.keywords.length}) 개수가 일치하지 않음`);
       }
 
-      const resolved = await resolveQueueAccount(queue.account);
+      const resolved = await resolveQueueAccount(queue.account, ownerId);
       const baseItems = queue.items?.map((item) => ({
         keyword: item.keyword,
         category: item.category,
@@ -579,7 +618,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 const updateCompatSchema = z.object({
   queues: z.array(
     z.object({
-      account: z.object({ id: z.string(), password: z.string().optional(), blogId: z.string().optional() }),
+      account: z.object({ id: z.string().optional(), password: z.string().optional(), blogId: z.string().optional(), dabutAccountId: z.string().optional() }),
       keywords: z.array(z.string()),
       manuscripts: z.array(z.object({
         title: z.string().min(1),
@@ -603,7 +642,8 @@ const updateCompatSchema = z.object({
     keyword_category: z.string().optional(),
   });
 
-  app.post('/bot/auto-update', async (req: { body: unknown }) => {
+  app.post('/bot/auto-update', async (req) => {
+    const ownerId = getRequestOwnerId(req);
     const body = updateCompatSchema.parse(req.body);
 
     const results: Array<{
@@ -622,7 +662,7 @@ const updateCompatSchema = z.object({
         };
       }
 
-      const resolved = await resolveQueueAccount(queue.account);
+      const resolved = await resolveQueueAccount(queue.account, ownerId);
       const auth = await getValidCookies(resolved.account.id, resolved.account.password);
 
       let posts: Array<{ logNo: string; title: string; index: number }>;
@@ -641,7 +681,7 @@ const updateCompatSchema = z.object({
 
       if (posts.length === 0) {
         results.push({
-          account: maskAccountId(queue.account.id),
+          account: maskAccountId(resolved.account.id),
           totalJobs: 0,
           posts: [],
         });
@@ -704,7 +744,7 @@ const updateCompatSchema = z.object({
       }
 
       results.push({
-        account: maskAccountId(queue.account.id),
+        account: maskAccountId(resolved.account.id),
         totalJobs: jobsToCreate.length,
         posts: jobsToCreate,
       });

@@ -1,0 +1,183 @@
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import mongoose, { type Connection } from 'mongoose';
+import { env } from '../config/env.js';
+import { decryptStoredSecret } from '../lib/crypto/fernet.js';
+import { logger } from '../lib/logging/logger.js';
+
+const log = logger.child({ scope: 'DabutApp' });
+
+/*
+  dabut-backend 의 앱 DB(users / naver_accounts)를 그대로 읽는다.
+  로그인·회원가입 자체는 dabut API 로 넘기고, 여기서는 토큰 검증과 계정 조회만 한다.
+  발행 워커가 평문 비밀번호를 필요로 해서 password_enc 는 여기서 복호화한다.
+*/
+
+export interface DabutUser {
+  id: string;
+  username: string;
+  label: string;
+  isActive: boolean;
+}
+
+export interface DabutBlogAccount {
+  id: string;
+  name: string;
+  loginId: string;
+  blogId: string;
+  category: string;
+  group: string;
+  memo: string;
+  order: number;
+  isActive: boolean;
+  hasPassword: boolean;
+}
+
+export interface DabutJwtPayload {
+  sub: string;
+  username: string;
+  exp: number;
+}
+
+/* 스케쥴러 본체는 별도 Mongo 를 쓰므로 dabut 앱 DB 는 두 번째 커넥션으로 붙인다. */
+let connection: Connection | null = null;
+
+const getConnection = async (): Promise<Connection> => {
+  if (!env.DABUT_APP_MONGO_URI) {
+    throw new Error('DABUT_APP_MONGO_URI 가 설정되지 않았습니다.');
+  }
+  if (!connection) {
+    connection = mongoose.createConnection(env.DABUT_APP_MONGO_URI, {
+      dbName: env.DABUT_APP_DB_NAME,
+    });
+    await connection.asPromise();
+    log.info('mongo.connected', { db: env.DABUT_APP_DB_NAME });
+  }
+  return connection;
+};
+
+const usersCollection = async () => (await getConnection()).collection('users');
+
+const naverAccountsCollection = async () => (await getConnection()).collection('naver_accounts');
+
+export const isDabutAuthEnabled = (): boolean =>
+  Boolean(env.JWT_SECRET && env.DABUT_APP_MONGO_URI);
+
+const base64UrlDecode = (value: string): Buffer =>
+  Buffer.from(value.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+
+const base64UrlEncode = (value: Buffer): string =>
+  value.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+/**
+ * dabut 이 발급한 HS256 JWT 를 검증한다.
+ * 라이브러리를 더 붙이지 않으려고 node:crypto 로 서명만 확인한다.
+ */
+export const verifyDabutToken = (token: string): DabutJwtPayload | null => {
+  const secret = env.JWT_SECRET;
+  if (!secret || !token) return null;
+
+  const [headerPart, payloadPart, signaturePart] = token.split('.');
+  if (!headerPart || !payloadPart || !signaturePart) return null;
+
+  try {
+    const header = JSON.parse(base64UrlDecode(headerPart).toString('utf-8'));
+    if (header.alg !== 'HS256') return null;
+
+    const expected = base64UrlEncode(
+      createHmac('sha256', secret).update(`${headerPart}.${payloadPart}`).digest(),
+    );
+    const expectedBuffer = Buffer.from(expected);
+    const actualBuffer = Buffer.from(signaturePart);
+    if (expectedBuffer.length !== actualBuffer.length) return null;
+    if (!timingSafeEqual(expectedBuffer, actualBuffer)) return null;
+
+    const payload = JSON.parse(base64UrlDecode(payloadPart).toString('utf-8')) as DabutJwtPayload;
+    if (!payload.sub) return null;
+    if (payload.exp && payload.exp * 1000 < Date.now()) return null;
+
+    return payload;
+  } catch {
+    return null;
+  }
+};
+
+const toObjectId = (value: string): mongoose.Types.ObjectId | null => {
+  try {
+    return new mongoose.Types.ObjectId(value);
+  } catch {
+    return null;
+  }
+};
+
+export const findDabutUser = async (userId: string): Promise<DabutUser | null> => {
+  const objectId = toObjectId(userId);
+  if (!objectId) return null;
+
+  const doc = await (await usersCollection()).findOne({ _id: objectId });
+  if (!doc) return null;
+
+  return {
+    id: String(doc._id),
+    username: String(doc.username ?? ''),
+    label: String(doc.label ?? ''),
+    isActive: doc.is_active !== false,
+  };
+};
+
+const toBlogAccount = (doc: Record<string, unknown>): DabutBlogAccount => ({
+  id: String(doc._id),
+  name: String(doc.name ?? ''),
+  loginId: String(doc.login_id ?? ''),
+  blogId: String(doc.blog_id ?? ''),
+  category: String(doc.category ?? ''),
+  group: String(doc.group ?? ''),
+  memo: String(doc.memo ?? ''),
+  order: Number(doc.order ?? 0),
+  isActive: doc.is_active !== false,
+  hasPassword: Boolean(doc.password_enc),
+});
+
+/** 로그인한 계정이 소유한 블로그 목록. 비밀번호는 담지 않는다. */
+export const listDabutBlogAccounts = async (ownerId: string): Promise<DabutBlogAccount[]> => {
+  const docs = await (await naverAccountsCollection())
+    .find({ owner_id: ownerId })
+    .sort({ order: 1, created_at: 1 })
+    .toArray();
+
+  return docs.map((doc) => toBlogAccount(doc as Record<string, unknown>));
+};
+
+/** 발행에 쓸 평문 크리덴셜. 소유자가 일치할 때만 내보낸다. */
+export const resolveDabutBlogCredential = async (params: {
+  ownerId: string;
+  accountId: string;
+}): Promise<{ loginId: string; password: string; blogId: string } | null> => {
+  const objectId = toObjectId(params.accountId);
+  if (!objectId) return null;
+
+  const doc = await (await naverAccountsCollection()).findOne({
+    _id: objectId,
+    owner_id: params.ownerId,
+  });
+  if (!doc) return null;
+
+  const stored = String(doc.password_enc ?? '');
+  const password = decryptStoredSecret(stored, env.API_KEY_ENC_SECRET ?? '');
+  if (!password) {
+    log.warn('credential.decrypt.failed', { accountId: params.accountId });
+    return null;
+  }
+
+  return {
+    loginId: String(doc.login_id ?? ''),
+    password,
+    blogId: String(doc.blog_id ?? ''),
+  };
+};
+
+export const closeDabutApp = async (): Promise<void> => {
+  if (connection) {
+    await connection.close();
+    connection = null;
+  }
+};

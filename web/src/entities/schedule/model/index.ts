@@ -45,7 +45,10 @@ export interface ScheduleItemOption {
 }
 
 export interface AutoScheduleQueue {
-  account: { id: string; password: string; blogId?: string };
+  /** dabut 계정을 고르면 dabutAccountId 만, 직접 입력이면 id/password 를 보낸다. */
+  account:
+    | { dabutAccountId: string }
+    | { id: string; password: string; blogId?: string };
   keywords: string[];
   item_options?: ScheduleItemOption[];
   blog_name?: string;

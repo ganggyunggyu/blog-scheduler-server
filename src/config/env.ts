@@ -36,9 +36,16 @@ const envSchema = z.object({
 
   POSTS_PER_DAY: z.coerce.number().default(3),
 
-  /* 운영 UI 인증. 설정하면 API 전체가 Bearer 토큰을 요구한다. 없으면 인증이 꺼진다. */
-  WEB_AUTH_SECRET: z.string().optional(),
-  WEB_USERS: z.string().optional(),
+  /*
+    운영 UI 인증. dabut-backend 의 앱 계정(users)을 그대로 쓴다.
+    JWT_SECRET 과 DABUT_APP_MONGO_URI 가 둘 다 있어야 인증이 켜진다.
+    로그인·회원가입은 DABUT_API_URL 로 넘기고, 토큰 검증은 여기서 HS256 으로 한다.
+  */
+  JWT_SECRET: z.string().optional(),
+  API_KEY_ENC_SECRET: z.string().optional(),
+  DABUT_APP_MONGO_URI: z.string().optional(),
+  DABUT_APP_DB_NAME: z.string().default('dabut'),
+  DABUT_API_URL: z.string().default('http://localhost:8000'),
 
   GEMINI_API_KEY: z.string().optional(),
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().email().optional(),

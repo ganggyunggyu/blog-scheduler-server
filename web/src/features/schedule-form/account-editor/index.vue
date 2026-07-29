@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { DomainPreset } from '@/entities/schedule';
+import type { BlogAccount } from '@/entities/blog-account';
 import { AppButton, AppField, INPUT_CLASS } from '@/shared/ui';
 import { parseTargets, type AccountBlock } from '../model';
 
@@ -9,6 +10,8 @@ interface Props {
   preset: DomainPreset;
   index: number;
   removable: boolean;
+  blogAccounts: BlogAccount[];
+  blogAccountsLoading: boolean;
 }
 
 const props = defineProps<Props>();
@@ -22,6 +25,25 @@ const targets = computed(() => parseTargets(props.block, props.preset));
 
 const patch = (partial: Partial<AccountBlock>) => {
   emit('update', { ...props.block, ...partial });
+};
+
+const selectedBlogAccount = computed(() =>
+  props.blogAccounts.find((item) => item.id === props.block.dabutAccountId),
+);
+
+const isManualMode = computed(() => !props.block.dabutAccountId);
+
+/** 다붓에 등록된 블로그를 고르면 계정 정보는 서버가 채운다. */
+const handleBlogAccountChange = (event: Event) => {
+  const dabutAccountId = (event.target as HTMLSelectElement).value;
+  const matched = props.blogAccounts.find((item) => item.id === dabutAccountId);
+
+  patch({
+    dabutAccountId,
+    accountId: matched?.loginId ?? '',
+    password: '',
+    blogName: matched?.name ?? props.block.blogName,
+  });
 };
 
 const handleAccountIdInput = (event: Event) => {
@@ -61,7 +83,7 @@ const handleTestLogin = () => {
         <AppButton
           size="sm"
           variant="ghost"
-          :disabled="!props.block.accountId || !props.block.password"
+          :disabled="!props.block.dabutAccountId && (!props.block.accountId || !props.block.password)"
           @click="handleTestLogin"
         >
           로그인 확인
@@ -73,7 +95,50 @@ const handleTestLogin = () => {
     </header>
 
     <div class="grid gap-4 p-3 md:grid-cols-2">
-      <AppField label="계정 ID">
+      <AppField
+        label="블로그"
+        class-name="md:col-span-2"
+        :hint="
+          props.blogAccountsLoading
+            ? '다붓에서 블로그 목록을 불러오는 중입니다.'
+            : '다붓에 등록한 블로그를 고르면 계정 정보를 서버가 채웁니다.'
+        "
+      >
+        <select
+          :class="INPUT_CLASS"
+          :value="props.block.dabutAccountId"
+          :disabled="props.blogAccountsLoading"
+          @change="handleBlogAccountChange"
+        >
+          <option value="">직접 입력</option>
+          <option
+            v-for="item in props.blogAccounts"
+            :key="item.id"
+            :value="item.id"
+            :disabled="!item.hasPassword"
+          >
+            {{ item.name || item.loginId }}
+            {{ item.category ? `· ${item.category}` : '' }}
+            {{ item.hasPassword ? '' : '(비밀번호 없음)' }}
+          </option>
+        </select>
+      </AppField>
+
+      <p
+        v-if="selectedBlogAccount"
+        class="md:col-span-2 flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-[6px] border border-line bg-surface px-3 py-2 text-[12px]"
+      >
+        <span class="text-ink-faint">아이디</span>
+        <span class="font-mono text-ink">{{ selectedBlogAccount.loginId }}</span>
+        <span class="text-ink-faint">블로그</span>
+        <span class="font-mono text-ink">{{ selectedBlogAccount.blogId || '-' }}</span>
+        <span class="text-ink-faint">비밀번호</span>
+        <span :class="selectedBlogAccount.hasPassword ? 'text-accent' : 'text-state-failed'">
+          {{ selectedBlogAccount.hasPassword ? '저장됨' : '없음' }}
+        </span>
+      </p>
+
+      <AppField v-if="isManualMode" label="계정 ID">
         <input
           :class="INPUT_CLASS"
           type="text"
@@ -83,7 +148,7 @@ const handleTestLogin = () => {
         />
       </AppField>
 
-      <AppField label="비밀번호">
+      <AppField v-if="isManualMode" label="비밀번호">
         <input
           :class="INPUT_CLASS"
           type="password"

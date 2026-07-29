@@ -9,6 +9,12 @@ const routes: RouteRecordRaw[] = [
     meta: { public: true },
   },
   {
+    path: '/signup',
+    name: 'signup',
+    component: () => import('@/pages/signup-page/index.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/',
     name: 'dashboard',
     component: () => import('@/pages/dashboard-page/index.vue'),
