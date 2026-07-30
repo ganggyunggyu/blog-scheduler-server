@@ -4,6 +4,7 @@ import {
   assertRestaurantPlan,
   buildRestaurantPlanItems,
   findDuplicateBusinessNames,
+  findRegionMismatches,
   normalizeBusinessName,
   type RestaurantAccountPlan,
 } from '../../src/services/restaurant-plan.service.js';
@@ -113,4 +114,35 @@ test('assertRestaurantPlan: 정상 플랜은 통과함', () => {
       buildPlan('acc2', ['C식당', 'D식당'], '제이제이'),
     ]),
   );
+});
+
+test('findRegionMismatches: 담당 권역 밖 상권 키워드를 잡아냄', () => {
+  const seoulPlan: RestaurantAccountPlan = {
+    accountId: 'e4f-l',
+    region: '서울',
+    blogCharacter: '사랑채',
+    items: buildRestaurantPlanItems([
+      { keyword: '홍대맛집', businessName: '무세이' },
+      { keyword: '수원인계동맛집', businessName: '쏘삼208' },
+    ]),
+  };
+
+  assert.deepEqual(findRegionMismatches([seoulPlan]), [
+    { accountId: 'e4f-l', region: '서울', keyword: '수원인계동맛집' },
+  ]);
+});
+
+test('findRegionMismatches: 권역 안 키워드만 있으면 빈 배열', () => {
+  assert.deepEqual(findRegionMismatches([buildPlan('acc1', ['A식당', 'B식당'])]), []);
+});
+
+test('assertRestaurantPlan: 블로그 하나가 다른 권역 글을 섞으면 에러로 막음', () => {
+  const mixed: RestaurantAccountPlan = {
+    accountId: 'e4f-l',
+    region: '서울',
+    blogCharacter: '사랑채',
+    items: buildRestaurantPlanItems([{ keyword: '대구동성로맛집', businessName: '목마식당' }]),
+  };
+
+  assert.throws(() => assertRestaurantPlan([mixed]), /권역 밖 키워드: e4f-l\(서울\)\/대구동성로맛집/);
 });

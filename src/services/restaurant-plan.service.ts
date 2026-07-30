@@ -46,8 +46,34 @@ export interface RestaurantAccountPlan {
   items: RestaurantPlanItem[];
 }
 
+/**
+ * 대윤기획 규칙: 블로그 하나는 한 권역만 담당함.
+ * 키워드가 그 권역 밖 상권을 가리키면 등록 단계에서 막기 위한 토큰표임.
+ */
+export const REGION_AREA_TOKENS: Record<string, string[]> = {
+  '인천/부천': ['인천', '부천', '송도', '청라'],
+  '서울': ['서울', '강남', '홍대', '성수', '여의도', '종로', '잠실', '연남', '을지로', '압구정', '광화문', '신촌', '마포', '서촌', '이태원', '건대'],
+  '일산/파주': ['일산', '파주', '고양', '킨텍스', '정발산', '화정', '원흥', '헤이리', '문산', '운정'],
+  '수원/동탄/광교/용인/분당': ['수원', '동탄', '광교', '용인', '분당', '판교', '기흥', '수지', '정자', '행궁'],
+  '대구/포항/경산/구미/경주': ['대구', '포항', '경산', '구미', '경주', '동성로', '수성', '들안길', '앞산', '영일대', '죽도', '영남대', '인동', '원평', '황리단길'],
+};
+
 export const normalizeBusinessName = (name: string): string =>
   name.trim().replace(/\s+/g, ' ').toLowerCase();
+
+export const findRegionMismatches = (
+  plans: RestaurantAccountPlan[],
+): Array<{ accountId: string; region: string; keyword: string }> =>
+  plans.flatMap((plan) => {
+    const tokens = REGION_AREA_TOKENS[plan.region];
+    if (!tokens) {
+      return [{ accountId: plan.accountId, region: plan.region, keyword: '(권역 토큰표 없음)' }];
+    }
+
+    return plan.items
+      .filter((item) => !tokens.some((token) => item.keyword.includes(token)))
+      .map((item) => ({ accountId: plan.accountId, region: plan.region, keyword: item.keyword }));
+  });
 
 export const buildRestaurantPlanItems = (
   targets: RestaurantTarget[],
@@ -87,6 +113,12 @@ export const assertRestaurantPlan = (plans: RestaurantAccountPlan[]): void => {
   const duplicates = findDuplicateBusinessNames(plans);
   if (duplicates.length > 0) {
     throw new Error(`업체명 중복: ${duplicates.join(', ')}`);
+  }
+
+  const mismatches = findRegionMismatches(plans);
+  if (mismatches.length > 0) {
+    const detail = mismatches.map((m) => `${m.accountId}(${m.region})/${m.keyword}`).join(', ');
+    throw new Error(`권역 밖 키워드: ${detail}`);
   }
 
   const missingBusiness = plans.flatMap((plan) =>

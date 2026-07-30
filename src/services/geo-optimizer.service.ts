@@ -52,11 +52,21 @@ export interface LlmsTxtInput {
   entries: LlmsTxtEntry[];
 }
 
-type BlockType = 'heading' | 'quote' | 'paragraph';
+type BlockType = 'heading' | 'quote' | 'paragraph' | 'image' | 'table';
+
+export interface ArticleImage {
+  src: string;
+  alt: string;
+  caption: string;
+}
 
 export interface ArticleBlock {
   type: BlockType;
+  /** 채점용 평문. 이미지는 alt/캡션, 표는 셀을 이어붙인 값이 들어감. */
   text: string;
+  image?: ArticleImage;
+  /** 표의 행렬. 첫 행을 헤더로 봄. */
+  rows?: string[][];
 }
 
 const PASS_THRESHOLD = 0.6;
@@ -122,8 +132,40 @@ const splitLooseParagraphs = (chunk: string): string[] => {
     .filter((text) => text.length > 0);
 };
 
+/**
+ * 외부에서 들여온 원고는 `<figure><img>` 와 `<table>` 을 그대로 담고 있음.
+ * 예전에는 이 둘을 문단으로 뭉개서 태그를 벗겨버려 이미지가 사라지고 표가
+ * 셀 단위로 흩어졌음. 그래서 전용 블록으로 떼어냄.
+ */
+const parseImageBlock = (raw: string): ArticleBlock | null => {
+  const src = raw.match(/<img[^>]*\bsrc="([^"]*)"/i)?.[1];
+  if (!src) return null;
+
+  const alt = raw.match(/<img[^>]*\balt="([^"]*)"/i)?.[1] ?? '';
+  const captionRaw = raw.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/i)?.[1] ?? '';
+  const caption = stripTags(captionRaw);
+
+  return {
+    type: 'image',
+    text: [alt, caption].filter((part) => part.length > 0).join(' '),
+    image: { src, alt, caption },
+  };
+};
+
+const parseTableBlock = (raw: string): ArticleBlock | null => {
+  const rows = [...raw.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)]
+    .map((row) =>
+      [...row[1].matchAll(/<(th|td)[^>]*>([\s\S]*?)<\/\1>/gi)].map((cell) => stripTags(cell[2])),
+    )
+    .filter((cells) => cells.length > 0);
+
+  if (rows.length === 0) return null;
+
+  return { type: 'table', text: rows.flat().join(' '), rows };
+};
+
 export const parseArticleBlocks = (html: string): ArticleBlock[] => {
-  const blockPattern = /<(h[1-6]|blockquote)[^>]*>[\s\S]*?<\/\1>/gi;
+  const blockPattern = /<(h[1-6]|blockquote|figure|table)[^>]*>[\s\S]*?<\/\1>/gi;
   const blocks: ArticleBlock[] = [];
   let cursor = 0;
 
@@ -134,12 +176,26 @@ export const parseArticleBlocks = (html: string): ArticleBlock[] => {
     );
 
     const raw = match[0];
+    const tag = match[1].toLowerCase();
+    cursor = index + raw.length;
+
+    if (tag === 'figure') {
+      const block = parseImageBlock(raw);
+      if (block) blocks.push(block);
+      continue;
+    }
+
+    if (tag === 'table') {
+      const block = parseTableBlock(raw);
+      if (block) blocks.push(block);
+      continue;
+    }
+
     const text = stripTags(raw);
     if (text.length > 0) {
-      const isHeading = match[1].toLowerCase().startsWith('h') || isHeadingBlockquote(raw, text);
+      const isHeading = tag.startsWith('h') || isHeadingBlockquote(raw, text);
       blocks.push({ type: isHeading ? 'heading' : 'quote', text });
     }
-    cursor = index + raw.length;
   }
 
   splitLooseParagraphs(html.slice(cursor)).forEach((text) =>

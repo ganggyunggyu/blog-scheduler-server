@@ -72,3 +72,63 @@ test('toSemanticHtml: includeJsonLd=false 면 스크립트를 붙이지 않음',
 
   assert.ok(!html.includes('ld+json'));
 });
+
+/**
+ * 네이버 파이프라인은 `이미지1)` 리터럴 마커를 쓰지만, 외부에서 들여온 원고는
+ * 진짜 `<img>` / `<table>` 을 그대로 담고 있음. 예전 구현은 태그를 통째로 벗겨서
+ * 이미지와 표가 조용히 사라졌음.
+ */
+const richHtml = [
+  '<p>원주마사지는 원주에서 받는 손 기법 관리를 말합니다.</p>',
+  '<figure><img src="https://cdn.example.com/room.png" alt="관리실 내부" />',
+  '<figcaption>표기 시간에 상담이 포함되는지 본다</figcaption></figure>',
+  '<h2>종류는 어떻게 다른가요?</h2>',
+  '<table><thead><tr><th>종류</th><th>오일</th></tr></thead>',
+  '<tbody><tr><td>스웨디시</td><td>사용</td></tr>',
+  '<tr><td>타이</td><td>없음</td></tr></tbody></table>',
+  '<p>오일을 쓰느냐가 첫 갈래입니다.</p>',
+].join('');
+
+test('toMarkdown: 실제 img 태그를 마크다운 이미지로 옮김', () => {
+  const md = toMarkdown(richHtml);
+
+  assert.ok(md.includes('![관리실 내부](https://cdn.example.com/room.png)'), md);
+});
+
+test('toMarkdown: figcaption 을 이미지 아래 캡션 줄로 남김', () => {
+  const md = toMarkdown(richHtml);
+
+  assert.ok(md.includes('표기 시간에 상담이 포함되는지 본다'), md);
+});
+
+test('toMarkdown: table 을 GFM 파이프 표로 옮김', () => {
+  const md = toMarkdown(richHtml);
+
+  assert.ok(md.includes('| 종류 | 오일 |'), md);
+  assert.ok(md.includes('| --- | --- |'), md);
+  assert.ok(md.includes('| 스웨디시 | 사용 |'), md);
+  assert.ok(md.includes('| 타이 | 없음 |'), md);
+});
+
+test('toMarkdown: 표 안의 셀이 문단으로 흩어지지 않음', () => {
+  const md = toMarkdown(richHtml);
+
+  assert.ok(!/^스웨디시\s*$/m.test(md), md);
+});
+
+test('toSemanticHtml: img 와 table 을 그대로 살려 둠', () => {
+  const html = toSemanticHtml(richHtml, { title: '원주마사지', keyword: '원주마사지' });
+
+  assert.ok(html.includes('<img src="https://cdn.example.com/room.png"'), html);
+  assert.ok(html.includes('<table>'), html);
+  assert.ok(html.includes('<td>스웨디시</td>'), html);
+});
+
+test('toMarkdown: 이미지 마커 방식은 그대로 동작함', () => {
+  const md = toMarkdown(naverHtml, {
+    imageUrls: ['https://cdn.example.com/1.png'],
+    imageAltPrefix: '원주마사지',
+  });
+
+  assert.ok(md.includes('![원주마사지 1](https://cdn.example.com/1.png)'), md);
+});
