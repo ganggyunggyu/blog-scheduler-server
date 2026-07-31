@@ -33,6 +33,8 @@ export const scheduleJobSchema = new Schema(
     category: { type: String },
     businessName: { type: String },
     manuscriptType: { type: String },
+    /** 다붓 Project id. 항목별로 다른 원고 방식을 쓸 때 채움. */
+    projectId: { type: String },
     scheduledAt: { type: String, required: true, index: true },
     slot: { type: Number, required: true },
     generateJobId: { type: String },

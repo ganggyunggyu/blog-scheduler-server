@@ -208,3 +208,48 @@ test('findManuscriptRejection: 정상 길이의 맛집 원고는 통과시킴', 
 test('findManuscriptRejection: 거절 문구가 없어도 너무 짧으면 막음', () => {
   assert.match(findManuscriptRejection('짧은 본문입니다.') ?? '', /너무 짧음/);
 });
+
+/**
+ * 다붓의 Project(프롬프트+모델+파이프라인)를 원고 방식으로 그대로 쓰는 경로.
+ * 하드코딩 enum 을 늘리지 않고 project_id 만 넘기면 되게 함.
+ */
+test('buildManuscriptRequest: projectId 를 주면 다붓 프로젝트 엔드포인트로 보냄', () => {
+  const result = buildManuscriptRequest('default', '원주마사지', 'default', '', undefined, {
+    projectId: 'proj_abc123',
+  });
+
+  assert.equal(result.url, 'http://localhost:8000/generate/project');
+  assert.equal(result.body.project_id, 'proj_abc123');
+  assert.equal(result.body.keyword, '원주마사지');
+});
+
+test('buildManuscriptRequest: projectId 는 manuscriptType 보다 우선함', () => {
+  const result = buildManuscriptRequest('restaurant/v1', '부천중동맛집', 'restaurant', '', undefined, {
+    projectId: 'proj_restaurant',
+    businessName: '베코',
+  });
+
+  assert.equal(result.url, 'http://localhost:8000/generate/project');
+  assert.equal(result.body.business_name, '베코');
+});
+
+test('buildManuscriptRequest: projectId 경로도 업체명을 그대로 실어 보냄', () => {
+  const result = buildManuscriptRequest('default', '수원행궁동맛집', 'default', 'ref-1', undefined, {
+    projectId: 'proj_x',
+    businessName: '솔솥',
+  });
+
+  assert.deepEqual(result.body, {
+    project_id: 'proj_x',
+    keyword: '수원행궁동맛집',
+    ref: 'ref-1',
+    business_name: '솔솥',
+  });
+});
+
+test('buildManuscriptRequest: projectId 가 없으면 기존 동작을 그대로 유지함', () => {
+  const result = buildManuscriptRequest('pet', '강아지사료', 'pet');
+
+  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler-pet');
+  assert.equal(result.body.project_id, undefined);
+});

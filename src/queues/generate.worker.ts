@@ -32,6 +32,8 @@ export interface GenerateJobData {
   blogName?: string;
   /** 맛집1/맛집2 에서 조사 대상 업체를 고정할 때만 채움. */
   businessName?: string;
+  /** 다붓 Project id. 있으면 manuscriptType 대신 이 프로젝트로 원고를 뽑음. */
+  projectId?: string;
   providedManuscript?: ProvidedManuscript;
   providedMultiImages?: MultiImageData;
   imageDateCode?: string;
@@ -101,6 +103,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     keywordCategory: providedCategory,
     blogName,
     businessName,
+    projectId,
     providedManuscript,
     providedMultiImages,
     imageDateCode,
@@ -208,7 +211,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         imageSource,
         manuscriptType,
         category,
-        { businessName, blogName },
+        { businessName, blogName, projectId },
       );
     log.info('job.prepared', {
       jobDir: prepared.jobDir,

@@ -46,6 +46,8 @@ const scheduleItemSchema = z.object({
 const scheduleItemOptionSchema = z.object({
   businessName: z.string().optional(),
   manuscriptType: manuscriptTypeSchema.optional(),
+  /** 다붓 Project id. manuscriptType 보다 우선함. */
+  projectId: z.string().min(1).optional(),
 });
 const providedManuscriptSchema = z.object({
   title: z.string().min(1),
@@ -77,6 +79,8 @@ const pythonCompatSchema = z.object({
   image_count: z.number().default(5),
   image_source: imageSourceSchema,
   manuscript_type: manuscriptTypeSchema,
+  /** 다붓 Project id 기본값. item_options 의 projectId 가 있으면 그쪽이 이김. */
+  project_id: z.string().min(1).optional(),
   delay_between_posts: z.number().default(10),
   keyword_category: z.string().optional(),
 });
@@ -101,7 +105,7 @@ interface QueueAccount {
  */
 const applyItemOptions = (
   items: ScheduleItem[],
-  itemOptions?: Array<{ businessName?: string; manuscriptType?: string }>,
+  itemOptions?: Array<{ businessName?: string; manuscriptType?: string; projectId?: string }>,
 ): ScheduleItem[] => {
   if (!itemOptions?.length) {
     return items;
@@ -111,6 +115,7 @@ const applyItemOptions = (
     ...item,
     businessName: itemOptions[index]?.businessName ?? item.businessName,
     manuscriptType: itemOptions[index]?.manuscriptType ?? item.manuscriptType,
+    projectId: itemOptions[index]?.projectId ?? item.projectId,
   }));
 };
 
@@ -145,6 +150,8 @@ interface EnqueueScheduleGenerateJobInput {
   imageCount: number;
   imageSource?: 'ai' | 'google' | 'keyword' | 'product' | 'local';
   manuscriptType?: string;
+  /** 다붓 Project id. 항목별 override 가 없을 때 쓰는 기본값. */
+  projectId?: string;
   delayBetweenPostsSeconds: number;
   keywordCategory?: string;
   blogName?: string;
@@ -163,6 +170,7 @@ const enqueueScheduleGenerateJob = async ({
   imageCount,
   imageSource,
   manuscriptType,
+  projectId,
   delayBetweenPostsSeconds,
   keywordCategory,
   blogName,
@@ -189,6 +197,7 @@ const enqueueScheduleGenerateJob = async ({
     imageCount,
     imageSource,
     manuscriptType: jobItem.manuscriptType ?? manuscriptType,
+    projectId: jobItem.projectId ?? projectId,
     delayBetweenPostsSeconds,
     scheduledAt: jobItem.scheduledAt,
     blogName,
@@ -551,6 +560,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageCount: body.image_count,
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
+          projectId: body.project_id,
           delayBetweenPostsSeconds: body.delay_between_posts,
           keywordCategory: body.keyword_category,
           blogName,
@@ -599,6 +609,8 @@ const updateCompatSchema = z.object({
     image_count: z.number().default(5),
     image_source: imageSourceSchema,
     manuscript_type: manuscriptTypeSchema,
+    /** 다붓 Project id 기본값. item_options 의 projectId 가 우선함. */
+    project_id: z.string().min(1).optional(),
     delay_between_posts: z.number().default(10),
     keyword_category: z.string().optional(),
   });
@@ -699,6 +711,7 @@ const updateCompatSchema = z.object({
           imageCount: body.image_count,
           imageSource: body.image_source,
           manuscriptType: queue.item_options?.[i]?.manuscriptType ?? body.manuscript_type,
+          projectId: queue.item_options?.[i]?.projectId ?? body.project_id,
           businessName: queue.item_options?.[i]?.businessName,
           delayBetweenPostsSeconds: body.delay_between_posts,
           scheduledAt: new Date().toISOString(),

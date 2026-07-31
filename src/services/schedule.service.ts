@@ -42,6 +42,8 @@ export interface ScheduleItem {
   businessName?: string;
   /** 항목별 원고 타입 override. 맛집1/맛집2 를 번갈아 쓸 때 사용함. */
   manuscriptType?: string;
+  /** 다붓 Project id. 있으면 manuscriptType 대신 이 프로젝트로 원고를 뽑음. */
+  projectId?: string;
   scheduledAt: Date;
   slot: number;
 }
@@ -223,6 +225,7 @@ export interface ScheduleQueueJob {
   category?: string;
   businessName?: string;
   manuscriptType?: string;
+  projectId?: string;
   scheduledAt: string;
   slot: number;
   status: string;
@@ -234,6 +237,7 @@ export interface ScheduleJobDocument {
   category?: string | null;
   businessName?: string | null;
   manuscriptType?: string | null;
+  projectId?: string | null;
   scheduledAt: string;
   slot: number;
 }
@@ -254,6 +258,7 @@ export const toScheduleQueueJob = (
   category: jobDocument.category ?? undefined,
   businessName: jobDocument.businessName ?? undefined,
   manuscriptType: jobDocument.manuscriptType ?? undefined,
+  projectId: jobDocument.projectId ?? undefined,
   scheduledAt: jobDocument.scheduledAt,
   slot: jobDocument.slot,
   status,
@@ -289,6 +294,7 @@ export const createSchedule = async (input: CreateScheduleInput) => {
       keyword: item.keyword,
       businessName: item.businessName,
       manuscriptType: item.manuscriptType,
+      projectId: item.projectId,
     })),
   });
 

@@ -81,7 +81,31 @@ export interface ManuscriptExtraOptions {
   businessName?: string;
   /** 맛집2 캐릭터명. 다른 원고 타입에서는 무시됨. */
   blogName?: string;
+  /**
+   * 다붓 Project id. 주면 하드코딩된 MANUSCRIPT_ENDPOINTS 를 건너뛰고
+   * 프로젝트에 저장된 프롬프트/모델/파이프라인으로 뽑음.
+   * 원고 방식을 추가할 때 이 서버를 다시 배포하지 않아도 되게 하는 경로임.
+   */
+  projectId?: string;
 }
+
+/** 다붓 Project 기반 생성. 프로젝트가 프롬프트와 모델을 들고 있어 여기선 식별자만 넘김. */
+const PROJECT_ENDPOINT_PATH = '/generate/project';
+
+const buildProjectRequest = (
+  projectId: string,
+  keyword: string,
+  ref: string,
+  businessName?: string,
+): ManuscriptRequestConfig => {
+  const body: Record<string, string> = { project_id: projectId, keyword, ref };
+
+  if (businessName) {
+    body.business_name = businessName;
+  }
+
+  return { url: `${env.MANUSCRIPT_API_URL}${PROJECT_ENDPOINT_PATH}`, body };
+};
 
 export const buildManuscriptRequest = (
   type: ManuscriptType,
@@ -91,6 +115,10 @@ export const buildManuscriptRequest = (
   category?: string,
   extras: ManuscriptExtraOptions = {},
 ): ManuscriptRequestConfig => {
+  if (extras.projectId) {
+    return buildProjectRequest(extras.projectId, keyword, ref, extras.businessName);
+  }
+
   const endpoint = MANUSCRIPT_ENDPOINTS[type];
   const body: Record<string, string> = { service, keyword, ref };
 
