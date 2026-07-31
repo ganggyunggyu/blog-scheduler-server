@@ -5,6 +5,7 @@ import { env } from '../config/env.js';
 import { logger } from '../lib/logging/logger.js';
 import { ProgressBar } from '../lib/utils/progress.js';
 import { downloadImagesToDir, type ImageData } from './product-image.service.js';
+import { signDabutServiceToken } from './dabut-app.service.js';
 import type { ProductImagesResponse } from '../types/metadata.js';
 
 export { getProductData, prepareProductImages, downloadImagesToDir } from './product-image.service.js';
@@ -74,6 +75,8 @@ export interface ManuscriptRequestConfig {
   url: string;
   body: Record<string, string>;
   engine?: string;
+  /** 다붓 Project 경로에서만 채워짐. 내장 엔드포인트는 인증이 없어 비워둠. */
+  headers?: Record<string, string>;
 }
 
 export interface ManuscriptExtraOptions {
@@ -87,6 +90,11 @@ export interface ManuscriptExtraOptions {
    * 원고 방식을 추가할 때 이 서버를 다시 배포하지 않아도 되게 하는 경로임.
    */
   projectId?: string;
+  /**
+   * 프로젝트를 소유한 다붓 계정 id. 다붓이 프로젝트를 owner_id 로 격리해 읽어서
+   * 이 값이 없으면 프로젝트 경로가 401 로 떨어짐.
+   */
+  ownerId?: string;
 }
 
 /** 다붓 Project 기반 생성. 프로젝트가 프롬프트와 모델을 들고 있어 여기선 식별자만 넘김. */
@@ -97,6 +105,7 @@ const buildProjectRequest = (
   keyword: string,
   ref: string,
   businessName?: string,
+  ownerId?: string,
 ): ManuscriptRequestConfig => {
   const body: Record<string, string> = { project_id: projectId, keyword, ref };
 
@@ -104,7 +113,13 @@ const buildProjectRequest = (
     body.business_name = businessName;
   }
 
-  return { url: `${env.MANUSCRIPT_API_URL}${PROJECT_ENDPOINT_PATH}`, body };
+  // 토큰은 요청 직전에 새로 발급한다. 예약 잡은 며칠 뒤에 돌아서
+  // 예약 시점에 만든 토큰은 실행할 때 이미 만료돼 있다.
+  const headers = ownerId
+    ? { Authorization: `Bearer ${signDabutServiceToken(ownerId)}` }
+    : undefined;
+
+  return { url: `${env.MANUSCRIPT_API_URL}${PROJECT_ENDPOINT_PATH}`, body, headers };
 };
 
 export const buildManuscriptRequest = (
@@ -116,7 +131,13 @@ export const buildManuscriptRequest = (
   extras: ManuscriptExtraOptions = {},
 ): ManuscriptRequestConfig => {
   if (extras.projectId) {
-    return buildProjectRequest(extras.projectId, keyword, ref, extras.businessName);
+    return buildProjectRequest(
+      extras.projectId,
+      keyword,
+      ref,
+      extras.businessName,
+      extras.ownerId,
+    );
   }
 
   const endpoint = MANUSCRIPT_ENDPOINTS[type];
@@ -201,7 +222,7 @@ export const callManuscriptAPI = async (
   category?: string,
   extras: ManuscriptExtraOptions = {},
 ): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
-  const { url, body, engine } = buildManuscriptRequest(type, keyword, service, ref, category, extras);
+  const { url, body, engine, headers } = buildManuscriptRequest(type, keyword, service, ref, category, extras);
   const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
   manuscriptLog.info(progress.start('request'), {
     url,
@@ -212,7 +233,7 @@ export const callManuscriptAPI = async (
     ...(engine && { engine }),
   });
 
-  const response = await axios.post<Manuscript>(url, body, { timeout: 300000 });
+  const response = await axios.post<Manuscript>(url, body, { timeout: 300000, headers });
 
   const raw = response.data;
   const { title, content } = parseManuscriptContent(raw.content ?? '', keyword);

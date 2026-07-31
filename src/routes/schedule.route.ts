@@ -191,6 +191,8 @@ interface EnqueueScheduleGenerateJobInput {
   manuscriptType?: string;
   /** 다붓 Project id. 항목별 override 가 없을 때 쓰는 기본값. */
   projectId?: string;
+  /** 프로젝트를 소유한 다붓 계정 id. 없으면 프로젝트 원고 요청이 401 로 떨어짐. */
+  ownerId?: string;
   /** 계정별로 만든 본문 블록 순서. 없으면 워커가 내장 파이프라인을 씀. */
   contentBlocks?: string[];
   delayBetweenPostsSeconds: number;
@@ -212,6 +214,7 @@ const enqueueScheduleGenerateJob = async ({
   imageSource,
   manuscriptType,
   projectId,
+  ownerId,
   contentBlocks,
   delayBetweenPostsSeconds,
   keywordCategory,
@@ -240,6 +243,7 @@ const enqueueScheduleGenerateJob = async ({
     imageSource,
     manuscriptType: jobItem.manuscriptType ?? manuscriptType,
     projectId: jobItem.projectId ?? projectId,
+    ownerId,
     contentBlocks,
     delayBetweenPostsSeconds,
     scheduledAt: jobItem.scheduledAt,
@@ -316,6 +320,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   });
 
   app.post('/schedules', async (req) => {
+    const ownerId = getRequestOwnerId(req);
     const body = createScheduleSchema.parse(req.body);
 
     const results: Array<{
@@ -360,6 +365,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageCount: body.imageCount,
           imageSource: body.imageSource,
           manuscriptType: body.manuscriptType,
+          ownerId,
           delayBetweenPostsSeconds: body.delayBetweenPostsSeconds,
           keywordCategory: body.keywordCategory,
         });
@@ -436,6 +442,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
   });
 
   app.post('/schedules/:id/execute', async (req, reply: FastifyReply) => {
+    const ownerId = getRequestOwnerId(req);
     const { id } = req.params as { id: string };
     const body = executeScheduleSchema.parse(req.body ?? {});
 
@@ -488,6 +495,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         ref: schedule.ref,
         generateImages: schedule.generateImages,
         imageCount: schedule.imageCount,
+        ownerId,
         delayBetweenPostsSeconds: schedule.delayBetweenPostsSeconds,
       });
     }
@@ -612,6 +620,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
           projectId: body.project_id,
+          ownerId,
           contentBlocks,
           delayBetweenPostsSeconds: body.delay_between_posts,
           keywordCategory: body.keyword_category,

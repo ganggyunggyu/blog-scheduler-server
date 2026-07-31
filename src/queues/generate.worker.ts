@@ -34,6 +34,11 @@ export interface GenerateJobData {
   businessName?: string;
   /** 다붓 Project id. 있으면 manuscriptType 대신 이 프로젝트로 원고를 뽑음. */
   projectId?: string;
+  /**
+   * 프로젝트를 소유한 다붓 계정 id. 다붓이 프로젝트를 owner_id 로 격리해 읽어서
+   * 이게 없으면 프로젝트 경로가 401 로 떨어짐. 토큰이 아니라 id 만 싣는다.
+   */
+  ownerId?: string;
   /** 계정별로 만든 본문 블록 순서. 발행 잡으로 그대로 넘김. */
   contentBlocks?: string[];
   providedManuscript?: ProvidedManuscript;
@@ -106,6 +111,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     blogName,
     businessName,
     projectId,
+    ownerId,
     contentBlocks,
     providedManuscript,
     providedMultiImages,
@@ -214,7 +220,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         imageSource,
         manuscriptType,
         category,
-        { businessName, blogName, projectId },
+        { businessName, blogName, projectId, ownerId },
       );
     log.info('job.prepared', {
       jobDir: prepared.jobDir,

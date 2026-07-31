@@ -101,6 +101,45 @@ export const verifyDabutToken = (token: string): DabutJwtPayload | null => {
   }
 };
 
+/** 다붓 토큰 기본 수명. 원고 생성 한 건이 최대 5분이라 그보다 넉넉하게만 잡는다. */
+const SERVICE_TOKEN_TTL_SECONDS = 15 * 60;
+
+/**
+ * 스케쥴러가 다붓 API 를 사용자 자격으로 부르기 위한 단명 토큰을 만든다.
+ *
+ * 예약 잡은 며칠 뒤에 실행되므로 로그인 시점의 토큰을 잡에 실어두면 만료돼 있다.
+ * JWT_SECRET 을 다붓과 공유하고 있어서 실행 직전에 새로 발급하는 쪽이 맞다.
+ * 수명을 짧게 두는 이유는 이 토큰이 잡 페이로드나 로그에 남더라도
+ * 오래 살아 있지 않게 하려는 것이다.
+ */
+export const signDabutServiceToken = (
+  ownerId: string,
+  ttlSeconds: number = SERVICE_TOKEN_TTL_SECONDS,
+): string => {
+  const secret = env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET 이 없어 다붓 토큰을 발급할 수 없습니다.');
+  }
+  if (!ownerId) {
+    throw new Error('ownerId 가 없어 다붓 토큰을 발급할 수 없습니다.');
+  }
+
+  const header = base64UrlEncode(Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
+  const payload = base64UrlEncode(
+    Buffer.from(
+      JSON.stringify({
+        sub: ownerId,
+        exp: Math.floor(Date.now() / 1000) + ttlSeconds,
+      }),
+    ),
+  );
+  const signature = base64UrlEncode(
+    createHmac('sha256', secret).update(`${header}.${payload}`).digest(),
+  );
+
+  return `${header}.${payload}.${signature}`;
+};
+
 const toObjectId = (value: string): mongoose.Types.ObjectId | null => {
   try {
     return new mongoose.Types.ObjectId(value);

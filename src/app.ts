@@ -7,8 +7,19 @@ import { registerRoutes } from './routes/index.js';
 import { connectMongo } from './config/mongo.js';
 import { getAllQueues, initializeExistingQueues } from './queues/queue-manager.js';
 import { logger } from './lib/logging/logger.js';
+import { redactJobData } from './lib/queue/redact-job-data.js';
 
 const log = logger.child({ scope: 'App' });
+
+/**
+ * 잡 페이로드에는 네이버 비밀번호가 평문으로 들어가는데 /admin/queues 는
+ * 인증 없이 열린다. 화면에 나가는 사본에서만 가린다.
+ */
+const toRedactedAdapter = (queue: ConstructorParameters<typeof BullMQAdapter>[0]): BullMQAdapter => {
+  const adapter = new BullMQAdapter(queue);
+  adapter.setFormatter('data', redactJobData);
+  return adapter;
+};
 
 export interface AppContext {
   app: ReturnType<typeof Fastify>;
@@ -19,8 +30,7 @@ let bullBoardInstance: ReturnType<typeof createBullBoard> | null = null;
 
 export const refreshBullBoard = (): void => {
   if (!bullBoardInstance) return;
-  const queues = getAllQueues().map((q) => new BullMQAdapter(q));
-  bullBoardInstance.replaceQueues(queues);
+  bullBoardInstance.replaceQueues(getAllQueues().map(toRedactedAdapter));
 };
 
 export const buildApp = async (): Promise<AppContext> => {
