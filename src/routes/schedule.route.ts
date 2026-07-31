@@ -25,6 +25,7 @@ import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { findAccountById } from '../services/account-directory.service.js';
 import { listDabutBlogAccounts, resolveDabutBlogCredential } from '../services/dabut-app.service.js';
 import { getRequestOwnerId } from './auth.route.js';
+import { findContentPipeline } from '../services/content-pipeline.service.js';
 import { resolvePublishCategory } from '../services/publish-category.service.js';
 import {
   buildAdhocGenerateIdentity,
@@ -190,6 +191,8 @@ interface EnqueueScheduleGenerateJobInput {
   manuscriptType?: string;
   /** 다붓 Project id. 항목별 override 가 없을 때 쓰는 기본값. */
   projectId?: string;
+  /** 계정별로 만든 본문 블록 순서. 없으면 워커가 내장 파이프라인을 씀. */
+  contentBlocks?: string[];
   delayBetweenPostsSeconds: number;
   keywordCategory?: string;
   blogName?: string;
@@ -209,6 +212,7 @@ const enqueueScheduleGenerateJob = async ({
   imageSource,
   manuscriptType,
   projectId,
+  contentBlocks,
   delayBetweenPostsSeconds,
   keywordCategory,
   blogName,
@@ -236,6 +240,7 @@ const enqueueScheduleGenerateJob = async ({
     imageSource,
     manuscriptType: jobItem.manuscriptType ?? manuscriptType,
     projectId: jobItem.projectId ?? projectId,
+    contentBlocks,
     delayBetweenPostsSeconds,
     scheduledAt: jobItem.scheduledAt,
     blogName,
@@ -499,6 +504,13 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
       manuscriptType: body.manuscript_type,
     });
 
+    // 로그인한 계정이 이 카테고리용 블록 순서를 직접 만들어 뒀으면 그걸 그대로 실어 보낸다.
+    // 문서가 없으면 undefined 로 남겨서 워커가 기존 내장 파이프라인을 쓰게 한다.
+    const customPipeline = ownerId && body.keyword_category
+      ? await findContentPipeline(ownerId, body.keyword_category)
+      : null;
+    const contentBlocks = customPipeline?.isActive ? customPipeline.blocks : undefined;
+
     const results: Array<{
       scheduleId: string;
       account: string;
@@ -600,6 +612,7 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
           imageSource: body.image_source,
           manuscriptType: body.manuscript_type,
           projectId: body.project_id,
+          contentBlocks,
           delayBetweenPostsSeconds: body.delay_between_posts,
           keywordCategory: body.keyword_category,
           blogName,

@@ -34,6 +34,8 @@ export interface GenerateJobData {
   businessName?: string;
   /** 다붓 Project id. 있으면 manuscriptType 대신 이 프로젝트로 원고를 뽑음. */
   projectId?: string;
+  /** 계정별로 만든 본문 블록 순서. 발행 잡으로 그대로 넘김. */
+  contentBlocks?: string[];
   providedManuscript?: ProvidedManuscript;
   providedMultiImages?: MultiImageData;
   imageDateCode?: string;
@@ -104,6 +106,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
     blogName,
     businessName,
     projectId,
+    contentBlocks,
     providedManuscript,
     providedMultiImages,
     imageDateCode,
@@ -335,6 +338,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       category,
       keywordCategory,
       manuscriptType,
+      contentBlocks,
       throttleSeconds: delayBetweenPostsSeconds,
       scheduledAt,
       mode,

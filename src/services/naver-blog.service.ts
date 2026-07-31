@@ -36,7 +36,8 @@ import {
   type WriteResult,
 } from '../lib/naver-editor/index.js';
 import type { ProductMetadata, ExcludeLibraryLinkItem } from '../types/metadata.js';
-import { getContentImagesForBlock, getContentPipeline, getContentTextForBlock, getMultiImagesForBlock, isEyeBrandPipelineCategory, type ContentBlock } from './naver-blog-pipeline.js';
+import { resolveContentPipelineBlocks } from './content-pipeline.service.js';
+import { getContentImagesForBlock, getContentTextForBlock, getMultiImagesForBlock, isEyeBrandPipelineCategory, type ContentBlock } from './naver-blog-pipeline.js';
 import type { ManuscriptType } from './manuscript.service.js';
 
 const log = logger.child({ scope: 'NaverBlog' });
@@ -74,6 +75,8 @@ interface BasePostParams {
   metadata?: ProductMetadata;
   keywordCategory?: string;
   manuscriptType?: ManuscriptType;
+  /** 계정별로 만든 본문 블록 순서. 없으면 내장 파이프라인을 씀. */
+  contentBlocks?: string[];
 }
 
 interface WritePostParams extends BasePostParams {
@@ -292,15 +295,18 @@ const BLOCK_EXECUTORS: Record<ContentBlock, (ctx: ContentBlockContext) => Promis
 
 const executeContentPipeline = async (
   ctx: ContentBlockContext,
-  options: { keywordCategory?: string; manuscriptType?: ManuscriptType }
+  options: { keywordCategory?: string; manuscriptType?: ManuscriptType; contentBlocks?: string[] }
 ): Promise<void> => {
-  const pipeline = getContentPipeline({
-    ...options,
+  const pipeline = resolveContentPipelineBlocks({
+    custom: options.contentBlocks,
+    keywordCategory: options.keywordCategory,
+    manuscriptType: options.manuscriptType,
     hasExcludeLibrary: (ctx.excludeLibrary?.length ?? 0) > 0,
   });
   log.info('pipeline.start', {
     category: options.keywordCategory ?? 'default',
     manuscriptType: options.manuscriptType ?? 'default',
+    source: options.contentBlocks?.length ? 'custom' : 'builtin',
     blocks: pipeline,
   });
   for (const block of pipeline) {
@@ -326,7 +332,7 @@ const applyFinalAlibabaWhiteText = async (
 // ============================================================
 
 export const writePost = async (params: WritePostParams): Promise<WriteResult> => {
-  const { cookies, accountId, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory, manuscriptType } = params;
+  const { cookies, accountId, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, scheduleTime, metadata, keywordCategory, manuscriptType, contentBlocks } = params;
   const progress = new ProgressBar({ label: 'publish', total: 5, width: 14 });
 
   const session = await createSession(cookies, accountId);
@@ -372,7 +378,7 @@ export const writePost = async (params: WritePostParams): Promise<WriteResult> =
         excludeLibrary,
         excludeLibraryLink,
       },
-      { keywordCategory, manuscriptType }
+      { keywordCategory, manuscriptType, contentBlocks }
     );
     log.info(progress.step('content.entered'));
 
@@ -407,7 +413,7 @@ interface UpdatePostParams extends BasePostParams {
 }
 
 export const updatePost = async (params: UpdatePostParams): Promise<WriteResult> => {
-  const { cookies, blogId, logNo, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, metadata, keywordCategory, manuscriptType } = params;
+  const { cookies, blogId, logNo, title, content, images, multiImages, excludeLibrary, excludeLibraryLink, category, metadata, keywordCategory, manuscriptType, contentBlocks } = params;
   const progress = new ProgressBar({ label: 'update', total: 6, width: 14 });
 
   const session = await createSession(cookies);
@@ -457,7 +463,7 @@ export const updatePost = async (params: UpdatePostParams): Promise<WriteResult>
         excludeLibrary,
         excludeLibraryLink,
       },
-      { keywordCategory, manuscriptType }
+      { keywordCategory, manuscriptType, contentBlocks }
     );
     log.info(progress.step('content.entered'));
 

@@ -31,6 +31,8 @@ export interface PublishJobData {
   metadata?: ProductMetadata;
   keywordCategory?: string;
   manuscriptType?: ManuscriptType;
+  /** 계정별 본문 블록 순서. 없으면 내장 파이프라인을 씀. */
+  contentBlocks?: string[];
 }
 
 const log = logger.child({ scope: 'Publish' });
@@ -127,7 +129,8 @@ const executePost = async (
   excludeLibrary?: string[],
   excludeLibraryLink?: ExcludeLibraryLinkItem[],
   keywordCategory?: string,
-  manuscriptType?: ManuscriptType
+  manuscriptType?: ManuscriptType,
+  contentBlocks?: string[]
 ) => {
   if (mode === 'image-replace' && blogId && logNo) {
     return updatePostImages({
@@ -153,6 +156,7 @@ const executePost = async (
       metadata,
       keywordCategory,
       manuscriptType,
+      contentBlocks,
     });
   }
   return writePost({
@@ -168,11 +172,12 @@ const executePost = async (
     metadata,
     keywordCategory,
     manuscriptType,
+    contentBlocks,
   });
 };
 
 export const processPublish = async (job: Job<PublishJobData>) => {
-  const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory, manuscriptType } = job.data;
+  const { scheduleId, scheduleJobId, account, jobDir, manuscript, multiImages, excludeLibrary, excludeLibraryLink, category, throttleSeconds, scheduledAt, mode = 'create', logNo, metadata, keywordCategory, manuscriptType, contentBlocks } = job.data;
   const blogId = account.blogId || account.id.split('@')[0];
   const maskedAccount = account.id.slice(0, 3) + '***';
   const attempts = job.opts.attempts ?? 1;
@@ -217,7 +222,7 @@ export const processPublish = async (job: Job<PublishJobData>) => {
 
     if (cookies) {
       log.info('session.cache', { account: maskedAccount, mode });
-      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory, manuscriptType);
+      const result = await executePost(mode, cookies, manuscript, category, scheduledAt, blogId, logNo, metadata, multiImages, excludeLibrary, excludeLibraryLink, keywordCategory, manuscriptType, contentBlocks);
 
       if (result.success) {
         log.info('completed', { jobId: job.id, postUrl: result.postUrl });
