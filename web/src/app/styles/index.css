@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+
+/*
+  운영 대시보드용 단일 다크 테마.
+  액센트는 emerald 하나로 고정하고, 큐 상태색(대기/진행/완료/실패)만 예외로 둔다.
+*/
+@theme {
+  --color-surface: #0b0c0e;
+  --color-surface-raised: #121317;
+  --color-surface-overlay: #17191e;
+  --color-line: #23262d;
+  --color-line-strong: #31353e;
+
+  --color-ink: #e8eaed;
+  --color-ink-muted: #9aa0a9;
+  --color-ink-faint: #6b7280;
+
+  --color-accent: #34d399;
+  --color-accent-dim: #0f2f24;
+
+  --color-state-waiting: #6b7280;
+  --color-state-active: #34d399;
+  --color-state-done: #64748b;
+  --color-state-failed: #fb7185;
+  --color-state-delayed: #fbbf24;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Apple SD Gothic Neo',
+    'Pretendard', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', 'JetBrains Mono', monospace;
+
+  --radius-card: 10px;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* 숫자는 전부 등폭. 밀도 높은 표에서 자릿수가 흔들리면 못 읽는다. */
+  .tnum {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: #06120d;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-surface);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 99px;
+    border: 3px solid var(--color-surface);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #454a55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
