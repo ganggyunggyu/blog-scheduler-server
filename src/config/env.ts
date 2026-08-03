@@ -47,6 +47,13 @@ const envSchema = z.object({
   DABUT_APP_DB_NAME: z.string().default('dabut_app'),
   DABUT_API_URL: z.string().default('http://localhost:8000'),
 
+  /**
+   * Bull Board(/admin/queues) 를 여는 Basic 인증 비밀번호.
+   * 이 경로는 브라우저 UI 라 Bearer 를 못 싣어 전역 인증 훅에서 빠져 있다.
+   * 안 넣으면 화면을 아예 닫는다. 배포된 채로 열려 있으면 잡을 지울 수 있다.
+   */
+  ADMIN_QUEUES_PASSWORD: z.string().optional(),
+
   GEMINI_API_KEY: z.string().optional(),
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().email().optional(),
   GOOGLE_PRIVATE_KEY: z.string().optional(),

@@ -4,8 +4,9 @@ services:
   scheduler:
     build: .
     ports:
-      - "3000:3000"
+      - "8001:8001"
     environment:
+      - PORT=8001
       - TZ=Asia/Seoul
       - REDIS_HOST=redis
       - MONGO_URI=mongodb://mongo:27017/scheduler

@@ -1,0 +1,37 @@
+app = "21lab-scheduler"
+primary_region = "nrt"
+
+[build]
+
+[env]
+  PORT = "8001"
+  NODE_ENV = "production"
+  TZ = "Asia/Seoul"
+  PLAYWRIGHT_HEADLESS = "true"
+  # 배포 직후 밀려 있던 예약이 곧바로 실행되면 의도치 않은 발행이 나간다.
+  # 화면과 API 를 먼저 확인한 뒤 이 값을 지우고 재배포한다.
+  SCHEDULER_DISABLE_QUEUE_RESTORE = "true"
+
+[http_service]
+  internal_port = 8001
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  # 큐 워커가 항상 살아 있어야 예약 시각에 발행이 돈다.
+  min_machines_running = 1
+
+  [http_service.http_options.response.headers]
+    # 큐 대시보드가 검색엔진에 잡히면 안 된다.
+    X-Robots-Tag = "noindex, nofollow"
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "30s"
+  method = "GET"
+  path = "/health"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  # 크로미움이 뜨는 서버라 1GB 로는 발행 중에 OOM 이 난다.
+  memory = "2gb"
