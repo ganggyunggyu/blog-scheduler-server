@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import axios from 'axios';
 import { buildManuscriptRequest, findManuscriptRejection, generateImageUrls, parseManuscriptContent, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+import { env } from '../../src/config/env.js';
+
+/* 개발자 .env 가 로컬이든 원격이든 통과해야 한다. 검증 대상은 호스트가 아니라 경로다. */
+const API_BASE = env.MANUSCRIPT_API_URL;
 
 test('buildManuscriptRequest: restaurant/v1 은 맛집1 엔드포인트로 업체명을 고정해서 보냄', () => {
   const result = buildManuscriptRequest('restaurant/v1', '부천중동맛집', 'restaurant', '', undefined, {
@@ -10,7 +14,7 @@ test('buildManuscriptRequest: restaurant/v1 은 맛집1 엔드포인트로 업�
     blogName: '블루망고',
   });
 
-  assert.equal(result.url, 'http://localhost:8000/generate/restaurant/v1');
+  assert.equal(result.url, `${API_BASE}/generate/restaurant/v1`);
   assert.deepEqual(result.body, {
     service: 'restaurant',
     keyword: '부천중동맛집',
@@ -26,7 +30,7 @@ test('buildManuscriptRequest: restaurant/v2 는 맛집2 엔드포인트를 씀',
     blogName: '제이제이',
   });
 
-  assert.equal(result.url, 'http://localhost:8000/generate/restaurant/v2');
+  assert.equal(result.url, `${API_BASE}/generate/restaurant/v2`);
   assert.equal(result.body.business_name, '이터스 현대프리미엄아울렛송도점');
   assert.equal(result.body.blog_name, '제이제이');
 });
@@ -43,7 +47,7 @@ test('buildManuscriptRequest: 기존 restaurant 는 글밥 엔드포인트 그�
     businessName: '무시돼야 함',
   });
 
-  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler-restaurant');
+  assert.equal(result.url, `${API_BASE}/generate/blog-filler-restaurant`);
   assert.deepEqual(result.body, {
     service: 'restaurant',
     keyword: '수원맛집',
@@ -89,7 +93,7 @@ test('parseManuscriptContent: 제목 줄이 비면 키워드를 제목으로 씀
 test('buildManuscriptRequest: default 는 blog-filler 엔드포인트를 사용함', () => {
   const result = buildManuscriptRequest('default', '강아지 산책', 'default', '');
 
-  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler');
+  assert.equal(result.url, `${API_BASE}/generate/blog-filler`);
   assert.deepEqual(result.body, {
     service: 'default',
     keyword: '강아지 산책',
@@ -101,7 +105,7 @@ test('buildManuscriptRequest: default 는 blog-filler 엔드포인트를 사용�
 test('buildManuscriptRequest: alibaba 도 원고는 blog-filler 엔드포인트로 보냄', () => {
   const result = buildManuscriptRequest('alibaba', '1688', 'default', '', '기타');
 
-  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler');
+  assert.equal(result.url, `${API_BASE}/generate/blog-filler`);
   assert.deepEqual(result.body, {
     service: 'default',
     keyword: '1688',
@@ -113,7 +117,7 @@ test('buildManuscriptRequest: alibaba 도 원고는 blog-filler 엔드포인트�
 test('buildManuscriptRequest: grok 은 기존처럼 category 와 engine 을 유지함', () => {
   const result = buildManuscriptRequest('grok', '스마일라식', 'default', '', '안과');
 
-  assert.equal(result.url, 'http://localhost:8000/generate/grok');
+  assert.equal(result.url, `${API_BASE}/generate/grok`);
   assert.deepEqual(result.body, {
     service: 'default',
     keyword: '스마일라식',
@@ -218,7 +222,7 @@ test('buildManuscriptRequest: projectId 를 주면 다붓 프로젝트 엔드포
     projectId: 'proj_abc123',
   });
 
-  assert.equal(result.url, 'http://localhost:8000/generate/project');
+  assert.equal(result.url, `${API_BASE}/generate/project`);
   assert.equal(result.body.project_id, 'proj_abc123');
   assert.equal(result.body.keyword, '원주마사지');
 });
@@ -229,7 +233,7 @@ test('buildManuscriptRequest: projectId 는 manuscriptType 보다 우선함', ()
     businessName: '베코',
   });
 
-  assert.equal(result.url, 'http://localhost:8000/generate/project');
+  assert.equal(result.url, `${API_BASE}/generate/project`);
   assert.equal(result.body.business_name, '베코');
 });
 
@@ -250,6 +254,6 @@ test('buildManuscriptRequest: projectId 경로도 업체명을 그대로 실어 
 test('buildManuscriptRequest: projectId 가 없으면 기존 동작을 그대로 유지함', () => {
   const result = buildManuscriptRequest('pet', '강아지사료', 'pet');
 
-  assert.equal(result.url, 'http://localhost:8000/generate/blog-filler-pet');
+  assert.equal(result.url, `${API_BASE}/generate/blog-filler-pet`);
   assert.equal(result.body.project_id, undefined);
 });

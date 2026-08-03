@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildProductImageRequest, normalizeImageDownloadUrl } from '../../src/services/product-image.service.js';
+import { env } from '../../src/config/env.js';
+
+/* 개발자 .env 가 로컬이든 원격이든 통과해야 한다. 검증 대상은 호스트가 아니라 경로다. */
+const API_BASE = env.IMAGE_API_URL;
 
 test('buildProductImageRequest: 애견은 product-images 요청에 category를 싣지 않음', () => {
   const result = buildProductImageRequest({
@@ -11,7 +15,7 @@ test('buildProductImageRequest: 애견은 product-images 요청에 category를 �
   });
 
   assert.equal(result.endpoint, 'product-images');
-  assert.equal(result.url, 'http://localhost:3939/api/image/product-images');
+  assert.equal(result.url, `${API_BASE}/api/image/product-images`);
   assert.deepEqual(result.params, {
     keyword: '강아지',
     blogId: 'qwzx16',
@@ -28,7 +32,7 @@ test('buildProductImageRequest: 한려담원은 category-random 요청으로 보
   });
 
   assert.equal(result.endpoint, 'category-random');
-  assert.equal(result.url, 'http://localhost:3939/api/image/category-random');
+  assert.equal(result.url, `${API_BASE}/api/image/category-random`);
   assert.deepEqual(result.params, {
     category: '한려담원',
     keyword: '흑염소진액',
@@ -45,7 +49,7 @@ test('buildProductImageRequest: 알리바바 manuscriptType은 product-images �
   });
 
   assert.equal(result.endpoint, 'product-images');
-  assert.equal(result.url, 'http://localhost:3939/api/image/product-images');
+  assert.equal(result.url, `${API_BASE}/api/image/product-images`);
   assert.deepEqual(result.params, {
     keyword: '1688',
     blogId: 'weed3122',
