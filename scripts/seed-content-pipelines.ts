@@ -54,11 +54,15 @@ const resolveOwnerId = async (username: string): Promise<string> => {
 };
 
 const run = async (): Promise<void> => {
-  const username = readFlag('owner-username') ?? '21lab';
   const isApply = process.argv.includes('--apply');
 
-  const ownerId = await resolveOwnerId(username);
-  console.log(`대상 계정: ${username} (${ownerId})`);
+  // 배포된 서버는 다른 다붓 DB 를 보므로 같은 이름이어도 계정 id 가 다르다.
+  // 그 경우 로컬에서 이름으로 찾으면 엉뚱한 주인 앞으로 심게 되어 id 를 직접 받는다.
+  const explicitId = readFlag('owner-id');
+  const username = readFlag('owner-username') ?? '21lab';
+
+  const ownerId = explicitId ?? (await resolveOwnerId(username));
+  console.log(`대상 계정: ${explicitId ? '(id 직접 지정)' : username} (${ownerId})`);
 
   await mongoose.connect(env.MONGO_URI);
 
