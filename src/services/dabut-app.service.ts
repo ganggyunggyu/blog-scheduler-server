@@ -27,6 +27,8 @@ export interface DabutBlogAccount {
   category: string;
   group: string;
   memo: string;
+  /** 계정에 묶인 인증 전화번호. 로그인 확인용으로 화면에서 복사해 쓴다. */
+  mvpn: string;
   order: number;
   isActive: boolean;
   hasPassword: boolean;
@@ -171,6 +173,7 @@ const toBlogAccount = (doc: Record<string, unknown>): DabutBlogAccount => ({
   category: String(doc.category ?? ''),
   group: String(doc.group ?? ''),
   memo: String(doc.memo ?? ''),
+  mvpn: String(doc.mvpn ?? ''),
   order: Number(doc.order ?? 0),
   isActive: doc.is_active !== false,
   hasPassword: Boolean(doc.password_enc),
