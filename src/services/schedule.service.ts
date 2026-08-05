@@ -231,6 +231,41 @@ export interface ScheduleQueueJob {
   status: string;
 }
 
+/**
+ * 계산된 항목을 ScheduleJob 저장 문서로 옮김.
+ *
+ * projectId 가 빠져 있어서 잡을 저장하는 순간 항목별 프로젝트 지정이 사라졌음.
+ * 워커는 projectId 없이 manuscriptType 기본값으로 떨어져 옛 엔드포인트를 불렀고,
+ * 화면에서 맛집1/맛집2 를 섞어 보내도 둘 다 기본 원고로 나갔음.
+ */
+export interface ScheduleJobInput {
+  scheduleId: unknown;
+  keyword: string;
+  category?: string;
+  businessName?: string;
+  manuscriptType?: string;
+  projectId?: string;
+  scheduledAt: string;
+  slot: number;
+  status: string;
+}
+
+export const buildScheduleJobDocuments = (
+  scheduleId: unknown,
+  items: ScheduleItem[],
+): ScheduleJobInput[] =>
+  items.map((item) => ({
+    scheduleId,
+    keyword: item.keyword,
+    category: item.category,
+    businessName: item.businessName,
+    manuscriptType: item.manuscriptType,
+    projectId: item.projectId,
+    scheduledAt: formatKst(item.scheduledAt),
+    slot: item.slot,
+    status: 'pending',
+  }));
+
 export interface ScheduleJobDocument {
   _id: unknown;
   keyword: string;
@@ -331,18 +366,7 @@ export const createSchedule = async (input: CreateScheduleInput) => {
     status: 'pending',
   });
 
-  const jobs = await ScheduleJobModel.insertMany(
-    items.map((item) => ({
-      scheduleId: schedule._id,
-      keyword: item.keyword,
-      category: item.category,
-      businessName: item.businessName,
-      manuscriptType: item.manuscriptType,
-      scheduledAt: formatKst(item.scheduledAt),
-      slot: item.slot,
-      status: 'pending',
-    }))
-  );
+  const jobs = await ScheduleJobModel.insertMany(buildScheduleJobDocuments(schedule._id, items));
 
   return { schedule, jobs, items, reused: false };
 };
