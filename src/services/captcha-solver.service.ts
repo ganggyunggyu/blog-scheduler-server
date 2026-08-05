@@ -6,7 +6,19 @@ import { logger } from '../lib/logging/logger.js';
 
 const log = logger.child({ scope: 'Captcha' });
 
-const MODEL = 'gemini-2.5-flash';
+/**
+ * 쓸 모델 이름.
+ *
+ * gemini-2.5-flash 로 박아뒀다가, 구글이 신규 프로젝트에 그 버전을 닫으면서
+ * 404 로 통째로 죽었다. 키를 바꿔도 안 풀렸고 재배포해야만 고칠 수 있었다.
+ * 기본값을 버전 없는 별칭으로 두고, 그마저 막히면 배포 없이 갈아끼우게 환경변수로 받는다.
+ */
+const DEFAULT_MODEL = 'gemini-flash-latest';
+
+export const resolveCaptchaModel = (source: { CAPTCHA_MODEL?: string }): string =>
+  source.CAPTCHA_MODEL?.trim() || DEFAULT_MODEL;
+
+const MODEL = resolveCaptchaModel({ CAPTCHA_MODEL: process.env.CAPTCHA_MODEL });
 const MAX_ATTEMPTS = 3;
 const CAPTCHA_INPUT_DELAY_MS = 200;
 const PW_INPUT_DELAY_MS = 150;
