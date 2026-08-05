@@ -37,3 +37,4 @@ coverage/
 data
 # 멀티플랫폼 익스포트 결과물
 out/
+node_modules

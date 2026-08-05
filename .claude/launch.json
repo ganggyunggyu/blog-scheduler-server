@@ -1,12 +1,19 @@
 {
   "version": "0.0.1",
-  "autoPort": true,
   "configurations": [
     {
       "name": "scheduler-server",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["dev"],
       "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "dabut-frontend",
+      "cwd": "/Users/ganggyunggyu/Programing/21lab/dabut-frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev"],
+      "port": 5173,
       "autoPort": true
     }
   ]

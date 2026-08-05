@@ -20,6 +20,12 @@ RUN npm install -g pnpm@10.27.0
 # 빌드에 devDependencies(typescript)가 필요해서 일단 전부 받는다.
 RUN pnpm install --frozen-lockfile
 
+# 베이스 이미지에 든 브라우저는 그 이미지 태그의 Playwright 버전에 맞춰져 있다.
+# 여기 의존성은 rebrowser-playwright 를 ^ 로 잡아서 더 높은 버전이 깔리고,
+# 그러면 이미지의 브라우저 경로와 어긋나 실행 파일을 못 찾는다.
+# 실제로 깔린 버전이 요구하는 브라우저를 직접 받는다.
+RUN pnpm exec playwright install chromium
+
 COPY src ./src
 RUN pnpm build
 

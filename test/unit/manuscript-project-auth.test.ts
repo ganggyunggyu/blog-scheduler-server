@@ -38,7 +38,13 @@ test('프로젝트 경로: ownerId 가 없으면 헤더를 만들지 않는다',
   assert.equal(headers?.Authorization, undefined);
 });
 
-test('프로젝트 경로: 프로젝트 식별자와 키워드가 본문에 실린다', () => {
+/*
+  ref 자리에는 스케쥴 배치 추적용 라벨("retry-3" 등)이 들어오는데, 이걸 그대로
+  실어 보내면 다붓의 web_search pre_step 이 "사용자가 이미 참조원고를 줬다"로
+  읽고 검색을 건너뛴다. 업체 정보 없이 모델한테 넘어가서 안전선 지침대로
+  "정보 부족" 거절 답변(100~200자)만 나오고 700자 미달로 전부 리젝됐었다.
+*/
+test('프로젝트 경로: 프로젝트 식별자와 키워드가 본문에 실리고 ref 는 비운다', () => {
   const { url, body } = buildManuscriptRequest('default', '흑염소 효능', 'default', '참고', undefined, {
     projectId: PROJECT_ID,
     ownerId: OWNER_ID,
@@ -47,7 +53,7 @@ test('프로젝트 경로: 프로젝트 식별자와 키워드가 본문에 실�
   assert.ok(url.endsWith('/generate/project'), url);
   assert.equal(body.project_id, PROJECT_ID);
   assert.equal(body.keyword, '흑염소 효능');
-  assert.equal(body.ref, '참고');
+  assert.equal(body.ref, '');
 });
 
 test('내장 원고 타입 경로: 인증 헤더를 붙이지 않는다', () => {

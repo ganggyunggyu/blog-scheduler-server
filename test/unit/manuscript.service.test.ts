@@ -55,6 +55,19 @@ test('buildManuscriptRequest: 기존 restaurant 는 글밥 엔드포인트 그�
   });
 });
 
+test('buildManuscriptRequest: 프로젝트 경로는 ownerId 가 있어야 Authorization 헤더를 실음', () => {
+  const withoutOwner = buildManuscriptRequest('default', '산본맛집', 'default', '', undefined, {
+    projectId: 'prj_matjip1',
+  });
+  assert.equal(withoutOwner.headers, undefined);
+
+  const withOwner = buildManuscriptRequest('default', '산본맛집', 'default', '', undefined, {
+    projectId: 'prj_matjip1',
+    ownerId: '6a6abf0bf86b1cbdd1afe1dd',
+  });
+  assert.match(withOwner.headers?.Authorization ?? '', /^Bearer .+/);
+});
+
 test('parseManuscriptContent: 맛집2 의 [제목] 접두어와 구분선을 걷어냄', () => {
   const raw = [
     '[제목] 일산 웨스턴돔 맛집 동경규카츠, 개인 화로에서 익혀 먹는 규카츠 정식',
@@ -237,7 +250,14 @@ test('buildManuscriptRequest: projectId 는 manuscriptType 보다 우선함', ()
   assert.equal(result.body.business_name, '베코');
 });
 
-test('buildManuscriptRequest: projectId 경로도 업체명을 그대로 실어 보냄', () => {
+/*
+  ref 는 스케쥴 배치 추적용 라벨("retry-3" 등)이 들어오는 자리라 프로젝트
+  API 로 그대로 흘리면 안 된다. 다붓의 web_search pre_step 이 ref 가 있으면
+  "사용자가 이미 참조원고를 줬다"로 읽고 검색을 건너뛰는데, 그러면 업체 정보가
+  하나도 없는 채로 모델한테 넘어가서 안전선 지침대로 "정보 부족" 거절 답변
+  (100~200자)만 나오고 700자 미달로 전부 리젝되는 사고가 실제로 났었다.
+*/
+test('buildManuscriptRequest: projectId 경로는 업체명만 싣고 배치 추적용 ref 는 비움', () => {
   const result = buildManuscriptRequest('default', '수원행궁동맛집', 'default', 'ref-1', undefined, {
     projectId: 'proj_x',
     businessName: '솔솥',
@@ -246,7 +266,7 @@ test('buildManuscriptRequest: projectId 경로도 업체명을 그대로 실어 
   assert.deepEqual(result.body, {
     project_id: 'proj_x',
     keyword: '수원행궁동맛집',
-    ref: 'ref-1',
+    ref: '',
     business_name: '솔솥',
   });
 });

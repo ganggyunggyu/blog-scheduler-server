@@ -103,11 +103,16 @@ const PROJECT_ENDPOINT_PATH = '/generate/project';
 const buildProjectRequest = (
   projectId: string,
   keyword: string,
-  ref: string,
   businessName?: string,
   ownerId?: string,
 ): ManuscriptRequestConfig => {
-  const body: Record<string, string> = { project_id: projectId, keyword, ref };
+  // ref 는 여기서 절대 안 실어 보낸다. 스케쥴 배치 추적용 라벨("retry-3" 등)이
+  // 들어오는 자리인데, 다붓 프로젝트 파이프라인은 ref 가 있으면 "사용자가
+  // 이미 참조원고를 줬다"로 읽고 web_search pre_steps 를 통째로 건너뛴다.
+  // 그러면 업체 정보가 하나도 안 채워진 채로 모델한테 넘어가서, 안전선
+  // 지침("확인 안 된 사실은 지어내지 않는다")대로 모델이 정보 부족을 이유로
+  // 100~200자짜리 거절 답변만 내놓고 700자 미달로 전부 리젝됐었다.
+  const body: Record<string, string> = { project_id: projectId, keyword, ref: '' };
 
   if (businessName) {
     body.business_name = businessName;
@@ -134,7 +139,6 @@ export const buildManuscriptRequest = (
     return buildProjectRequest(
       extras.projectId,
       keyword,
-      ref,
       extras.businessName,
       extras.ownerId,
     );
