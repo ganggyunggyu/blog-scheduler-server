@@ -62,6 +62,57 @@ fly deploy
 - 예약 시각에 워커가 살아 있어야 하므로 `min_machines_running = 1`, `auto_stop_machines = false` 로 고정돼 있다. 크로미움이 뜨는 서버라 메모리를 2GB 아래로 내리면 발행 중에 OOM 이 난다. (다붓 백엔드는 반대로 트래픽 없으면 자동 정지다)
 - 재시작하면 `initializeExistingQueues()` 가 남아 있는 예약을 복원한다. `SCHEDULER_DISABLE_QUEUE_RESTORE=true` 로 끌 수 있지만, 꺼둔 사이에 쌓인 예약은 워커가 붙지 않아 고아가 된다. 끌 일이 있으면 큐를 먼저 비운다.
 
+## 폴더 구조
+
+```
+scheduler-server/
+├── src/
+│   ├── routes/           # Fastify 라우트 (발행 등록, 스케줄 조회, 계정 관리)
+│   ├── queues/           # BullMQ 큐와 워커
+│   │   ├── generate.worker.ts        # 원고 생성 → 이미지 준비 → 발행
+│   │   └── account-execution.ts      # 계정 단위 실행 코디네이터
+│   ├── services/         # 도메인 서비스 (login-failure, schedule-idempotency 등)
+│   ├── lib/
+│   │   ├── naver-editor/ # 스마트에디터 조작 (본문 입력, 이미지 삽입, 스타일)
+│   │   ├── browser/      # Playwright 컨텍스트 생성 및 재사용
+│   │   ├── fingerprint/  # 브라우저 지문 설정
+│   │   ├── crypto/       # 계정 자격증명 암복호화
+│   │   ├── logging/
+│   │   └── utils/
+│   ├── schemas/          # zod 스키마
+│   ├── config/           # 환경변수 로딩
+│   ├── constants/
+│   └── types/
+├── scripts/              # 발행 상태 검증, 누락 복구, 스케줄 재배치 운영 스크립트
+├── work/                 # 일회성 작업 스크립트
+├── test/                 # 유닛 테스트 (tsx --test)
+├── web/                  # 정적 제어 페이지
+├── docs/
+└── docker-compose.yml
+```
+
+## 환경 변수
+
+`.env.example`을 복사해서 채운다. 배포 환경에서는 아래 값들이 Fly 시크릿으로 들어가므로 로컬 주소와 다르다.
+
+| 변수 | 설명 |
+| --- | --- |
+| `PORT` | Fastify 서버 포트 |
+| `TZ` | `Asia/Seoul` 고정. 예약 시간 계산 기준 |
+| `REDIS_HOST` / `REDIS_PORT` / `REDIS_DB` / `REDIS_PASSWORD` | BullMQ 큐용 Redis |
+| `MONGO_URI` | 스케줄, 계정, 발행 이력 저장소 |
+| `MANUSCRIPT_API_URL` | 원고 생성 API (다붓 백엔드) |
+| `IMAGE_API_URL` | 이미지 생성 API |
+| `DABUT_API_URL` | 다붓 백엔드 |
+| `PLAYWRIGHT_HEADLESS` | 브라우저 헤드리스 여부 |
+| `PLAYWRIGHT_SLOW_MO` | 액션 사이 지연(ms) |
+| `PLAYWRIGHT_ACTION_TIMEOUT_MS` / `PLAYWRIGHT_NAVIGATION_TIMEOUT_MS` | 타임아웃 |
+| `LEAD_TIME_MINUTES` | 예약 시각 대비 작업을 미리 큐에 올리는 리드타임 |
+| `ADMIN_QUEUES_PASSWORD` | `/admin/queues` Bull Board 접근 가드 |
+| `SCHEDULER_DISABLE_QUEUE_RESTORE` | 재시작 시 기존 예약 복원 끄기 |
+
+로컬에서 Redis와 MongoDB를 함께 띄우려면 `docker compose up -d`를 쓴다.
+
 ## 트러블슈팅
 
 1. **같은 네이버 계정으로 여러 발행 작업이 겹치면 브라우저 세션/로그인 상태가 꼬임** — 계정 하나가 동시에 여러 큐 작업에서 쓰이면 세션 정리 타이밍이 겹쳐서 레이스 컨디션이 났다.
