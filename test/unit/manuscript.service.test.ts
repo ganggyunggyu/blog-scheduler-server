@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import axios from 'axios';
-import { buildManuscriptRequest, generateImageUrls, prepareProvidedJob } from '../../src/services/manuscript.service.js';
+import { buildManuscriptRequest, generateImageUrls, prepareJob, prepareProvidedJob } from '../../src/services/manuscript.service.js';
 
 test('buildManuscriptRequest: default 는 blog-filler 엔드포인트를 사용함', () => {
   const result = buildManuscriptRequest('default', '강아지 산책', 'default', '');
@@ -70,6 +70,70 @@ test('prepareProvidedJob: 외부에서 만든 원고를 job 아티팩트로 저�
   };
   assert.equal(savedMeta.source, 'manual');
   assert.equal(savedMeta.manuscriptType, 'pet');
+});
+
+test('prepareJob: restaurant/v2 응답의 businessName/fileName을 job 아티팩트에 반영함', async () => {
+  const originalPost = axios.post;
+
+  axios.post = (async (url: string) => {
+    assert.match(url, /\/generate\/restaurant\/v2$/);
+    return {
+      data: {
+        _id: 'abc123',
+        content: '[제목] 을지로 맛집 다녀온 후기\n------------------------------------------------------------\n\n🏪 상호 : 우레옥\n본문 내용',
+        businessName: '우레옥',
+        fileName: '을지로맛집_우레옥_1234.txt',
+      },
+    } as Awaited<ReturnType<typeof axios.post>>;
+  }) as typeof axios.post;
+
+  try {
+    const prepared = await prepareJob(
+      '을지로 맛집',
+      'default',
+      '',
+      false,
+      5,
+      'ai',
+      'restaurant/v2',
+    );
+
+    assert.equal(prepared.businessName, '우레옥');
+
+    // manuscript.txt는 그대로 유지되고(파이프라인이 이 이름으로 계속 읽음),
+    // 업체명이 들어간 파일명으로도 같은 내용이 추가 저장돼야 한다.
+    const canonical = await readFile(`${prepared.jobDir}/manuscript.txt`, 'utf-8');
+    assert.match(canonical, /을지로 맛집 다녀온 후기/);
+
+    const labeled = await readFile(`${prepared.jobDir}/을지로맛집_우레옥_1234.txt`, 'utf-8');
+    assert.equal(labeled, canonical);
+
+    const savedMeta = JSON.parse(await readFile(`${prepared.jobDir}/meta.json`, 'utf-8')) as {
+      businessName?: string;
+    };
+    assert.equal(savedMeta.businessName, '우레옥');
+  } finally {
+    axios.post = originalPost;
+  }
+});
+
+test('prepareJob: businessName이 없는 응답(default 타입 등)은 라벨 파일을 추가로 만들지 않음', async () => {
+  const originalPost = axios.post;
+
+  axios.post = (async () => ({
+    data: { _id: 'xyz', content: '기본 원고 제목\n\n본문' },
+  } as Awaited<ReturnType<typeof axios.post>>)) as typeof axios.post;
+
+  try {
+    const prepared = await prepareJob('강아지 산책', 'default', '', false, 5, 'ai', 'default');
+
+    assert.equal(prepared.businessName, undefined);
+
+    const files = await import('node:fs/promises').then((fs) => fs.readdir(prepared.jobDir));
+    assert.deepEqual(files.sort(), ['images', 'manuscript.txt', 'meta.json']);
+  } finally {
+    axios.post = originalPost;
+  }
 });
 
 test('generateImageUrls: AI 생성 요청에 count 를 싣고 부족분을 보충함', async () => {

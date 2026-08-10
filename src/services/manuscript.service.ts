@@ -18,6 +18,11 @@ interface Manuscript {
   keyword?: string;
   category?: string;
   engine?: string;
+  // restaurant/v1, restaurant/v2 응답에만 실려온다 - 업체명이 프롬프트 자유 선택으로
+  // 결정된 경우에도(웹검색으로 고른 경우) blog_analyzer가 실제 선택된 업체명과, 그걸
+  // 반영한 저장용 파일명("{키워드}_{업체명}_{4자리숫자}.txt")을 함께 내려준다.
+  businessName?: string;
+  fileName?: string;
 }
 
 interface JobDir {
@@ -101,7 +106,7 @@ export const callManuscriptAPI = async (
   service: string,
   ref: string = '',
   category?: string,
-): Promise<{ id: string; title: string; content: string; raw: Manuscript }> => {
+): Promise<{ id: string; title: string; content: string; businessName: string; fileName: string; raw: Manuscript }> => {
   const { url, body, engine } = buildManuscriptRequest(type, keyword, service, ref, category);
   const progress = new ProgressBar({ label: 'manuscript', total: 1, width: 16 });
   manuscriptLog.info(progress.start('request'), {
@@ -134,14 +139,18 @@ export const callManuscriptAPI = async (
     content = lines.slice(1).join('\n').trim();
   }
 
+  const businessName = (raw.businessName ?? '').trim();
+  const fileName = (raw.fileName ?? '').trim();
+
   manuscriptLog.info(progress.done('done'), {
     id: raw._id ?? '',
     titlePreview: title.slice(0, 30),
     length: content.length,
+    ...(businessName && { businessName }),
     ...(engine && { engine }),
   });
 
-  return { id: raw._id ?? '', title, content, raw };
+  return { id: raw._id ?? '', title, content, businessName, fileName, raw };
 };
 
 const parseImageResponse = (data: unknown): string[] => {
@@ -361,6 +370,7 @@ export interface PreparedJob {
   content: string;
   images: string[];
   manuscriptId: string;
+  businessName?: string;
 }
 
 export interface ProvidedManuscript {
@@ -372,13 +382,20 @@ const writePreparedJobFiles = async (
   dir: string,
   manuscript: { id: string; title: string; content: string },
   meta: Record<string, unknown>,
+  labeledFileName?: string,
 ): Promise<void> => {
   const manuscriptPath = path.join(dir, 'manuscript.txt');
-  await writeFile(
-    manuscriptPath,
-    `${manuscript.title}\n\n${manuscript.content}`
-  );
+  const manuscriptBody = `${manuscript.title}\n\n${manuscript.content}`;
+  await writeFile(manuscriptPath, manuscriptBody);
   await writeFile(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
+
+  // 맛집1/맛집2: 원고를 "{키워드}_{업체명}_{4자리숫자}.txt" 형식으로도 저장한다
+  // (blog_analyzer가 businessName을 실었을 때만). manuscript.txt는 파이프라인이
+  // 계속 그 이름으로 읽는 파일이라 건드리지 않고, 업체명을 붙인 사본을 추가로 둔다 -
+  // jobs 폴더를 훑을 때 어떤 업체 원고인지 파일명만 보고 바로 알 수 있게 하기 위함.
+  if (labeledFileName && labeledFileName !== 'manuscript.txt') {
+    await writeFile(path.join(dir, labeledFileName), manuscriptBody);
+  }
 };
 
 export const prepareProvidedJob = async (
@@ -473,7 +490,9 @@ export const prepareJob = async (
       createdAt: new Date().toISOString(),
       status: 'generated',
       source: 'api',
+      ...(manuscript.businessName && { businessName: manuscript.businessName }),
     },
+    manuscript.fileName,
   );
 
   let images: string[] = [];
@@ -495,6 +514,7 @@ export const prepareJob = async (
     dir,
     title: manuscript.title.slice(0, 30),
     images: images.length,
+    ...(manuscript.businessName && { businessName: manuscript.businessName }),
   });
 
   return {
@@ -503,6 +523,7 @@ export const prepareJob = async (
     content: manuscript.content,
     images,
     manuscriptId: manuscript.id,
+    ...(manuscript.businessName && { businessName: manuscript.businessName }),
   };
 };
 
