@@ -12,3 +12,4 @@ export * from './map.js';
 export * from './link.js';
 export * from './excludeLibraryLink.js';
 export * from './phone.js';
+export * from './subheading.js';

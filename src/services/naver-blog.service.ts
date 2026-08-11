@@ -32,6 +32,7 @@ import {
   uploadImage,
   removeImage,
   dismissTransferErrorPopup,
+  insertImagesAtSubheadings,
   type MultiImageData,
   type WriteResult,
 } from '../lib/naver-editor/index.js';
@@ -526,29 +527,70 @@ export const updatePostImages = async (params: UpdatePostImagesParams): Promise<
 
     const existingCount = (await frame.$$('.se-component.se-image')).length;
     const replaceCount = Math.min(existingCount, images.length);
-    log.info('image-replace.plan', { existingCount, newCount: images.length, replaceCount });
+    const insertCount = existingCount === 0 ? images.length : 0;
+    log.info('image-replace.plan', { existingCount, newCount: images.length, replaceCount, insertCount });
 
-    for (let i = 0; i < replaceCount; i++) {
-      const removed = await removeImage(page, frame, i);
-      if (!removed) {
-        throw new Error(`기존 이미지 삭제 실패 (index=${i + 1})`);
-      }
+    if (insertCount > 0) {
+      // 기존 이미지가 0장이면 교체할 대상이 없다. 원문 텍스트는 그대로 두고
+      // 소제목(1. / 【1】 / [1] / ▶1)마다 이미지 하나씩 끼워 넣는 게 기본 동작이다.
+      const subheadingResult = await insertImagesAtSubheadings(page, frame, images);
+      log.info('image-insert.subheading.result', subheadingResult);
 
-      const uploaded = await uploadImage(page, frame, images[i]);
-      if (!uploaded) {
-        const transferError = await dismissTransferErrorPopup(page, frame);
-        const fileName = images[i]?.split('/').pop() ?? `index=${i + 1}`;
-        if (transferError) {
-          throw new Error(`이미지 전송 오류 (${fileName}): ${transferError}`);
+      if (subheadingResult.matched === 0) {
+        // 소제목을 하나도 못 찾은 글(구성이 다르거나 원고 형식이 다른 경우)만
+        // 본문 맨 끝에 새 이미지를 순서대로 몰아서 붙이는 폴백을 쓴다.
+        log.warn('image-insert.fallback.append', { reason: 'no_subheadings_found' });
+        await focusEditor(page, frame);
+        await focusLastParagraphEnd(frame);
+        await page.waitForTimeout(300);
+
+        for (let i = 0; i < insertCount; i++) {
+          const uploaded = await uploadImage(page, frame, images[i]);
+          if (!uploaded) {
+            const transferError = await dismissTransferErrorPopup(page, frame);
+            const fileName = images[i]?.split('/').pop() ?? `index=${i + 1}`;
+            if (transferError) {
+              throw new Error(`이미지 전송 오류 (${fileName}): ${transferError}`);
+            }
+            throw new Error(`이미지 업로드 실패 (${fileName})`);
+          }
+
+          await page.waitForTimeout(1000);
+          log.info('image-insert.step', { index: i + 1, total: insertCount });
         }
-        throw new Error(`이미지 업로드 실패 (${fileName})`);
+
+        log.info(progress.step('images.inserted'), { count: insertCount });
+      } else {
+        if (subheadingResult.inserted < subheadingResult.matched) {
+          throw new Error(
+            `소제목별 이미지 삽입 일부 실패 (matched=${subheadingResult.matched}, inserted=${subheadingResult.inserted})`,
+          );
+        }
+        log.info(progress.step('images.inserted'), { count: subheadingResult.inserted });
+      }
+    } else {
+      for (let i = 0; i < replaceCount; i++) {
+        const removed = await removeImage(page, frame, i);
+        if (!removed) {
+          throw new Error(`기존 이미지 삭제 실패 (index=${i + 1})`);
+        }
+
+        const uploaded = await uploadImage(page, frame, images[i]);
+        if (!uploaded) {
+          const transferError = await dismissTransferErrorPopup(page, frame);
+          const fileName = images[i]?.split('/').pop() ?? `index=${i + 1}`;
+          if (transferError) {
+            throw new Error(`이미지 전송 오류 (${fileName}): ${transferError}`);
+          }
+          throw new Error(`이미지 업로드 실패 (${fileName})`);
+        }
+
+        await page.waitForTimeout(1000);
+        log.info('image-replace.step', { index: i + 1, total: replaceCount });
       }
 
-      await page.waitForTimeout(1000);
-      log.info('image-replace.step', { index: i + 1, total: replaceCount });
+      log.info(progress.step('images.replaced'), { count: replaceCount });
     }
-
-    log.info(progress.step('images.replaced'), { count: replaceCount });
 
     await setAlignCenter(page, frame);
     await page.waitForTimeout(500);

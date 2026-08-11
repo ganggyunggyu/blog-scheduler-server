@@ -1,6 +1,8 @@
 import type { Frame, Page } from 'playwright';
 import { env } from '../../config/env.js';
 import { logger } from '../logging/logger.js';
+import { focusParagraphEndByIndex } from './editor.js';
+import { isSubheading } from './subheading.js';
 
 const log = logger.child({ scope: 'Image' });
 
@@ -396,6 +398,70 @@ export const uploadMultipleImages = async (
   }
 
   return { success: 0, failed: validPaths.length };
+};
+
+export interface SubheadingInsertResult {
+  inserted: number;
+  matched: number;
+}
+
+/**
+ * 기존 이미지가 0장인 발행글에 새 이미지를 소제목(1. / 【1】 / [1] / ▶1 패턴)마다
+ * 하나씩 끼워 넣는다. 원문 텍스트는 건드리지 않고 각 소제목 문단 끝에 이미지만 추가한다.
+ * 소제목을 하나도 못 찾으면 matched=0 을 돌려주고, 호출부가 본문 끝에 몰아서 붙이는
+ * 방식으로 폴백해야 한다.
+ */
+export const insertImagesAtSubheadings = async (
+  page: Page,
+  frame: Frame,
+  images: string[],
+): Promise<SubheadingInsertResult> => {
+  const paragraphTexts = await frame.evaluate(() =>
+    Array.from(document.querySelectorAll('p.se-text-paragraph')).map((p) => p.textContent ?? '')
+  );
+
+  const subheadingIndices = paragraphTexts
+    .map((text, index) => (isSubheading(text) ? index : -1))
+    .filter((index) => index >= 0);
+
+  const targets = subheadingIndices.slice(0, images.length);
+  log.info('insertAtSubheadings.plan', {
+    subheadings: subheadingIndices.length,
+    images: images.length,
+    targets: targets.length,
+  });
+
+  let inserted = 0;
+
+  for (let i = 0; i < targets.length; i++) {
+    const paragraphIndex = targets[i];
+    const image = images[i];
+
+    const focused = await focusParagraphEndByIndex(frame, paragraphIndex);
+    if (!focused) {
+      log.warn('insertAtSubheadings.focus.failed', { paragraphIndex, imageIndex: i });
+      continue;
+    }
+
+    await page.waitForTimeout(200);
+    const uploaded = await uploadImage(page, frame, image);
+    if (uploaded) {
+      inserted += 1;
+    } else {
+      const transferError = await dismissTransferErrorPopup(page, frame);
+      log.warn('insertAtSubheadings.upload.failed', {
+        paragraphIndex,
+        imageIndex: i,
+        transferError: transferError ?? '',
+      });
+    }
+
+    await page.waitForTimeout(800);
+    log.info('insertAtSubheadings.step', { index: i + 1, total: targets.length });
+  }
+
+  log.info('insertAtSubheadings.done', { inserted, matched: targets.length });
+  return { inserted, matched: targets.length };
 };
 
 // MultiImageData 구조로 업로드 (individual/slide/collage)

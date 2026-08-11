@@ -4,6 +4,7 @@ import { ProgressBar } from '../utils/progress.js';
 import { uploadImage } from './image.js';
 import { insertLink } from './link.js';
 import { focusLastParagraphEnd, forceResetTypingStyleToDefault } from './editor.js';
+import { isSubheading } from './subheading.js';
 
 const log = logger.child({ scope: 'Content' });
 
@@ -43,11 +44,7 @@ const resetPetContentTypingStyle = async (
   }
 };
 
-export const isSubheading = (line: string): boolean => {
-  const patterns = [/^\d+\.(?:\s|[가-힣a-zA-Z])/, /^【\d+】/, /^\[\d+\]/, /^▶\s*\d+/];
-  const trimmed = line.trim();
-  return patterns.some((pattern) => pattern.test(trimmed));
-};
+export { isSubheading };
 
 const isEyeBrandImagePlaceholderLine = (line: string): boolean =>
   /^\[IMG\](?:\s|$)/.test(line.trim());

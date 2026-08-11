@@ -520,6 +520,60 @@ export const focusLastParagraphEnd = async (frame: FrameController): Promise<boo
   return true;
 };
 
+/** 라이브 문서에서 index 번째 p.se-text-paragraph 끝으로 커서를 옮긴다. 소제목별 이미지 삽입용. */
+export const focusParagraphEndByIndex = async (
+  frame: FrameController,
+  index: number,
+): Promise<boolean> => {
+  const focused = await frame.evaluate((targetIndex) => {
+    const paragraphs = Array.from(document.querySelectorAll<HTMLParagraphElement>('p.se-text-paragraph'));
+    const paragraph = paragraphs[targetIndex];
+
+    if (!paragraph) {
+      return false;
+    }
+
+    let textNode: Text | null = null;
+    const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+    let currentNode = walker.nextNode();
+    while (currentNode) {
+      textNode = currentNode as Text;
+      currentNode = walker.nextNode();
+    }
+
+    if (!textNode) {
+      return false;
+    }
+
+    const editable =
+      paragraph.closest<HTMLElement>('[contenteditable="true"]') ??
+      paragraph.closest<HTMLElement>('.se-component-content');
+
+    editable?.focus();
+
+    const selection = window.getSelection();
+    if (!selection) {
+      return false;
+    }
+
+    const range = document.createRange();
+    range.setStart(textNode, textNode.textContent?.length ?? 0);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    return true;
+  }, index);
+
+  if (!focused) {
+    log.warn('paragraph.byIndex.focus.failed', { index });
+    return false;
+  }
+
+  log.info('paragraph.byIndex.focused', { index });
+  return true;
+};
+
 export const normalizeCurrentEmptyParagraphStyle = async (
   frame: FrameController
 ): Promise<boolean> => {
