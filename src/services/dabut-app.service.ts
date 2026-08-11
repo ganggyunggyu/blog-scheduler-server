@@ -217,6 +217,33 @@ export const resolveDabutBlogCredential = async (params: {
   };
 };
 
+/**
+ * 다붓 계정이 등록해둔 provider API 키를 복호화해서 돌려준다.
+ * `users.api_keys.{provider}` 는 dabut 이 Fernet(enc:v1:) 으로 암호화해서 저장한다.
+ */
+export const resolveOwnerApiKey = async (
+  ownerId: string,
+  provider: string,
+): Promise<string | null> => {
+  const objectId = toObjectId(ownerId);
+  if (!objectId) return null;
+
+  const doc = await (await usersCollection()).findOne({ _id: objectId });
+  if (!doc) return null;
+
+  const apiKeys = (doc.api_keys ?? {}) as Record<string, unknown>;
+  const stored = apiKeys[provider];
+  if (typeof stored !== 'string' || !stored) return null;
+
+  const plain = decryptStoredSecret(stored, env.API_KEY_ENC_SECRET ?? '');
+  if (!plain) {
+    log.warn('owner.apikey.decrypt.failed', { ownerId, provider });
+    return null;
+  }
+
+  return plain;
+};
+
 export const closeDabutApp = async (): Promise<void> => {
   if (connection) {
     await connection.close();
