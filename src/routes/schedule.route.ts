@@ -965,23 +965,50 @@ const linkUpdateSchema = z.object({
     keyword_category: z.string().default('한려담원'),
   });
 
-  app.post('/bot/image-replace', async (req: { body: unknown }, reply: FastifyReply) => {
+  /**
+   * blogId 로 실행 계정을 찾는다. 레거시 account-directory 를 먼저 보고,
+   * 거기 없거나 비밀번호가 없으면 로그인한 다붓 계정(ownerId) 소유의
+   * naver_accounts 에서 같은 blogId 를 찾아 복호화해서 쓴다.
+   */
+  const resolveImageReplaceAccount = async (
+    blogId: string,
+    ownerId?: string,
+  ): Promise<QueueAccount | null> => {
+    const matchedAccount = await findAccountById(blogId);
+    if (matchedAccount?.password) {
+      return { id: matchedAccount.id, password: matchedAccount.password, blogId };
+    }
+
+    if (!ownerId) return null;
+
+    const dabutAccounts = await listDabutBlogAccounts(ownerId);
+    const matchedDabut = dabutAccounts.find((item) => item.blogId === blogId);
+    if (!matchedDabut) return null;
+
+    const credential = await resolveDabutBlogCredential({ ownerId, accountId: matchedDabut.id });
+    if (!credential) return null;
+
+    return { id: credential.loginId, password: credential.password, blogId: credential.blogId || blogId };
+  };
+
+  app.post('/bot/image-replace', async (req, reply: FastifyReply) => {
+    const ownerId = getRequestOwnerId(req);
     const body = imageReplaceSchema.parse(req.body);
     const { links } = body;
 
     const pairs = await Promise.all(links.map(async (link) => {
       const { blogId, logNo } = parseBlogUrl(link);
-      const matchedAccount = await findAccountById(blogId);
-      return { blogId, logNo, matchedAccount };
+      const account = await resolveImageReplaceAccount(blogId, ownerId);
+      return { blogId, logNo, account };
     }));
 
     const missingAccounts = [...new Set(
-      pairs.filter((pair) => !pair.matchedAccount).map((pair) => pair.blogId)
+      pairs.filter((pair) => !pair.account).map((pair) => pair.blogId)
     )];
 
     if (missingAccounts.length > 0) {
       return reply.status(400).send({
-        message: `DB에 없는 계정: ${missingAccounts.join(', ')}`,
+        message: `계정을 찾을 수 없거나 실행 비밀번호가 없음: ${missingAccounts.join(', ')}`,
       });
     }
 
@@ -1001,13 +1028,7 @@ const linkUpdateSchema = z.object({
     let totalJobs = 0;
 
     for (const [blogId, accountPairs] of grouped) {
-      const { matchedAccount } = accountPairs[0];
-      if (!matchedAccount?.password) {
-        return reply.status(400).send({
-          message: `DB 계정에 실행 비밀번호가 없음: ${blogId}`,
-        });
-      }
-      const account = { id: matchedAccount.id, password: matchedAccount.password, blogId };
+      const account = accountPairs[0].account!;
       const accountGenerateQueue = getGenerateQueue(account.id);
 
       const jobsList: Array<{ logNo: string }> = [];
