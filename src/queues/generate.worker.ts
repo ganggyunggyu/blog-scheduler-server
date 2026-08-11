@@ -175,7 +175,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       let bodyImages = productData.bodyImages;
 
       if (bodyImages.length === 0) {
-        bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+        bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category, ownerId);
       }
 
       log.info('image-replace.prepared', { keyword, images: bodyImages.length });
@@ -210,6 +210,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
         imageCount,
         imageSource,
         manuscriptType,
+        ownerId,
       )
       : await prepareJob(
         keyword,
@@ -264,7 +265,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       });
 
       if (productData.bodyImages.length === 0) {
-        productData.bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+        productData.bodyImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category, ownerId);
         log.info('product.fallback.ai', { count: productData.bodyImages.length });
       }
     }
@@ -278,7 +279,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       const slideDir = path.join(prepared.jobDir, 'images', 'slide');
       const fs = await import('fs/promises');
       await fs.mkdir(slideDir, { recursive: true });
-      productData.multiImages.slide = await generateAndDownloadAIImages(keyword, fallbackSlideImageCount, slideDir, category);
+      productData.multiImages.slide = await generateAndDownloadAIImages(keyword, fallbackSlideImageCount, slideDir, category, ownerId);
       log.info('product.fallback.slide.ai', { count: productData.multiImages.slide.length });
     }
 
@@ -287,7 +288,7 @@ export const processGenerate = async (job: Job<GenerateJobData>) => {
       const imagesDir = path.join(prepared.jobDir, 'images');
       const fallbackImages = await fetchBodyImagesFromAI(keyword, 5, imagesDir);
       if (fallbackImages.length === 0) {
-        const aiImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category);
+        const aiImages = await generateAndDownloadAIImages(keyword, imageCount, imagesDir, category, ownerId);
         if (productData) {
           productData.bodyImages = aiImages;
         } else {

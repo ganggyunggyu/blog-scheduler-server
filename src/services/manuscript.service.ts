@@ -311,7 +311,8 @@ export const fetchBodyImagesFromAI = async (
 const generateImageUrlsFromAI = async (
   keyword: string,
   imageCount: number,
-  category?: string
+  category?: string,
+  ownerId?: string
 ): Promise<string[]> => {
   const url = `${env.MANUSCRIPT_API_URL}/generate/image`;
   const progress = new ProgressBar({ label: 'image', total: 1, width: 16 });
@@ -323,6 +324,13 @@ const generateImageUrlsFromAI = async (
     source: 'ai',
   });
 
+  // 다붓 쪽 계정별 API 키 미들웨어는 Authorization 헤더가 있는 요청에만 적용된다.
+  // 헤더 없이 부르면 계정이 등록한 키를 못 찾고 서버 기본 키로 조용히 떨어져서,
+  // 그 키가 죽어 있으면(선불 크레딧 소진 등) 원고는 되는데 이미지만 계속 빈다.
+  const headers = ownerId
+    ? { Authorization: `Bearer ${signDabutServiceToken(ownerId)}` }
+    : undefined;
+
   const urls: string[] = [];
   const maxAttempts = 3;
 
@@ -331,7 +339,7 @@ const generateImageUrlsFromAI = async (
     const response = await axios.post(
       url,
       { keyword, category: category ?? '', count: requestedCount },
-      { timeout: 300000 }
+      { timeout: 300000, headers }
     );
 
     const nextUrls = parseImageResponse(response.data)
@@ -437,8 +445,9 @@ export const generateAndDownloadAIImages = async (
   imageCount: number,
   imagesDir: string,
   category?: string,
+  ownerId?: string,
 ): Promise<string[]> => {
-  const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
+  const urls = await generateImageUrlsFromAI(keyword, imageCount, category, ownerId);
   const imageData = urls.map((url) => ({ url }));
   return downloadImagesToDir(imageData, imagesDir);
 };
@@ -447,7 +456,8 @@ export const generateImageUrls = async (
   keyword: string,
   imageCount: number,
   category?: string,
-  imageSource: ImageSource = 'ai'
+  imageSource: ImageSource = 'ai',
+  ownerId?: string
 ): Promise<ImageData[]> => {
   if (imageSource === 'google') {
     const urls = await generateImageUrlsFromGoogle(keyword, imageCount);
@@ -465,7 +475,7 @@ export const generateImageUrls = async (
   if (imageSource === 'local') {
     return [];
   }
-  const urls = await generateImageUrlsFromAI(keyword, imageCount, category);
+  const urls = await generateImageUrlsFromAI(keyword, imageCount, category, ownerId);
   return urls.map((url) => ({ url }));
 };
 
@@ -504,6 +514,7 @@ export const prepareProvidedJob = async (
   imageCount: number,
   imageSource: ImageSource = 'ai',
   manuscriptType: ManuscriptType = 'default',
+  ownerId?: string,
 ): Promise<PreparedJob> => {
   const { dir, imagesDir } = await createJobDir(keyword);
   const manuscriptId = `manual_${Date.now()}`;
@@ -536,7 +547,8 @@ export const prepareProvidedJob = async (
       keyword,
       finalImageCount,
       undefined,
-      imageSource
+      imageSource,
+      ownerId
     );
     images = await downloadImagesToDir(
       imageUrls.slice(0, finalImageCount),
@@ -598,7 +610,8 @@ export const prepareJob = async (
       keyword,
       finalImageCount,
       undefined,
-      imageSource
+      imageSource,
+      extras.ownerId
     );
     images = await downloadImagesToDir(
       imageUrls.slice(0, finalImageCount),
