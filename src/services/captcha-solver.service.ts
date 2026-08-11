@@ -1,68 +1,105 @@
-import { GoogleGenAI } from '@google/genai';
+import axios from 'axios';
 import type { Page } from 'playwright';
-import { env } from '../config/env.js';
 import { SELECTORS } from '../constants/selectors.js';
 import { logger } from '../lib/logging/logger.js';
+import { resolveOwnerApiKey } from './dabut-app.service.js';
 
 const log = logger.child({ scope: 'Captcha' });
 
 /**
- * 쓸 모델 이름.
+ * 캡차 풀이는 다붓 "21lab" 계정이 등록해둔 OpenAI 키로 gpt-5.6-luna 를 쓴다.
  *
- * gemini-2.5-flash 로 박아뒀다가, 구글이 신규 프로젝트에 그 버전을 닫으면서
- * 404 로 통째로 죽었다. 키를 바꿔도 안 풀렸고 재배포해야만 고칠 수 있었다.
- * 기본값을 버전 없는 별칭으로 두고, 그마저 막히면 배포 없이 갈아끼우게 환경변수로 받는다.
+ * 예전엔 서버 환경변수 GEMINI_API_KEY 로 고정해뒀는데, 그 구글 프로젝트가 선불
+ * 크레딧 소진(RESOURCE_EXHAUSTED)으로 죽어서 캡차 자동풀기가 통째로 막혔다.
+ * 계정별 키 체계로 옮기는 첫 단계로, 일단 스케쥴러가 관리하는 계정들의 소유주인
+ * "21lab" 다붓 계정의 OpenAI 키를 매번 복호화해서 쓴다(요청마다 새로 읽어서
+ * 다붓 쪽에서 키를 바꾸면 재배포 없이 바로 반영됨).
  */
-const DEFAULT_MODEL = 'gemini-flash-latest';
+const CAPTCHA_KEY_OWNER_ID = '6a6abf0bf86b1cbdd1afe1dd';
+
+/**
+ * 모델이 은퇴/장애로 죽으면 배포 없이 갈아끼울 수 있게 환경변수로도 받는다
+ * (gemini-2.5-flash 가 신규 프로젝트에서 통째로 막혔던 전례가 있어서 그대로 유지함).
+ */
+const DEFAULT_CAPTCHA_MODEL = 'gpt-5.6-luna';
 
 export const resolveCaptchaModel = (source: { CAPTCHA_MODEL?: string }): string =>
-  source.CAPTCHA_MODEL?.trim() || DEFAULT_MODEL;
+  source.CAPTCHA_MODEL?.trim() || DEFAULT_CAPTCHA_MODEL;
 
-const MODEL = resolveCaptchaModel({ CAPTCHA_MODEL: process.env.CAPTCHA_MODEL });
+const CAPTCHA_MODEL = resolveCaptchaModel({ CAPTCHA_MODEL: process.env.CAPTCHA_MODEL });
 const MAX_ATTEMPTS = 3;
 const CAPTCHA_INPUT_DELAY_MS = 200;
 const PW_INPUT_DELAY_MS = 150;
 const LOGIN_CLICK_WAIT_MS = 3000;
-
-let geminiClient: GoogleGenAI | null = null;
 
 const clickVisibleLoginButton = async (page: Page): Promise<void> => {
   const button = page.locator(SELECTORS.login.btn).filter({ visible: true }).first();
   await button.click();
 };
 
-const getGeminiClient = (): GoogleGenAI => {
-  if (geminiClient) return geminiClient;
-  if (!env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY가 설정되지 않았습니다.');
-  geminiClient = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-  return geminiClient;
-};
-
 const safeEvaluate = async <T>(page: Page, fn: () => T, fallback: T): Promise<T> => {
   return page.evaluate(fn).catch(() => fallback);
 };
 
-const solveCaptchaWithAI = async (imageBase64: string, question: string): Promise<string> => {
-  const ai = getGeminiClient();
+interface OpenAIResponsesOutputTextPart {
+  type: string;
+  text?: string;
+}
+interface OpenAIResponsesOutputItem {
+  type: string;
+  content?: OpenAIResponsesOutputTextPart[];
+}
+interface OpenAIResponsesResult {
+  output_text?: string;
+  output?: OpenAIResponsesOutputItem[];
+}
 
-  const response = await ai.models.generateContent({
-    model: MODEL,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
-          {
-            text: `이 이미지는 네이버 로그인 캡차로 나오는 가상 영수증 이미지야.
+const extractResponsesText = (data: OpenAIResponsesResult): string => {
+  if (data.output_text) return data.output_text;
+
+  const texts = (data.output ?? [])
+    .flatMap((item) => item.content ?? [])
+    .filter((part) => part.type === 'output_text' && typeof part.text === 'string')
+    .map((part) => part.text as string);
+
+  return texts.join('').trim();
+};
+
+const solveCaptchaWithAI = async (imageBase64: string, question: string): Promise<string> => {
+  const apiKey = await resolveOwnerApiKey(CAPTCHA_KEY_OWNER_ID, 'openai');
+  if (!apiKey) {
+    throw new Error('캡차 풀이용 OpenAI 키를 다붓 계정에서 찾지 못했습니다.');
+  }
+
+  const { data } = await axios.post<OpenAIResponsesResult>(
+    'https://api.openai.com/v1/responses',
+    {
+      model: CAPTCHA_MODEL,
+      input: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: `이 이미지는 네이버 로그인 캡차로 나오는 가상 영수증 이미지야.
 질문: "${question}"
 답만 정확히 적어. 숫자면 숫자만, 물건 이름이면 이름만. 다른 말 하지마.`,
-          },
-        ],
-      },
-    ],
-  });
+            },
+            {
+              type: 'input_image',
+              image_url: `data:image/jpeg;base64,${imageBase64}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      timeout: 30000,
+    },
+  );
 
-  const answer = response.text?.trim() ?? '';
+  const answer = extractResponsesText(data).trim();
   log.info('ai.answer', { question, answer });
   return answer;
 };
@@ -98,11 +135,6 @@ export const detectCaptcha = async (page: Page): Promise<{
 };
 
 export const attemptCaptchaSolve = async (page: Page, password?: string): Promise<boolean> => {
-  if (!env.GEMINI_API_KEY) {
-    log.error('gemini-key-missing');
-    return false;
-  }
-
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       const captcha = await detectCaptcha(page);
