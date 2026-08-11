@@ -15,11 +15,11 @@ const buildPlan = (
   blogCharacter = '블루망고',
 ): RestaurantAccountPlan => ({
   accountId,
-  region: '인천/부천',
+  region: '경기남부(수원/용인/분당)',
   blogCharacter,
   items: buildRestaurantPlanItems(
     businessNames.map((businessName, index) => ({
-      keyword: `부천상권${index}맛집`,
+      keyword: `수원상권${index}맛집`,
       businessName,
     })),
   ),
@@ -96,7 +96,7 @@ test('assertRestaurantPlan: 업체명이 겹치면 에러로 막음', () => {
 test('assertRestaurantPlan: 업체명이 비어 있으면 에러로 막음', () => {
   assert.throws(
     () => assertRestaurantPlan([buildPlan('acc1', ['A식당', '  '])]),
-    /업체명 미지정: acc1\/부천상권1맛집/,
+    /업체명 미지정: acc1\/수원상권1맛집/,
   );
 });
 
@@ -119,7 +119,7 @@ test('assertRestaurantPlan: 정상 플랜은 통과함', () => {
 test('findRegionMismatches: 담당 권역 밖 상권 키워드를 잡아냄', () => {
   const seoulPlan: RestaurantAccountPlan = {
     accountId: 'e4f-l',
-    region: '서울',
+    region: '서울 강북',
     blogCharacter: '사랑채',
     items: buildRestaurantPlanItems([
       { keyword: '홍대맛집', businessName: '무세이' },
@@ -128,7 +128,7 @@ test('findRegionMismatches: 담당 권역 밖 상권 키워드를 잡아냄', ()
   };
 
   assert.deepEqual(findRegionMismatches([seoulPlan]), [
-    { accountId: 'e4f-l', region: '서울', keyword: '수원인계동맛집' },
+    { accountId: 'e4f-l', region: '서울 강북', keyword: '수원인계동맛집' },
   ]);
 });
 
@@ -139,10 +139,10 @@ test('findRegionMismatches: 권역 안 키워드만 있으면 빈 배열', () =>
 test('assertRestaurantPlan: 블로그 하나가 다른 권역 글을 섞으면 에러로 막음', () => {
   const mixed: RestaurantAccountPlan = {
     accountId: 'e4f-l',
-    region: '서울',
+    region: '서울 강북',
     blogCharacter: '사랑채',
     items: buildRestaurantPlanItems([{ keyword: '대구동성로맛집', businessName: '목마식당' }]),
   };
 
-  assert.throws(() => assertRestaurantPlan([mixed]), /권역 밖 키워드: e4f-l\(서울\)\/대구동성로맛집/);
+  assert.throws(() => assertRestaurantPlan([mixed]), /권역 밖 키워드: e4f-l\(서울 강북\)\/대구동성로맛집/);
 });
