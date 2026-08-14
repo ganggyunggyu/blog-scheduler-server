@@ -256,6 +256,16 @@ test('findManuscriptRejection: "방문 전 확인"이 한 번만 있으면 통�
   assert.equal(findManuscriptRejection(article), undefined);
 });
 
+test('findManuscriptRejection: 실제로 발행된 제목-거절문("업체 참고자료가 없어...")도 잡아냄', () => {
+  const title = '업체 참고자료가 없어 사실 기반 원고를 작성할 수 없습니다. 업체명과 주소, 영업시간, 주차, 메뉴,가격 정보를 보내주시면 지점 정보가 섞이지 않도록 원고를 작성하겠습니다.';
+
+  assert.match(findManuscriptRejection(title, { skipLengthCheck: true }) ?? '', /업체 참고자료 부족/);
+});
+
+test('findManuscriptRejection: skipLengthCheck 를 주면 짧아도 정상 제목은 통과시킴', () => {
+  assert.equal(findManuscriptRejection('서초 직장인 저녁 모임 서초역 술집 추천', { skipLengthCheck: true }), undefined);
+});
+
 /**
  * 다붓의 Project(프롬프트+모델+파이프라인)를 원고 방식으로 그대로 쓰는 경로.
  * 하드코딩 enum 을 늘리지 않고 project_id 만 넘기면 되게 함.

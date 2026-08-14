@@ -215,7 +215,10 @@ const VISIT_TO_CONFIRM_THRESHOLD = 2;
 
 const MIN_MANUSCRIPT_LENGTH = 700;
 
-export const findManuscriptRejection = (content: string): string | undefined => {
+export const findManuscriptRejection = (
+  content: string,
+  options: { skipLengthCheck?: boolean } = {},
+): string | undefined => {
   const compact = content.replace(/\s/g, '');
 
   const matched = REFUSAL_PATTERNS.find((pattern) => pattern.test(content));
@@ -223,7 +226,7 @@ export const findManuscriptRejection = (content: string): string | undefined => 
     return `생성기가 원고 대신 거절문을 반환함 (${compact.length}자)`;
   }
 
-  if (compact.length < MIN_MANUSCRIPT_LENGTH) {
+  if (!options.skipLengthCheck && compact.length < MIN_MANUSCRIPT_LENGTH) {
     return `원고가 너무 짧음 (${compact.length}자 < ${MIN_MANUSCRIPT_LENGTH}자)`;
   }
 
@@ -260,7 +263,9 @@ export const callManuscriptAPI = async (
   const raw = response.data;
   const { title, content } = parseManuscriptContent(raw.content ?? '', keyword);
 
-  const rejection = findManuscriptRejection(content);
+  // 거절문이 본문 대신 제목 줄에 그대로 얹혀서 나오는 경우가 있었다(실제 발행된 적 있음).
+  // content 만 보면 길이 체크를 통과해버리니 title 도 같이 검사한다.
+  const rejection = findManuscriptRejection(content) ?? findManuscriptRejection(title, { skipLengthCheck: true });
   if (rejection) {
     manuscriptLog.error('manuscript.rejected', { keyword, type, reason: rejection });
     throw new Error(`원고 생성 실패: ${rejection} (keyword=${keyword})`);
