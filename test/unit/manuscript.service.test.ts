@@ -226,6 +226,36 @@ test('findManuscriptRejection: 거절 문구가 없어도 너무 짧으면 막�
   assert.match(findManuscriptRejection('짧은 본문입니다.') ?? '', /너무 짧음/);
 });
 
+test('findManuscriptRejection: 업체정보 블록이 "미기재" 플레이스홀더면 막음', () => {
+  const article = [
+    `${'부천 상동에서 초밥이 당길 때 자주 가는 집을 소개합니다. '.repeat(40)}`,
+    '🏡주소 업체 참고자료 미기재',
+    '⏰영업시간 방문 전 확인',
+    '🅿️주차 방문 전 확인',
+    '🚇동선 신논현 기준 확인',
+  ].join('\n');
+
+  assert.match(findManuscriptRejection(article) ?? '', /업체 참고자료 부족/);
+});
+
+test('findManuscriptRejection: "방문 전 확인"이 두 번 넘게 겹쳐도 막음', () => {
+  const article = [
+    `${'천안 두정동에서 회식하기 좋은 고깃집을 소개합니다. '.repeat(40)}`,
+    '영업시간은 방문 전 확인 부탁드리고, 주차 가능 여부도 방문 전 확인이 필요합니다.',
+  ].join('\n');
+
+  assert.match(findManuscriptRejection(article) ?? '', /업체 참고자료 부족/);
+});
+
+test('findManuscriptRejection: "방문 전 확인"이 한 번만 있으면 통과시킴', () => {
+  const article = [
+    `${'천안 두정동에서 회식하기 좋은 고깃집을 소개합니다. '.repeat(40)}`,
+    '예약 필요 여부는 방문 전 확인해보시는 걸 추천드립니다.',
+  ].join('\n');
+
+  assert.equal(findManuscriptRejection(article), undefined);
+});
+
 /**
  * 다붓의 Project(프롬프트+모델+파이프라인)를 원고 방식으로 그대로 쓰는 경로.
  * 하드코딩 enum 을 늘리지 않고 project_id 만 넘기면 되게 함.

@@ -201,6 +201,18 @@ const REFUSAL_PATTERNS = [
   /검증을\s*완료할\s*수\s*없습니다/,
 ];
 
+/**
+ * 업체 참고자료(ref)를 못 구하면 맛집 프롬프트는 사실을 지어내는 대신
+ * "🏡주소 업체 참고자료 미기재", "⏰영업시간 방문 전 확인" 처럼 업체정보 블록을
+ * 플레이스홀더로 채운다. 안전장치 자체는 맞는데, 이게 그대로 나가면 업체정보가
+ * 통째로 빈 글이 발행된다(실제로 발행된 적 있음). "미기재" 문구가 한 번이라도
+ * 있거나 "방문 전 확인"이 여러 번 겹치면 업체정보 블록이 사실상 텅 빈 걸로 보고
+ * 생성 단계에서 막는다.
+ */
+const NO_REFERENCE_MARKERS = [/업체\s*참고자료\s*미기재/, /참고자료가?\s*없어/];
+const VISIT_TO_CONFIRM_PATTERN = /방문\s*전\s*확인/g;
+const VISIT_TO_CONFIRM_THRESHOLD = 2;
+
 const MIN_MANUSCRIPT_LENGTH = 700;
 
 export const findManuscriptRejection = (content: string): string | undefined => {
@@ -213,6 +225,12 @@ export const findManuscriptRejection = (content: string): string | undefined => 
 
   if (compact.length < MIN_MANUSCRIPT_LENGTH) {
     return `원고가 너무 짧음 (${compact.length}자 < ${MIN_MANUSCRIPT_LENGTH}자)`;
+  }
+
+  const hasNoReferenceMarker = NO_REFERENCE_MARKERS.some((pattern) => pattern.test(content));
+  const visitToConfirmCount = (content.match(VISIT_TO_CONFIRM_PATTERN) ?? []).length;
+  if (hasNoReferenceMarker || visitToConfirmCount >= VISIT_TO_CONFIRM_THRESHOLD) {
+    return `업체 참고자료 부족으로 업체정보 블록이 플레이스홀더로 채워짐 (미기재=${hasNoReferenceMarker}, 방문전확인=${visitToConfirmCount}회)`;
   }
 
   return undefined;
