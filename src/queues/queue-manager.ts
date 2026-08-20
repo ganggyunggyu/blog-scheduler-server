@@ -46,8 +46,8 @@ const hasRunnableJobs = (counts: RunnableQueueCounts): boolean => (
 
 const isAccountQueueIdle = async (accountId: string): Promise<boolean> => {
   const [generateCounts, publishCounts] = await Promise.all([
-    getRunnableQueueCounts(generateQueues.get(accountId)),
-    getRunnableQueueCounts(publishQueues.get(accountId)),
+    getRunnableQueueCounts(findQueue('generate', accountId)),
+    getRunnableQueueCounts(findQueue('publish', accountId)),
   ]);
 
   return !hasRunnableJobs(generateCounts) && !hasRunnableJobs(publishCounts);
@@ -122,6 +122,18 @@ const normalizeAccountKey = (accountId: string): string => accountId.replace(/[^
 
 const getQueueName = (type: 'generate' | 'publish', accountId: string): string =>
   `${type}_${normalizeAccountKey(accountId)}`;
+
+/**
+ * 이미 만들어진 큐를 꺼낸다. 없으면 만들지 않고 undefined 를 준다.
+ *
+ * 맵 키가 정규화돼 있으므로(위 normalizeAccountKey 주석 참고) 조회할 때도 같은 규칙을
+ * 거쳐야 한다. 이걸 빼먹으면 진짜 accountId("io4acg_dp6kf-2h0")로 부른 조회/정리/재시도가
+ * 큐를 못 찾고 조용히 "0건"으로 성공해버린다 — 화면에서는 버튼이 먹은 것처럼 보인다.
+ */
+const findQueue = (type: 'generate' | 'publish', accountId: string): Queue | undefined => {
+  const key = normalizeAccountKey(accountId);
+  return type === 'generate' ? generateQueues.get(key) : publishQueues.get(key);
+};
 
 const extractAccountIdFromQueueName = (queueName: string): string | null => {
   const match = queueName.match(/^(generate|publish)_(.+)$/);
@@ -336,14 +348,14 @@ export const drainAccountQueues = async (
   const maskedAccount = accountId.slice(0, 3) + '***';
   const result = { generate: 0, publish: 0 };
 
-  const generateQueue = generateQueues.get(accountId);
+  const generateQueue = findQueue('generate', accountId);
   if (generateQueue) {
     const counts = await generateQueue.getJobCounts('waiting', 'delayed', 'paused');
     result.generate = (counts.waiting ?? 0) + (counts.delayed ?? 0) + (counts.paused ?? 0);
     await generateQueue.drain(true);
   }
 
-  const publishQueue = publishQueues.get(accountId);
+  const publishQueue = findQueue('publish', accountId);
   if (publishQueue) {
     const counts = await publishQueue.getJobCounts('waiting', 'delayed', 'paused');
     result.publish = (counts.waiting ?? 0) + (counts.delayed ?? 0) + (counts.paused ?? 0);
@@ -390,9 +402,7 @@ export const removeJobFromQueue = async (
   jobId: string,
   type: 'generate' | 'publish'
 ): Promise<boolean> => {
-  const queue = type === 'generate'
-    ? generateQueues.get(accountId)
-    : publishQueues.get(accountId);
+  const queue = findQueue(type, accountId);
 
   if (!queue) return false;
 
@@ -495,9 +505,7 @@ export const getAccountQueueJobs = async (
   status: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed' = 'waiting',
   limit: number = 20
 ): Promise<QueueJob[]> => {
-  const queue = type === 'generate'
-    ? generateQueues.get(accountId)
-    : publishQueues.get(accountId);
+  const queue = findQueue(type, accountId);
 
   if (!queue) return [];
 
@@ -522,9 +530,7 @@ export const retryFailedJob = async (
   jobId: string,
   type: 'generate' | 'publish'
 ): Promise<boolean> => {
-  const queue = type === 'generate'
-    ? generateQueues.get(accountId)
-    : publishQueues.get(accountId);
+  const queue = findQueue(type, accountId);
 
   if (!queue) return false;
 
@@ -556,9 +562,7 @@ export const cleanJobs = async (
   status: CleanableJobStatus = 'completed',
   grace: number = 0
 ): Promise<number> => {
-  const queue = type === 'generate'
-    ? generateQueues.get(accountId)
-    : publishQueues.get(accountId);
+  const queue = findQueue(type, accountId);
 
   if (!queue) return 0;
 
