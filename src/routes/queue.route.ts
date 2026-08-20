@@ -5,10 +5,11 @@ import {
   getQueuesDashboard,
   getAccountQueueJobs,
   retryFailedJob,
-  cleanCompletedJobs,
+  cleanJobs,
   drainAccountQueues,
   drainAllQueues,
 } from '../queues/queue-manager.js';
+import { cleanSchema } from '../lib/queue/clean-request.js';
 
 const jobQuerySchema = z.object({
   type: z.enum(['generate', 'publish']).default('generate'),
@@ -21,10 +22,6 @@ const retrySchema = z.object({
   jobId: z.string(),
 });
 
-const cleanSchema = z.object({
-  type: z.enum(['generate', 'publish']),
-  grace: z.number().min(0).default(0),
-});
 
 export const queueRoutes = async (app: FastifyInstance) => {
   // 전체 대시보드 조회
@@ -82,14 +79,14 @@ export const queueRoutes = async (app: FastifyInstance) => {
     return { success: true, jobId: body.jobId };
   });
 
-  // 완료된 작업 정리
+  // 끝난 작업 정리 (completed 기본, failed 도 지정 가능)
   app.post('/api/queues/:accountId/clean', async (req) => {
     const { accountId } = req.params as { accountId: string };
     const body = cleanSchema.parse(req.body);
 
-    const removed = await cleanCompletedJobs(accountId, body.type, body.grace);
+    const removed = await cleanJobs(accountId, body.type, body.status, body.grace);
 
-    return { success: true, removed };
+    return { success: true, status: body.status, removed };
   });
 
   // 특정 계정 큐 비우기 (waiting/delayed/paused)

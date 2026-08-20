@@ -540,9 +540,20 @@ export const retryFailedJob = async (
   }
 };
 
-export const cleanCompletedJobs = async (
+/** 큐에서 지워도 되는 종료 상태. active/waiting 은 실행 중이거나 실행 예정이라 제외한다. */
+export type CleanableJobStatus = 'completed' | 'failed';
+
+/**
+ * 끝난 잡을 큐에서 걷어낸다.
+ *
+ * failed 를 지우는 건 재시도가 아니라 폐기다. BullMQ 의 failed 집합은 그냥 쌓여만 있고
+ * 저절로 다시 돌지는 않지만, 남겨두면 대시보드 숫자가 계속 오염되고 나중에 사람이
+ * 실수로 retry 를 눌러 이미 발행된 키워드가 중복 발행될 수 있다.
+ */
+export const cleanJobs = async (
   accountId: string,
   type: 'generate' | 'publish',
+  status: CleanableJobStatus = 'completed',
   grace: number = 0
 ): Promise<number> => {
   const queue = type === 'generate'
@@ -551,6 +562,19 @@ export const cleanCompletedJobs = async (
 
   if (!queue) return 0;
 
-  const removed = await queue.clean(grace, 1000, 'completed');
+  const removed = await queue.clean(grace, 1000, status);
+  log.info('queue.cleaned', {
+    accountId: accountId.slice(0, 3) + '***',
+    type,
+    status,
+    removed: removed.length,
+  });
   return removed.length;
 };
+
+/** 기존 호출부 호환용. 새 코드는 cleanJobs 를 직접 쓴다. */
+export const cleanCompletedJobs = async (
+  accountId: string,
+  type: 'generate' | 'publish',
+  grace: number = 0
+): Promise<number> => cleanJobs(accountId, type, 'completed', grace);
