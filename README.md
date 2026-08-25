@@ -36,25 +36,30 @@ pnpm typecheck
 
 ### 배포
 
-세 서비스로 나뉘어 있고, 프론트가 나머지 둘을 직접 호출한다.
+다붓은 저장소 하나가 아니라 서비스 다섯 개가 붙어 돌아간다. 프론트가 나머지를 전부 직접 호출한다.
 
-| 서비스 | 주소 | 호스팅 |
-| --- | --- | --- |
-| 다붓 UI (프론트) | https://21lab-ai-agent.vercel.app | Vercel `21lab-ai-agent`, main 푸시 시 자동 배포 |
-| 다붓 백엔드 (원고, 계정, 프로젝트) | https://blog-analyzer.fly.dev | Fly.io `blog-analyzer` (nrt), 내부 포트 8080 |
-| 스케줄러 API (이 저장소) | https://21lab-scheduler.fly.dev | Fly.io `21lab-scheduler` (nrt), 내부 포트 8001 |
+| 서비스 | 주소 | 호스팅 | 저장소 |
+| --- | --- | --- | --- |
+| 다붓 UI | https://21lab-ai-agent.vercel.app | Vercel `21lab-ai-agent` | `dabut-frontend` |
+| 다붓 백엔드 (원고, 계정, 프로젝트) | https://blog-analyzer.fly.dev | Fly.io `blog-analyzer` (nrt) | `dabut-backend` |
+| **스케줄러 API (이 저장소)** | https://21lab-scheduler.fly.dev | Fly.io `21lab-scheduler` (nrt) | `blog-scheduler-server` |
+| 이미지 생성 | https://image-generator-weld-two.vercel.app | Vercel | 별도 |
+| 시트 API | https://21lab-sheet-app.vercel.app | Vercel | 별도 |
 
-프론트는 `VITE_API_URL` 로 다붓 백엔드를, `VITE_SCHEDULE_API_URL` 로 이 서버를 가리킨다.
+큐 저장소로 Fly Redis 앱 `21lab-scheduler-redis` 가 하나 더 있고 외부에 열려 있지 않다.
 
-이 서버 배포:
+프론트는 `VITE_API_URL`(다붓 백엔드), `VITE_SCHEDULE_API_URL`(이 서버), `VITE_IMAGE_API_URL`, `VITE_SHEET_API_URL` 로 각각을 가리킨다.
+이 서버는 `MANUSCRIPT_API_URL`, `IMAGE_API_URL`, `DABUT_API_URL` 로 원고/이미지/다붓 백엔드를 호출한다. 셋 다 Fly 시크릿이라 `.env.example` 의 로컬 주소와 다르다.
+
+#### 이 서버 배포
 
 ```bash
 fly deploy
 ```
 
-- 헬스체크는 `GET /health`. Fly 가 30초 간격으로 찌른다. 큐 대시보드는 `/admin/queues` 이고 잡 페이로드에 네이버 비밀번호가 평문으로 들어가므로 접근 가드가 걸려 있다.
-- 예약 시각에 워커가 살아 있어야 하므로 `min_machines_running = 1`, `auto_stop_machines = false` 로 고정돼 있다. 크로미움이 뜨는 서버라 메모리는 2GB 아래로 내리면 발행 중에 OOM 이 난다.
-- 큐 저장소는 같은 조직의 Fly Redis 앱 `21lab-scheduler-redis` 이고 외부에 열려 있지 않다. `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` 시크릿으로 붙는다.
+- 헬스체크는 `GET /health`. Fly 가 30초 간격으로 찌른다.
+- 큐 대시보드는 `/admin/queues`. 잡 페이로드에 네이버 비밀번호가 평문으로 들어가므로 `ADMIN_QUEUES_PASSWORD` 가드가 걸려 있고 `X-Robots-Tag: noindex` 를 내려보낸다.
+- 예약 시각에 워커가 살아 있어야 하므로 `min_machines_running = 1`, `auto_stop_machines = false` 로 고정돼 있다. 크로미움이 뜨는 서버라 메모리를 2GB 아래로 내리면 발행 중에 OOM 이 난다. (다붓 백엔드는 반대로 트래픽 없으면 자동 정지다)
 - 재시작하면 `initializeExistingQueues()` 가 남아 있는 예약을 복원한다. `SCHEDULER_DISABLE_QUEUE_RESTORE=true` 로 끌 수 있지만, 꺼둔 사이에 쌓인 예약은 워커가 붙지 않아 고아가 된다. 끌 일이 있으면 큐를 먼저 비운다.
 
 ## 트러블슈팅
