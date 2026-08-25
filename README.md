@@ -34,6 +34,29 @@ pnpm test                  # 유닛 테스트
 pnpm typecheck
 ```
 
+### 배포
+
+세 서비스로 나뉘어 있고, 프론트가 나머지 둘을 직접 호출한다.
+
+| 서비스 | 주소 | 호스팅 |
+| --- | --- | --- |
+| 다붓 UI (프론트) | https://21lab-ai-agent.vercel.app | Vercel `21lab-ai-agent`, main 푸시 시 자동 배포 |
+| 다붓 백엔드 (원고, 계정, 프로젝트) | https://blog-analyzer.fly.dev | Fly.io `blog-analyzer` (nrt), 내부 포트 8080 |
+| 스케줄러 API (이 저장소) | https://21lab-scheduler.fly.dev | Fly.io `21lab-scheduler` (nrt), 내부 포트 8001 |
+
+프론트는 `VITE_API_URL` 로 다붓 백엔드를, `VITE_SCHEDULE_API_URL` 로 이 서버를 가리킨다.
+
+이 서버 배포:
+
+```bash
+fly deploy
+```
+
+- 헬스체크는 `GET /health`. Fly 가 30초 간격으로 찌른다. 큐 대시보드는 `/admin/queues` 이고 잡 페이로드에 네이버 비밀번호가 평문으로 들어가므로 접근 가드가 걸려 있다.
+- 예약 시각에 워커가 살아 있어야 하므로 `min_machines_running = 1`, `auto_stop_machines = false` 로 고정돼 있다. 크로미움이 뜨는 서버라 메모리는 2GB 아래로 내리면 발행 중에 OOM 이 난다.
+- 큐 저장소는 같은 조직의 Fly Redis 앱 `21lab-scheduler-redis` 이고 외부에 열려 있지 않다. `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` 시크릿으로 붙는다.
+- 재시작하면 `initializeExistingQueues()` 가 남아 있는 예약을 복원한다. `SCHEDULER_DISABLE_QUEUE_RESTORE=true` 로 끌 수 있지만, 꺼둔 사이에 쌓인 예약은 워커가 붙지 않아 고아가 된다. 끌 일이 있으면 큐를 먼저 비운다.
+
 ## 트러블슈팅
 
 1. **같은 네이버 계정으로 여러 발행 작업이 겹치면 브라우저 세션/로그인 상태가 꼬임** — 계정 하나가 동시에 여러 큐 작업에서 쓰이면 세션 정리 타이밍이 겹쳐서 레이스 컨디션이 났다.
