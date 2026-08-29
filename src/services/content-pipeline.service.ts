@@ -26,24 +26,27 @@ export interface ContentBlockInfo {
 /*
   프론트가 그대로 읽어서 편집 화면을 그림. 라벨과 설명은 화면 노출 문구임.
 
-  excluded1~3 / allExcluded 는 원래 "제외 이미지" 라고 적혀 있었는데, 화면에서는
-  무엇을 제외한다는 건지 알 수가 없었다. 실제로는 S3 `라이브러리제외` 폴더에 올려둔
-  이미지를 지정한 자리에 넣는 것이고, 본문 이미지와 달리 밝기 변형 없이 원본 그대로
-  들어가며 네이버 이미지 라이브러리에도 남지 않는다(새 탭에 올렸다가 잘라내서
-  붙여넣는 방식이라서다 - lib/naver-editor/oneLineManuscript.ts).
+  라벨은 S3 폴더 이름을 그대로 쓴다. 운영자가 이미지를 올릴 때 보는 폴더가
+  `라이브러리제외`, `라이브러리제외_링크` 라서, 화면에서 다른 말로 부르면 어느 폴더
+  이야기인지 매번 되짚어야 한다. 원래는 "제외 이미지 1" 이라고만 적혀 있어서
+  무엇을 제외한다는 건지도, 어느 폴더인지도 알 수 없었다.
 
-  excludeLibraryLinks 는 이름이 아예 반대로 읽혔다. 링크를 빼는 게 아니라 이미지를
-  넣고 거기에 링크를 거는 블록이다(lib/naver-editor/excludeLibraryLink.ts).
+  이 이미지들은 본문 이미지와 달리 밝기 변형 없이 원본 그대로 들어가고, 네이버
+  이미지 라이브러리에도 남지 않는다. 새 탭에 올렸다가 잘라내서 붙여넣기 때문이다
+  (lib/naver-editor/oneLineManuscript.ts).
+
+  excludeLibraryLinks 는 이름이 반대로 읽혔다. 링크를 빼는 게 아니라 이미지를 넣고
+  거기에 링크를 거는 블록이다(lib/naver-editor/excludeLibraryLink.ts).
 */
 export const CONTENT_BLOCK_CATALOG: ContentBlockInfo[] = [
-  { type: 'excluded1', label: '따로 넣는 이미지 1', description: '라이브러리제외 폴더의 첫 번째 이미지를 이 자리에 넣습니다.' },
-  { type: 'excluded2', label: '따로 넣는 이미지 2', description: '라이브러리제외 폴더의 두 번째 이미지를 이 자리에 넣습니다.' },
-  { type: 'excluded3', label: '따로 넣는 이미지 3', description: '라이브러리제외 폴더의 세 번째 이미지를 이 자리에 넣습니다.' },
-  { type: 'allExcluded', label: '따로 넣는 이미지 전체', description: '라이브러리제외 폴더의 이미지를 한 번에 다 넣습니다.' },
+  { type: 'excluded1', label: '라이브러리제외 이미지 1', description: 'S3 라이브러리제외 폴더의 첫 번째 이미지를 이 자리에 넣습니다.' },
+  { type: 'excluded2', label: '라이브러리제외 이미지 2', description: 'S3 라이브러리제외 폴더의 두 번째 이미지를 이 자리에 넣습니다.' },
+  { type: 'excluded3', label: '라이브러리제외 이미지 3', description: 'S3 라이브러리제외 폴더의 세 번째 이미지를 이 자리에 넣습니다.' },
+  { type: 'allExcluded', label: '라이브러리제외 이미지 전체', description: 'S3 라이브러리제외 폴더의 이미지를 한 번에 다 넣습니다.' },
   { type: 'maps', label: '지도', description: '업체 위치 지도를 넣습니다.' },
   { type: 'phone', label: '전화번호', description: '업체 전화번호를 넣습니다.' },
   { type: 'content', label: '원고 본문', description: '생성된 원고 본문입니다. 반드시 한 번만 넣어야 합니다.' },
-  { type: 'excludeLibraryLinks', label: '링크 거는 이미지', description: '라이브러리제외_링크 폴더의 이미지를 넣고 각각에 링크를 겁니다.' },
+  { type: 'excludeLibraryLinks', label: '라이브러리제외 링크 이미지', description: 'S3 라이브러리제외_링크 폴더의 이미지를 넣고 각각에 링크를 겁니다.' },
   { type: 'spacing', label: '여백', description: '위아래 간격을 벌립니다.' },
   { type: 'bottomSpacing', label: '하단 여백', description: '본문 아래쪽 간격을 벌립니다.' },
   { type: 'link', label: '링크', description: 'UTM 링크나 지정한 외부 링크를 넣습니다.' },
