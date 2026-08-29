@@ -55,6 +55,12 @@ interface FixedPublishTime {
 
 export interface ScheduleTimingOptions {
   fixedPublishTime?: FixedPublishTime;
+  /** 하루 첫 글 시각(0-23). 없으면 오늘은 다음 정시, 다음 날부터는 6~10시 랜덤. */
+  startHour?: number;
+  /** 글 사이 간격(분). 없으면 오늘은 60분, 다음 날부터는 120~180분 랜덤. */
+  intervalMinutes?: number;
+  /** 하루 발행 수. 있으면 scheduleMode 로 계산한 값을 덮어씀. */
+  postsPerDay?: number;
 }
 
 export const parseKeywordWithCategory = (
@@ -91,6 +97,10 @@ export interface CreateScheduleInput {
   keywordCategory?: string;
   manuscripts?: Array<{ title: string; content: string }>;
   providedMultiImages?: MultiImageData[];
+  /** 직접 정한 발행 타이밍. 안 주면 지금까지처럼 서버가 랜덤으로 잡는다. */
+  startHour?: number;
+  intervalMinutes?: number;
+  postsPerDay?: number;
 }
 
 const randomBetween = (min: number, max: number): number =>
@@ -109,15 +119,47 @@ const applyFixedPublishTime = (
   );
 
 export const buildScheduleTimingOptions = (
-  _input: { manuscriptType?: string },
-): ScheduleTimingOptions => ({});
+  input: {
+    manuscriptType?: string;
+    startHour?: number;
+    intervalMinutes?: number;
+    postsPerDay?: number;
+  },
+): ScheduleTimingOptions => ({
+  ...(input.startHour !== undefined && { startHour: input.startHour }),
+  ...(input.intervalMinutes !== undefined && { intervalMinutes: input.intervalMinutes }),
+  ...(input.postsPerDay !== undefined && { postsPerDay: input.postsPerDay }),
+});
 
-const buildScheduleTimingKey = (options: ScheduleTimingOptions): string => {
-  if (!options.fixedPublishTime) {
-    return '';
+/**
+ * 요청 지문에 넣을 타이밍 요약.
+ *
+ * 시각만 다른 두 요청이 같은 지문으로 묶이면 두 번째가 기존 스케쥴로 재사용되면서
+ * 조용히 무시되므로 직접 정한 값도 전부 넣는다. 아무것도 안 정하면 빈 문자열이라
+ * 이미 저장된 스케쥴의 지문과 그대로 맞는다.
+ */
+export const buildScheduleTimingKey = (options: ScheduleTimingOptions): string => {
+  const parts: string[] = [];
+
+  if (options.fixedPublishTime) {
+    parts.push(
+      `fixed_${String(options.fixedPublishTime.hours).padStart(2, '0')}${String(options.fixedPublishTime.minutes).padStart(2, '0')}`
+    );
   }
 
-  return `fixed_${String(options.fixedPublishTime.hours).padStart(2, '0')}${String(options.fixedPublishTime.minutes).padStart(2, '0')}`;
+  if (options.startHour !== undefined) {
+    parts.push(`start_${String(options.startHour).padStart(2, '0')}`);
+  }
+
+  if (options.intervalMinutes !== undefined) {
+    parts.push(`gap_${options.intervalMinutes}`);
+  }
+
+  if (options.postsPerDay !== undefined) {
+    parts.push(`ppd_${options.postsPerDay}`);
+  }
+
+  return parts.join('|');
 };
 
 const addMinutesWithCap = (base: Date, minutes: number): Date => {
@@ -161,7 +203,7 @@ export const calculateSchedule = (
     const targetDate = new Date(baseDate);
     targetDate.setDate(targetDate.getDate() + dayOffset);
 
-    const postsPerDay = getPostsPerDay(scheduleMode, dayOffset);
+    const postsPerDay = options.postsPerDay ?? getPostsPerDay(scheduleMode, dayOffset);
 
     const isToday = isSameDay(targetDate, now);
     let currentTime: Date;
@@ -170,19 +212,26 @@ export const calculateSchedule = (
     if (options.fixedPublishTime) {
       currentTime = applyFixedPublishTime(targetDate, options.fixedPublishTime);
       intervalMinutes = 0;
-    } else if (isToday) {
-      const nextHour = new Date(now);
-      nextHour.setMinutes(0, 0, 0);
-      nextHour.setHours(nextHour.getHours() + 1);
-      currentTime = nextHour;
-      intervalMinutes = 60;
     } else {
-      const startHour = randomBetween(6, 10);
-      currentTime = setSeconds(
-        setMinutes(setHours(targetDate, startHour), 0),
-        0
-      );
-      intervalMinutes = randomBetween(120, 180);
+      if (options.startHour !== undefined) {
+        currentTime = setSeconds(
+          setMinutes(setHours(targetDate, options.startHour), 0),
+          0
+        );
+      } else if (isToday) {
+        const nextHour = new Date(now);
+        nextHour.setMinutes(0, 0, 0);
+        nextHour.setHours(nextHour.getHours() + 1);
+        currentTime = nextHour;
+      } else {
+        currentTime = setSeconds(
+          setMinutes(setHours(targetDate, randomBetween(6, 10)), 0),
+          0
+        );
+      }
+
+      intervalMinutes =
+        options.intervalMinutes ?? (isToday ? 60 : randomBetween(120, 180));
     }
 
     let postsThisDay = 0;
@@ -302,6 +351,9 @@ export const toScheduleQueueJob = (
 export const createSchedule = async (input: CreateScheduleInput) => {
   const timingOptions = buildScheduleTimingOptions({
     manuscriptType: input.manuscriptType,
+    startHour: input.startHour,
+    intervalMinutes: input.intervalMinutes,
+    postsPerDay: input.postsPerDay,
   });
   const items = input.items ?? calculateSchedule(
     input.keywords,

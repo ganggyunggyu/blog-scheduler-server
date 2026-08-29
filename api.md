@@ -79,44 +79,76 @@
 {
   "queues": [
     {
-      "account": { "id": "user1@naver.com", "password": "..." },
-      "keywords": ["키워드1", "키워드2", "키워드3"],
-      "posts_per_day": 3,
-      "interval_hours": 2
+      "account": { "dabutAccountId": "66f0..." },
+      "keywords": ["키워드1", "키워드2", "키워드3"]
     },
     {
       "account": { "id": "user2@naver.com", "password": "..." },
       "keywords": ["키워드4", "키워드5"]
     }
   ],
-  "start_date": "2025-01-07",
-  "start_hour": 10,
-  "posts_per_day": 3,
-  "interval_hours": 2,
+  "schedule_date": "2025-01-07",
+  "schedule_mode": "2",
   "service": "default",
   "ref": "",
   "generate_images": true,
   "image_count": 5,
-  "delay_between_posts": 10,
-  "delay_between_queues": 60
+  "image_source": "ai",
+  "manuscript_type": "default",
+  "project_id": "66f1...",
+  "keyword_category": "restaurant",
+  "delay_between_posts": 10
 }
 ```
+
+**발행 시각 설정**
+
+기본값은 서버가 알아서 잡는다. 다음 날부터는 6~10시 사이에서 시작해 120~180분
+간격으로 흩뿌리고, 오늘 날짜면 다음 정시부터 60분 간격으로 붙인다.
+
+시각을 직접 정하려면 아래 세 값을 같이 보낸다. 안 보내면 위 기본 동작 그대로다.
+
+| 필드 | 범위 | 설명 |
+|---|---|---|
+| `start_hour` | 0-23 | 하루 첫 글 시각 |
+| `interval_minutes` | 10-720 | 글 사이 간격(분) |
+| `posts_per_day` | 1-10 | 하루 발행 수. `schedule_mode` 로 계산한 값을 덮어씀 |
+
+```json
+{
+  "queues": [{ "account": { "dabutAccountId": "66f0..." }, "keywords": ["키워드1", "키워드2"] }],
+  "schedule_date": "2025-01-07",
+  "schedule_mode": "2",
+  "posts_per_day": 4,
+  "start_hour": 9,
+  "interval_minutes": 90
+}
+```
+
+마지막 글이 23:55을 넘으면 남은 키워드는 다음 날로 넘어간다.
 
 **Response**
 
 ```json
 {
   "success": true,
-  "total_queues": 2,
-  "summary": {
-    "total_keywords": 5,
-    "total_published": 5,
-    "total_failed": 0,
-    "elapsed": 350.2
-  },
-  "queue_results": [...]
+  "totalJobs": 5,
+  "schedules": [
+    {
+      "scheduleId": "66f2...",
+      "account": "use***@naver.com",
+      "reused": false,
+      "totalJobs": 3,
+      "jobs": [
+        { "id": "66f3...", "keyword": "키워드1", "scheduledAt": "2025-01-07T09:00:00+09:00", "slot": 1 }
+      ]
+    }
+  ]
 }
 ```
+
+요청이 이전과 완전히 같으면 새로 만들지 않고 기존 스케쥴을 그대로 돌려주며
+`reused: true` 가 붙는다. 시각 설정만 바꿔도 다른 요청으로 친다.
 
 ---
 

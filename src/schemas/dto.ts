@@ -26,6 +26,10 @@ export const createScheduleSchema = z.object({
   manuscriptType: z.enum(['default', 'update-restaurant', 'restaurant', 'restaurant/v1', 'restaurant/v2', 'pet', 'grok', 'keigo', 'hanryeodamwon', 'nyangnyang', 'kimdongpal', 'alibaba']).default('default'),
   delayBetweenPostsSeconds: z.number().min(0).max(600).default(10),
   keywordCategory: z.string().optional(),
+  /** 직접 정한 발행 타이밍. 안 보내면 서버가 랜덤으로 잡는다. */
+  startHour: z.number().int().min(0).max(23).optional(),
+  intervalMinutes: z.number().int().min(10).max(720).optional(),
+  postsPerDay: z.number().int().min(1).max(10).optional(),
 });
 
 export type CreateScheduleDto = z.infer<typeof createScheduleSchema>;

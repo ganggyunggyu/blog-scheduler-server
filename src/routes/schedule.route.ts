@@ -86,6 +86,13 @@ const pythonCompatSchema = z.object({
   project_id: z.string().min(1).optional(),
   delay_between_posts: z.number().default(10),
   keyword_category: z.string().optional(),
+  /**
+   * 직접 정한 발행 타이밍. 안 보내면 지금까지처럼 서버가 랜덤으로 잡는다.
+   * posts_per_day 를 보내면 schedule_mode 로 계산한 하루 발행 수를 덮어쓴다.
+   */
+  start_hour: z.number().int().min(0).max(23).optional(),
+  interval_minutes: z.number().int().min(10).max(720).optional(),
+  posts_per_day: z.number().int().min(1).max(10).optional(),
 });
 
 const maskAccountId = (accountId: string): string => {
@@ -347,6 +354,9 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         delayBetweenPostsSeconds: body.delayBetweenPostsSeconds,
         keywordCategory: body.keywordCategory,
         keywords: queue.keywords,
+        startHour: body.startHour,
+        intervalMinutes: body.intervalMinutes,
+        postsPerDay: body.postsPerDay,
       });
 
       totalJobs += jobs.length;
@@ -510,6 +520,9 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
     const effectiveMode = resolveScheduleMode(body.schedule_mode, body.manuscript_type);
     const timingOptions = buildScheduleTimingOptions({
       manuscriptType: body.manuscript_type,
+      startHour: body.start_hour,
+      intervalMinutes: body.interval_minutes,
+      postsPerDay: body.posts_per_day,
     });
 
     // 로그인한 계정이 이 카테고리용 블록 순서를 직접 만들어 뒀으면 그걸 그대로 실어 보낸다.
@@ -593,6 +606,9 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
         keywords: queue.keywords,
         manuscripts: queue.manuscripts,
         providedMultiImages: queue.multi_images,
+        startHour: body.start_hour,
+        intervalMinutes: body.interval_minutes,
+        postsPerDay: body.posts_per_day,
       });
 
       if (body.manuscript_type === 'hanryeodamwon' && blogName && !reused) {
