@@ -125,7 +125,21 @@
 }
 ```
 
-마지막 글이 23:55을 넘으면 남은 키워드는 다음 날로 넘어간다.
+`schedule_date` 가 오늘이면 첫 글은 `start_hour` 가 아니라 `지금 + LEAD_TIME_MINUTES`(기본 60분)
+부터 시작한다. 과거 시각으로 예약이 걸리는 걸 막기 위한 것이고, 둘째 날부터는 `start_hour` 를 따른다.
+
+하루의 마지막 인정 시각은 23:55 이다. 23:55 '이상'에 떨어지는 글은 그 날 나가지 않고 다음 날로
+넘어간다(23:55 정각도 포함). 키워드가 사라지지는 않고 일정이 하루씩 늘어난다.
+
+범위를 벗어난 값은 400 으로 돌려준다.
+
+```json
+{
+  "success": false,
+  "message": "요청 값이 올바르지 않습니다.",
+  "fields": [{ "field": "start_hour", "message": "Number must be less than or equal to 23" }]
+}
+```
 
 **Response**
 

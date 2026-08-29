@@ -10,6 +10,7 @@ import { logger } from './lib/logging/logger.js';
 import { redactJobData } from './lib/queue/redact-job-data.js';
 import { checkAdminQueuesAccess } from './lib/queue/admin-queues-guard.js';
 import { env } from './config/env.js';
+import { registerValidationErrorHandler } from './lib/http/validation-error-handler.js';
 
 const log = logger.child({ scope: 'App' });
 
@@ -80,6 +81,8 @@ export const buildApp = async (): Promise<AppContext> => {
   } else {
     await initializeExistingQueues();
   }
+
+  registerValidationErrorHandler(app);
 
   await registerRoutes(app);
 
