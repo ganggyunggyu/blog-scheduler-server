@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { Queue } from 'bullmq';
 import { z } from 'zod';
 import { createScheduleSchema, executeScheduleSchema, scheduleQuerySchema } from '../schemas/dto.js';
@@ -23,8 +23,18 @@ import { getPostList, getPostsByRange } from '../services/naver-blog.service.js'
 import { getValidCookies } from '../services/naver-auth.service.js';
 import { ScheduleJobModel, ScheduleModel } from '../schemas/schedule.schema.js';
 import { findAccountById } from '../services/account-directory.service.js';
-import { listDabutBlogAccounts, resolveDabutBlogCredential } from '../services/dabut-app.service.js';
+import {
+  isDabutAuthEnabled,
+  listDabutBlogAccounts,
+  resolveDabutBlogCredential,
+} from '../services/dabut-app.service.js';
 import { getRequestOwnerId } from './auth.route.js';
+import {
+  isVisibleSchedule,
+  resolveOwnedAccountScope,
+  resolveQueryAccountIds,
+  toAccountIdMatchers,
+} from '../services/schedule-ownership.service.js';
 import { findContentPipeline } from '../services/content-pipeline.service.js';
 import { resolvePublishCategory } from '../services/publish-category.service.js';
 import {
@@ -307,6 +317,17 @@ const resolveExecutableJobStatus = async (
   return null;
 };
 
+/**
+ * 요청자가 다룰 수 있는 네이버 로그인 아이디 목록.
+ * null 이면 스코프를 걸지 않는다(dabut 인증이 꺼져 있어 테넌트 구분이 없는 경우).
+ */
+const resolveScheduleAccountScope = async (req: FastifyRequest): Promise<string[] | null> =>
+  resolveOwnedAccountScope({
+    authEnabled: isDabutAuthEnabled(),
+    ownerId: getRequestOwnerId(req),
+    listAccounts: listDabutBlogAccounts,
+  });
+
 export const scheduleRoutes = async (app: FastifyInstance) => {
   app.post('/bot/login-test', async (req) => {
     const body = z.object({
@@ -400,10 +421,20 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
   app.get('/schedules', async (req) => {
     const query = scheduleQuerySchema.parse(req.query);
-    const filter: Record<string, string> = {};
+    const ownedAccountIds = await resolveScheduleAccountScope(req);
+    const filter: Record<string, unknown> = {};
 
-    if (query.accountId) filter.accountId = query.accountId;
     if (query.status) filter.status = query.status;
+
+    if (ownedAccountIds) {
+      const targetAccountIds = resolveQueryAccountIds(ownedAccountIds, query.accountId);
+      if (!targetAccountIds.length) {
+        return { schedules: [] };
+      }
+      filter.accountId = { $in: toAccountIdMatchers(targetAccountIds) };
+    } else if (query.accountId) {
+      filter.accountId = query.accountId;
+    }
 
     const schedules = await ScheduleModel.find(filter).sort({ createdAt: -1 }).limit(50);
     return { schedules };
@@ -411,9 +442,11 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
   app.get('/schedules/:id', async (req, reply: FastifyReply) => {
     const { id } = req.params as { id: string };
+    const ownedAccountIds = await resolveScheduleAccountScope(req);
 
     const schedule = await ScheduleModel.findById(id);
-    if (!schedule) {
+    // 남의 스케쥴은 존재 여부까지 감춘다. 403 을 주면 id 가 살아 있다는 사실이 새어나간다.
+    if (!schedule || !isVisibleSchedule(ownedAccountIds, schedule.accountId)) {
       return reply.status(404).send({ message: 'Schedule not found' });
     }
 
@@ -423,9 +456,10 @@ export const scheduleRoutes = async (app: FastifyInstance) => {
 
   app.delete('/schedules/:id', async (req, reply: FastifyReply) => {
     const { id } = req.params as { id: string };
+    const ownedAccountIds = await resolveScheduleAccountScope(req);
 
     const schedule = await ScheduleModel.findById(id);
-    if (!schedule) {
+    if (!schedule || !isVisibleSchedule(ownedAccountIds, schedule.accountId)) {
       return reply.status(404).send({ message: 'Schedule not found' });
     }
 
