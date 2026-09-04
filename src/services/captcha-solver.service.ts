@@ -21,6 +21,12 @@ const CAPTCHA_KEY_OWNER_ID = '6a6abf0bf86b1cbdd1afe1dd';
  * 모델이 은퇴/장애로 죽으면 배포 없이 갈아끼울 수 있게 환경변수로도 받는다
  * (gemini-2.5-flash 가 신규 프로젝트에서 통째로 막혔던 전례가 있어서 그대로 유지함).
  */
+import {
+  buildCaptchaPrompt,
+  normalizeCaptchaAnswer,
+  type CaptchaKind,
+} from './captcha-prompt.service.js';
+
 const DEFAULT_CAPTCHA_MODEL = 'gpt-5.6-luna';
 
 export const resolveCaptchaModel = (source: { CAPTCHA_MODEL?: string }): string =>
@@ -65,7 +71,11 @@ const extractResponsesText = (data: OpenAIResponsesResult): string => {
   return texts.join('').trim();
 };
 
-const solveCaptchaWithAI = async (imageBase64: string, question: string): Promise<string> => {
+export const solveCaptchaImage = async (
+  imageBase64: string,
+  question: string,
+  kind: CaptchaKind = 'login',
+): Promise<string> => {
   const apiKey = await resolveOwnerApiKey(CAPTCHA_KEY_OWNER_ID, 'openai');
   if (!apiKey) {
     throw new Error('캡차 풀이용 OpenAI 키를 다붓 계정에서 찾지 못했습니다.');
@@ -81,9 +91,7 @@ const solveCaptchaWithAI = async (imageBase64: string, question: string): Promis
           content: [
             {
               type: 'input_text',
-              text: `이 이미지는 네이버 로그인 캡차로 나오는 가상 영수증 이미지야.
-질문: "${question}"
-답만 정확히 적어. 숫자면 숫자만, 물건 이름이면 이름만. 다른 말 하지마.`,
+              text: buildCaptchaPrompt(kind, question),
             },
             {
               type: 'input_image',
@@ -99,8 +107,8 @@ const solveCaptchaWithAI = async (imageBase64: string, question: string): Promis
     },
   );
 
-  const answer = extractResponsesText(data).trim();
-  log.info('ai.answer', { question, answer });
+  const answer = normalizeCaptchaAnswer(kind, extractResponsesText(data));
+  log.info('ai.answer', { kind, question, answer });
   return answer;
 };
 
@@ -146,7 +154,7 @@ export const attemptCaptchaSolve = async (page: Page, password?: string): Promis
 
       log.info('attempt.start', { attempt, max: MAX_ATTEMPTS, type: captcha.captchaType, question: captcha.question });
 
-      const answer = await solveCaptchaWithAI(captcha.base64!, captcha.question!);
+      const answer = await solveCaptchaImage(captcha.base64!, captcha.question!, 'login');
 
       if (!answer) {
         log.warn('answer.empty', { attempt });
