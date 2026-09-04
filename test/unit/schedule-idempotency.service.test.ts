@@ -373,3 +373,88 @@ test('buildAdhocGenerateIdentity: 수동 원고가 다르면 다른 id를 반환
   assert.notEqual(first.jobId, second.jobId);
   assert.notEqual(first.scheduleJobId, second.scheduleJobId);
 });
+
+test('buildScheduleRequestFingerprint: projectId 만 다르면 다른 fingerprint 임', () => {
+  const base = {
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['동탄맛집'],
+    imageSource: 'product',
+    manuscriptType: 'restaurant/v1',
+    keywordCategory: '맛집',
+  };
+
+  const first = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', projectId: '맛집3' }],
+  });
+  const second = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', projectId: '맛집4' }],
+  });
+
+  assert.notEqual(first, second);
+});
+
+test('buildScheduleRequestFingerprint: 업체명이 같아도 projectId 가 다르면 다른 fingerprint 임', () => {
+  const base = {
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['동탄맛집'],
+    imageSource: 'product',
+    manuscriptType: 'restaurant/v1',
+    keywordCategory: '맛집',
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소' }],
+  };
+
+  const first = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소', projectId: '맛집3' }],
+  });
+  const second = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소', projectId: '맛집4' }],
+  });
+
+  assert.notEqual(first, second);
+});
+
+test('buildScheduleRequestFingerprint: projectId 가 없으면 기존 fingerprint 와 같음', () => {
+  const base = {
+    accountId: 'fail5644',
+    service: 'default',
+    ref: '',
+    scheduleDate: '2026-04-09',
+    scheduleMode: '2',
+    generateImages: true,
+    imageCount: 5,
+    delayBetweenPostsSeconds: 10,
+    keywords: ['동탄맛집'],
+    imageSource: 'product',
+    manuscriptType: 'restaurant/v1',
+    keywordCategory: '맛집',
+  };
+
+  const legacy = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소' }],
+  });
+  const withUndefinedProject = buildScheduleRequestFingerprint({
+    ...base,
+    itemOverrides: [{ keyword: '동탄맛집', businessName: '멘부쿠제면소', projectId: undefined }],
+  });
+
+  assert.equal(legacy, withUndefinedProject);
+});

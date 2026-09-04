@@ -21,11 +21,16 @@ interface ScheduleRequestFingerprintInput {
     collage?: string[];
   }>;
   /**
-   * 항목별 override(업체명/원고 타입). 키워드가 같아도 업체가 다르면 다른 스케쥴이라
-   * fingerprint 에 반영해야 함. 값이 없을 때는 키 자체를 빼서 기존 스케쥴의
-   * fingerprint 와 호환을 유지함.
+   * 항목별 override(업체명/원고 타입/프로젝트). 키워드가 같아도 업체나 프로젝트가
+   * 다르면 다른 스케쥴이라 fingerprint 에 반영해야 함. 값이 없을 때는 키 자체를 빼서
+   * 기존 스케쥴의 fingerprint 와 호환을 유지함.
    */
-  itemOverrides?: Array<{ keyword: string; businessName?: string; manuscriptType?: string }>;
+  itemOverrides?: Array<{
+    keyword: string;
+    businessName?: string;
+    manuscriptType?: string;
+    projectId?: string;
+  }>;
 }
 
 interface AdhocGenerateIdentityInput {
@@ -71,14 +76,25 @@ const buildBullJobId = (...parts: string[]): string =>
 
 const normalizeItemOverrides = (
   itemOverrides: ScheduleRequestFingerprintInput['itemOverrides'] = [],
-): Array<{ keyword: string; businessName: string; manuscriptType: string }> =>
+): Array<{ keyword: string; businessName: string; manuscriptType: string; projectId?: string }> =>
   itemOverrides
-    .map((item) => ({
-      keyword: item.keyword.trim(),
-      businessName: item.businessName?.trim() ?? '',
-      manuscriptType: item.manuscriptType?.trim() ?? '',
-    }))
-    .filter((item) => item.businessName.length > 0 || item.manuscriptType.length > 0);
+    .map((item) => {
+      const projectId = item.projectId?.trim() ?? '';
+      return {
+        keyword: item.keyword.trim(),
+        businessName: item.businessName?.trim() ?? '',
+        manuscriptType: item.manuscriptType?.trim() ?? '',
+        // projectId 는 있을 때만 키를 만든다. 항상 넣으면 이미 걸려 있는 예약들의
+        // fingerprint 가 전부 바뀌어 같은 요청이 중복으로 다시 잡힌다.
+        ...(projectId.length > 0 && { projectId }),
+      };
+    })
+    .filter(
+      (item) =>
+        item.businessName.length > 0 ||
+        item.manuscriptType.length > 0 ||
+        (item.projectId?.length ?? 0) > 0,
+    );
 
 export const buildScheduleRequestFingerprint = (
   input: ScheduleRequestFingerprintInput,
